@@ -1,0 +1,51 @@
+<div class="alert-section relative rounded-xl px-8">
+  <div class="alert-head flex justify-center pt-6">
+    <div
+      class="h-16 w-16 rounded-full flex justify-center items-center {{
+        iconBgColor
+      }}"
+    >
+      <div
+        class="h-12 w-12 rounded-full flex justify-center items-center {{
+          iconInnerBgColor
+        }}"
+      >
+        <fa-icon
+          [icon]="alertContent.icon"
+          [ngClass]="alertData.alertType"
+          class="{{ alertContent.iconClass }}"
+          size="2xl"
+        ></fa-icon>
+      </div>
+    </div>
+  </div>
+  <div class="alert-body text-main-font-color mt-3 text-center">
+    <h2 class="mb-2 text-xl font-bold leading-6 tracking-[0.3px]">
+      {{ alertContent.title }}
+    </h2>
+    <h3 class="text-secondary-font-color m-auto max-w-[40ch] text-sm">
+      {{ alertContent.content }}
+    </h3>
+  </div>
+  <div class="alertButton-btn flex justify-center gap-2 pb-8 pt-8">
+    @if (alertContent.isCancel) {
+      <app-common-button
+        [text]="alertContent.cancelMsg"
+        (clickEmit)="cancel()"
+        [buttonClass]="
+          'justify-center rounded-md border border-common-border-primary text-common-secondary-font-color !h-10 !w-36 common-button !shadow-none'
+        "
+      ></app-common-button>
+    }
+    @if (alertContent.isOk) {
+      <app-common-button
+        [text]="alertContent.doneMsg"
+        (clickEmit)="done()"
+        [buttonClass]="
+          alertContent.btnClass +
+          ' justify-center border border-common-border-primary rounded-md text-white !h-10 !w-36 common-gradient-button'
+        "
+      ></app-common-button>
+    }
+  </div>
+</div>

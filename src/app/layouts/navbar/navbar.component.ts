@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, viewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,16 +22,33 @@ import { CommonButtonComponent } from 'app/shared/components/common-button/commo
     CommonButtonComponent
   ],
   templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
     protected readonly navLinks: INavItem[] = NAV_LINKS;
+    readonly toggleCheckbox = viewChild.required<ElementRef<HTMLInputElement>>('toggleCheckbox');
 
-  toggleSidenav() {
-    const sidenav = document.querySelector('mat-sidenav') as any;
-    if (sidenav) {
-      sidenav.toggle();
+
+   closeMobileMenu() {
+    const toggleCheckbox = this.toggleCheckbox();
+    if (toggleCheckbox?.nativeElement) {
+      toggleCheckbox.nativeElement.checked = false;
+    }
+  }
+
+   @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const header = document.querySelector('header');
+    
+    if (
+      this.toggleCheckbox()?.nativeElement?.checked &&
+      header &&
+      !header.contains(target)
+    ) {
+      this.closeMobileMenu();
     }
   }
 }

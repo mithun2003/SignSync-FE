@@ -1,18 +1,24 @@
-<div class="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full">
-        <!-- Back to Home Link -->
-        <div class="mb-5">
-            <a routerLink="/" class="inline-flex items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                <span class="body-3-medium">Back to Home</span>
-            </a>
-        </div>
+<div class="m-5">
+    <div class="mb-5">
+        <a routerLink="/"
+            class="inline-flex items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span class="body-3-medium">Back to Home</span>
+        </a>
+    </div>
+    <div
+        class="flex  justify-center">
+        <div class="max-w-md w-full">
+            <!-- Back to Home Link -->
 
-        <!-- Main Card Container -->
-        <div class="rounded-2xl shadow-xl border border-gray-100 p-8">
-            <router-outlet></router-outlet>
+            <!-- Main Card Container -->
+            <div class="rounded-2xl shadow-xl border border-gray-100 p-8">
+                <router-outlet></router-outlet>
+            </div>
         </div>
     </div>
 </div>

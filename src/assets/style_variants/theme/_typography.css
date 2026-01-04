@@ -1,31 +1,40 @@
+@theme {
+  /* Typography Scale */
+  --font-roboto: "Roboto", sans-serif;
+  --font-karla: "Karla", sans-serif;
+  --font-manrope: "Manrope", sans-serif;
+  /* --font-headline-1: 64px;
+--font-headline-2: 36px;
+--font-headline-3: 28px;
+--font-headline-4: 20px;
+--font-body-1: 18px;
+--font-body-2: 16px;
+--font-body-3: 14px;
+--font-body-4: 12px; */
+  /* ===== RESPONSIVE TYPOGRAPHY ===== */
+  --font-headline-1: clamp(2.25rem, 5vw, 4rem); /* 36px → 64px */
+  --font-headline-2: clamp(1.75rem, 3.5vw, 2.25rem); /* 28px → 36px */
+  --font-headline-3: clamp(1.375rem, 2.5vw, 1.75rem); /* 22px → 28px */
+  --font-headline-4: clamp(1.125rem, 2vw, 1.25rem); /* 18px → 20px */
 
-@theme{
-/* Typography Scale */
---font-roboto: 'Roboto', sans-serif;
---font-karla: 'Karla', sans-serif;
---font-manrope: 'Manrope', sans-serif;
---text-headline-1: 64px;
---text-headline-2: 36px;
---text-headline-3: 28px;
---text-headline-4: 20px;
---text-body-1: 18px;
---text-body-2: 16px;
---text-body-3: 14px;
---text-body-4: 12px;
+  --font-body-1: clamp(1rem, 1.2vw, 1.125rem); /* 16px → 18px */
+  --font-body-2: clamp(0.875rem, 1vw, 1rem); /* 14px → 16px */
+  --font-body-3: clamp(0.8125rem, 0.9vw, 0.875rem); /* 13px → 14px */
+  --font-body-4: 0.75rem;
 
-/* Optional: Font weights as vars */
---font-regular: 400;
---font-medium: 500;
---font-semibold: 600;
+  /* Optional: Font weights as vars */
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
 }
 
 @layer utilities {
   /* .body-1{
-   @apply text-body-1 fw-semibold lh-base; 
+   @apply font-body-1 fw-semibold lh-base; 
   } */
   /* Headline Styles */
-  .headline-1 {
-    font-size: var(--text-headline-1);
+  /* .headline-1 {
+    font-size: var(--font-headline-1);
     font-weight: var(--font-semibold);
     font-family: var(--font-manrope);
     line-height: 1.2;
@@ -33,35 +42,35 @@
   }
 
   .headline-2 {
-    font-size: var(--text-headline-2);
+    font-size: var(--font-headline-2);
     font-weight: var(--font-semibold);
     font-family: var(--font-manrope);
     line-height: 1.2;
   }
   .headline-3 {
-    font-size: var(--text-headline-3);
+    font-size: var(--font-headline-3);
     font-weight: var(--font-semibold);
     font-family: var(--font-manrope);
     line-height: 1.2;
-  }
+  } */
 
-  /* Body Text */
-  .body-1 {
-    font-size: var(--text-body-1);
+  /* Body font */
+  /* .body-1 {
+    font-size: var(--font-body-1);
     font-weight: var(--font-regular);
     font-family: var(--font-manrope);
     line-height: 1.6;
   }
 
   .body-1-semibold {
-    font-size: var(--text-body-1);
+    font-size: var(--font-body-1);
     font-weight: var(--font-semibold);
     font-family: var(--font-manrope);
     line-height: 1.6;
   }
 
   .body-2 {
-    font-size: var(--text-body-2);
+    font-size: var(--font-body-2);
     font-weight: var(--font-regular);
     font-family: var(--font-manrope);
     line-height: 1.6;
@@ -69,21 +78,21 @@
   }
   
   .body-2-medium {
-    font-size: var(--text-body-2);
+    font-size: var(--font-body-2);
     font-weight: var(--font-medium);
     font-family: var(--font-manrope);
     line-height: 1.6;
   }
   
   .body-2-semibold {
-    font-size: var(--text-body-2);
+    font-size: var(--font-body-2);
     font-weight: var(--font-semibold);
     font-family: var(--font-manrope);
     line-height: 1.6;
   }
   
   .body-3 {
-    font-size: var(--text-body-3);
+    font-size: var(--font-body-3);
     font-weight: var(--font-regular);
     font-family: var(--font-manrope);
     line-height: 1.6;
@@ -92,21 +101,21 @@
   }
 
   .body-3-medium {
-    font-size: var(--text-body-3);
+    font-size: var(--font-body-3);
     font-weight: var(--font-medium);
     font-family: var(--font-manrope);
     line-height: 1.6;
   }
 
   .body-3-semibold {
-    font-size: var(--text-body-3);
+    font-size: var(--font-body-3);
     font-weight: var(--font-semibold);
     font-family: var(--font-manrope);
     line-height: 1.6;
   }
   
   .body-4 {
-    font-size: var(--text-body-4);
+    font-size: var(--font-body-4);
     font-weight: var(--font-regular);
     font-family: var(--font-manrope);
     line-height: 1.6;
@@ -114,17 +123,62 @@
   }
 
   .body-4-medium {
-    font-size: var(--text-body-4);
+    font-size: var(--font-body-4);
     font-weight: var(--font-medium);
     font-family: var(--font-manrope);
     line-height: 1.6;
   }
 
   .body-4-semibold {
-    font-size: var(--text-body-4);
+    font-size: var(--font-body-4);
     font-weight: var(--font-semibold);
     font-family: var(--font-manrope);
     line-height: 1.6;
+  } */
+
+  @layer utilities {
+    /* ===== HEADLINES ===== */
+    .headline-1 {
+      font: var(--font-semibold) var(--font-headline-1) / 1.2
+        var(--font-manrope);
+      letter-spacing: 0.04em;
+    }
+
+    .headline-2 {
+      font: var(--font-semibold) var(--font-headline-2) / 1.2
+        var(--font-manrope);
+    }
+
+    .headline-3 {
+      font: var(--font-semibold) var(--font-headline-3) / 1.25
+        var(--font-manrope);
+    }
+
+    /* ===== BODY TEXT ===== */
+    .body-1 {
+      font: var(--font-regular) var(--font-body-1) / 1.6 var(--font-manrope);
+    }
+
+    .body-1-semibold {
+      font: var(--font-semibold) var(--font-body-1) / 1.6 var(--font-manrope);
+    }
+
+    .body-2 {
+      font: var(--font-regular) var(--font-body-2) / 1.6 var(--font-manrope);
+    }
+
+    .body-2-medium {
+      font: var(--font-medium) var(--font-body-2) / 1.6 var(--font-manrope);
+    }
+
+    .body-3 {
+      font: var(--font-regular) var(--font-body-3) / 1.6 var(--font-manrope);
+      letter-spacing: 0.03em;
+    }
+
+    .body-4 {
+      font: var(--font-regular) var(--font-body-4) / 1.6 var(--font-manrope);
+    }
   }
 
   /* Add more if needed */

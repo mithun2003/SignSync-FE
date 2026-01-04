@@ -1,16 +1,33 @@
-import { Component, signal, EventEmitter, Output, inject, ElementRef, Renderer2, PLATFORM_ID, Inject, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  signal,
+  EventEmitter,
+  Output,
+  inject,
+  ElementRef,
+  Renderer2,
+  PLATFORM_ID,
+  Inject,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { AuthService } from '@core/services/auth.service';
+import { Subscription } from 'rxjs';
+import { AlertService } from 'app/shared/alert/service/alert.service';
+import { faRightFromBracket } from '@fortawesome/pro-solid-svg-icons';
 
+import { CommonService } from '@core/services/common/common.service';
 @Component({
   selector: 'app-admin-header',
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './admin-header.component.html'
+  templateUrl: './admin-header.component.html',
 })
 export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
-  private authService = inject(AuthService);
+  private commonService = inject(CommonService);
+  private alertService = inject(AlertService);
+  subscriptions: Subscription[] = [];
   @Output() mobileMenuToggle = new EventEmitter<void>();
 
   // Signals for reactive state
@@ -22,27 +39,34 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
     private router: Router,
     private elRef: ElementRef,
     private renderer: Renderer2,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) { }
+    @Inject(PLATFORM_ID) private platformId: Object,
+  ) {}
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      this.documentClickListener = this.renderer.listen('document', 'click', (event: Event) => {
-        // The dropdown menu
-        const userMenuDropdown = this.elRef.nativeElement.querySelector('.user-menu-dropdown');
-        // The button that toggles the menu
-        const userMenuButton = this.elRef.nativeElement.querySelector('.user-menu-button');
-        // If menu is open, and click is outside both the button and the dropdown, close it
-        if (
-          this.showUserMenu() &&
-          userMenuDropdown &&
-          userMenuButton &&
-          !userMenuDropdown.contains(event.target) &&
-          !userMenuButton.contains(event.target)
-        ) {
-          this.showUserMenu.set(false);
-        }
-      });
+      this.documentClickListener = this.renderer.listen(
+        'document',
+        'click',
+        (event: Event) => {
+          // The dropdown menu
+          const userMenuDropdown = this.elRef.nativeElement.querySelector(
+            '.user-menu-dropdown',
+          );
+          // The button that toggles the menu
+          const userMenuButton =
+            this.elRef.nativeElement.querySelector('.user-menu-button');
+          // If menu is open, and click is outside both the button and the dropdown, close it
+          if (
+            this.showUserMenu() &&
+            userMenuDropdown &&
+            userMenuButton &&
+            !userMenuDropdown.contains(event.target) &&
+            !userMenuButton.contains(event.target)
+          ) {
+            this.showUserMenu.set(false);
+          }
+        },
+      );
     }
   }
 
@@ -81,8 +105,12 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
   // Get user initials for avatar
   getUserInitials(): string {
     // const name = 'Admin User'; // Replace with actual user name
-    const name = this.authService.user()?.user?.name || 'User';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    const name = this.commonService.user()?.name || 'User';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
   }
 
   // Toggle mobile menu
@@ -90,27 +118,41 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
     this.mobileMenuToggle.emit();
   }
 
-
   // Toggle user menu dropdown
   toggleUserMenu(): void {
-    this.showUserMenu.update(show => !show);
+    this.showUserMenu.update((show) => !show);
   }
 
   // Sign out functionality
   signOut(): void {
     // TODO: Implement sign out logic
     console.log('Sign out');
-    this.authService.signOut();
+    this.subscriptions.push(
+      this.alertService
+        .alertMessage('confirm', {
+          title: 'Confirm Logout',
+          content: 'Are you sure you want to logout?',
+          doneMsg: 'Logout',
+          cancelMsg: 'Cancel',
+          icon: faRightFromBracket,
+          iconBgColor: 'red',
+          iconClass: 'text-common-primary-red-color',
+        })
+        .afterClosed()
+        .subscribe((res) => {
+          if (res) this.commonService.signOut();
+        }),
+    );
   }
 
   // Mock user data (replace with actual user service)
   user(): any {
-    const user = this.authService.user()?.user;
+    const user = this.commonService.user();
     return {
       user: {
         name: user?.name || 'Admin User',
-        email: user?.email || 'admin@example.com'
-      }
+        email: user?.email || 'admin@example.com',
+      },
     };
   }
 }

@@ -1,13 +1,15 @@
-<aside class="flex flex-col h-full border-r border-sidebar-border bg-sidebar w-64">
+<aside class="flex flex-col border-r border-border-primary w-64 h-full">
   <!-- Sidebar Header -->
-  <div class="h-16 flex items-center justify-between px-6 border-b border-sidebar-border sticky top-0 bg-sidebar z-10">
+  <div class="h-16 flex items-center justify-between px-6 border-b border-border-primary sticky top-0 bg-sidebar z-10">
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-gradient-to-r from-violet-primary to-pink-600 rounded-lg flex items-center justify-center">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- <div class="w-8 h-8 bg-linear-to-r from-violet-primary to-pink-600 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
         </svg>
-      </div>
-      <span class="text-lg font-bold tracking-tight text-sidebar-primary">ngXpress</span>
+      </div> -->
+      <img ngSrc="images/icon.png" width="40" height="10" alt="SignSync Logo"
+        class="logo" />
+      <span class="text-lg font-bold tracking-tight text-sidebar-primary">SignSync</span>
     </div>
     
     <!-- Mobile Close Button -->
@@ -22,7 +24,7 @@
   </div>
 
   <!-- Sidebar Content -->
-  <nav class="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
+  <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
     <!-- Main Navigation -->
     <div class="px-3 mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Main</div>
     

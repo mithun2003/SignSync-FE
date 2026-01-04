@@ -1,33 +1,34 @@
 import { Routes } from '@angular/router';
-import { adminGuard } from '@core/guards/admin.guard';
+import { roleGuard } from '@core/guards/role.guard';
 import { guestGuard } from '@core/guards/guest.guard';
 import { AdminLayoutComponent } from '@layouts/admin-layout/admin-layout.component';
 import { AuthLayoutComponent } from '@layouts/auth-layout/auth-layout.component';
-import { MainLayoutComponent } from '@layouts/main-layout/main-layout.component';
+import { UserLayoutComponent } from '@layouts/user-layout/user-layout.component';
 
 export const routes: Routes = [
-    {
-        path: '',
-        component: MainLayoutComponent,
-        children: [
-            { path: '', loadComponent: () => import('./home/home.component').then(m => m.HomeComponent) },
-            { path: 'gesture-detection', loadComponent: () => import('./gesture-detection/gesture-detection.component').then(m => m.GestureDetectionComponent) },
-        ]
-    },
-    {
-        path: 'auth',
-        component: AuthLayoutComponent,
-        canMatch: [guestGuard],
-        loadChildren: () => import('./auth/auth.routes').then(m => m.routes)
-    },
-    {
-        path: 'admin',
-        component: AdminLayoutComponent,
-        canMatch: [adminGuard],
-        loadChildren: () => import('./admin/admin.routes').then(m => m.routes)
-    },
-    {
-        path: '**',
-        loadComponent: () => import('./not-found/not-found.component').then(m => m.NotFoundComponent)
-    }
+  {
+    path: '',
+    component: UserLayoutComponent,
+    // canActivate: [roleGuard], // ✅ changed
+    loadChildren: () => import('./user/user.routes').then((m) => m.routes),
+  },
+  {
+    path: 'auth',
+    component: AuthLayoutComponent,
+    canActivate: [guestGuard],
+    loadChildren: () => import('./auth/auth.routes').then((m) => m.routes),
+  },
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [roleGuard], // ✅ changed
+    loadChildren: () => import('./admin/admin.routes').then((m) => m.routes),
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./not-found/not-found.component').then(
+        (m) => m.NotFoundComponent,
+      ),
+  },
 ];

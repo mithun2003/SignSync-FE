@@ -33,7 +33,7 @@
   }
 
   .common-button {
-    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md border border-border-color bg-white px-12 py-3 text-center text-sm font-bold transition-all duration-200 disabled:opacity-70;
+    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md border border-border-primary bg-white px-12 py-3 text-center text-sm font-bold transition-all duration-200 disabled:opacity-70;
   }
   .common-button:hover:not(:disabled) {
     @apply shadow-common-button-shadow;

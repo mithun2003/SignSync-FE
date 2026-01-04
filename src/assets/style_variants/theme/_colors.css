@@ -34,14 +34,20 @@
   --color-violet-primary: #760ed1;
   --color-violet-secondary: #5a05a4;
 
-  --color-border-color: #eaf1e8;
+
+  --color-purple-primary: #a855f7;
+  --color-pink-primary: #ec4899;
+
+
+  /* --color-border-primary: #eaf1e8; */
+  --color-border-primary: #eaf1e836;
 }
 
 @layer utilities {
   .gradient-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-secondary;
+    @apply text-transparent bg-clip-text bg-linear-to-r from-purple-primary via-pink-primary to-red-secondary;
   }
   .gradient-bg {
-    @apply bg-gradient-to-r from-purple-400 via-pink-500 to-red-secondary;
+    @apply bg-linear-to-r from-purple-primary via-pink-primary to-red-secondary;
   }
 }

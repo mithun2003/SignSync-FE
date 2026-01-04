@@ -1,90 +1,91 @@
-<div class="flex justify-center py-4 fixed w-full z-1">
+
+
+<header class="flex justify-center py-4 fixed w-full z-1">
   <div
-    class="toolbar w-3/4 px-4 py-3 md:px-6 h-16 flex justify-between items-center bg-white/20 rounded-4xl shadow-nav-bar border-white backdrop-blur-md">
-    <!-- Logo -->
-    <a routerLink="/home" class="flex items-center">
-      <img ngSrc="images/icon.png" width="40" height="10" alt="SignSync Logo"
-        class="logo" />
-      <span class="ml-1 font-bold text-white text-lg">SignSync</span>
-    </a>
+    class="
+    block
+    w-3/4
+    bg-white/20 rounded-4xl shadow-nav-bar border-white backdrop-blur-md
+    px-4
+    py-4
+    lg:flex lg:items-center lg:justify-between
+  ">
+    <div class="flex justify-between lg:block">
+      <!-- Logo -->
+      <a routerLink="/home" class="flex items-center">
+        <img ngSrc="images/icon.png" width="40" height="10" alt="SignSync Logo"
+          class="logo" />
+        <span class="ml-1 font-bold text-white text-lg">SignSync</span>
+      </a>
 
-    <!-- Spacer -->
-    <!-- <div class="flex-grow"></div> -->
+      <button class="block bg-transparent lg:hidden">
+        <input #toggleCheckbox class="invisible appearance-none" type="checkbox"
+          id="toggle" />
 
-    <!-- Desktop Nav (hidden on mobile) -->
-    <div class="hidden lg:flex items-center space-x-1 justify-evenly w-3/4">
+        <label for="toggle">
+          <svg
+            id="menu-icon"
+            class="cursor-pointer inline-block text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            style="fill: rgba(255, 255, 255, 1);">
+            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"></path>
+          </svg>
+
+          <svg
+            id="close-icon"
+            class="hidden cursor-pointer text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            style="fill: rgba(255, 255, 255, 1);">
+            <path
+              d="m16.192 6.344-4.243 4.242-4.242-4.242-1.414 1.414L10.535 12l-4.242 4.242 1.414 1.414 4.242-4.242 4.243 4.242 1.414-1.414L13.364 12l4.242-4.242z"></path>
+          </svg>
+        </label>
+      </button>
+    </div>
+    <div
+      #linksDiv
+      id="navigation"
+      style="--menu-height: {{ linksDiv.children.length * 3.5 }}rem"
+      class="
+      flex
+      h-0
+      flex-col
+      items-center
+      gap-4
+      w-full
+      overflow-hidden
+      text-white
+      transition-all
+      duration-500
+      ease-in-out
+      lg:h-auto lg:flex-row lg:overflow-auto lg:justify-between lg:w-3/4
+    ">
+
       @for (link of navLinks; track link.routerLink) {
       <a
         [routerLink]="link.routerLink"
         [routerLinkActiveOptions]="{ exact: true }"
         routerLinkActive="[&_div]:w-full"
-        class="nav-link text-white group p-2 px-4">
+        class="nav-link text-white group p-2 px-4"
+        (click)="closeMobileMenu()">
         {{ link.title }}
         <div
           class="bg-white h-0.5 w-0 group-hover:w-full transition-all duration-500 ease-in-out"></div>
       </a>
       }
-    </div>
-
-    <!-- Desktop Login Button -->
-    <!-- <button
-    routerLink="/auth/signin"
-    mat-flat-button
-    class="login-btn ml-4 hidden md:block">
-    Login
-  </button> -->
-    <!-- <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded p-[0.1rem]">
-  <span class="flex w-full bg-gray-900 text-white rounded py-3 px-12">
-  Gradient 
-     </span>
-</button> -->
-
-    <app-common-button
-      text="Login"
-      buttonClass="common-login-button body-3-medium"
-      routerLink="/auth/signin"></app-common-button>
-
-    <!-- Mobile Menu Button -->
-    <button
-      mat-icon-button
-      (click)="toggleSidenav()"
-      class="!hidden"
-      aria-label="Toggle menu">
-      <mat-icon>menu</mat-icon>
-    </button>
-  </div>
-</div>
-
-<!-- Mobile Sidenav -->
-<mat-sidenav-container class="hidden lg:hidden">
-  <mat-sidenav #sidenav mode="over" position="end" class="w-64">
-    <div class="sidenav-content">
-      <div class="flex justify-end mb-4">
-        <button mat-icon-button (click)="sidenav.close()"
-          aria-label="Close menu">
-          <mat-icon>close</mat-icon>
-        </button>
+      <!-- <ng-content></ng-content> -->
+      <div>
+        <app-common-button
+          text="Login"
+          buttonClass="common-login-button body-3-medium"
+          routerLink="/auth/signin"></app-common-button>
       </div>
-      <mat-nav-list>
-        @for (link of navLinks; track link.routerLink) {
-        <a
-          [routerLink]="link.routerLink"
-          routerLinkActive="active"
-          (click)="sidenav.close()"
-          class="mobile-nav-link">
-          {{ link.title }}
-        </a>
-        }
-        <div class="mt-6 pt-4 border-t border-neutral-silver">
-          <button
-            routerLink="/auth/signin"
-            mat-flat-button
-            class="login-btn w-full"
-            (click)="sidenav.close()">
-            Login
-          </button>
-        </div>
-      </mat-nav-list>
     </div>
-  </mat-sidenav>
-</mat-sidenav-container>
+  </div>
+</header>

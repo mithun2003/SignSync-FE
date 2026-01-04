@@ -1,8 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { IAuthResponse, IUser } from '../../models/auth.model';
 import { Router } from '@angular/router';
-import { catchError, of, tap } from 'rxjs';
-import { ApiService } from '@core/services/api.service';
+import { ApiService } from '@core/services/api/api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,14 +14,7 @@ export class AuthService {
   // Reactive signal for user session
   user = signal<IAuthResponse | null>(null);
 
-  /**
-   * To check if the user is signed in.
-   * This will return the user details if the user is logged in.
-   * @returns 
-   */
-  isSignedIn() {
-    return this.user() !== null;
-  }
+ 
 
   /**
    * To sign in a user using email and password.
@@ -30,7 +22,7 @@ export class AuthService {
    * @returns 
    */
   signIn(body: IUser) {
-    return this.apiService.post('auth/sign-in/email', body);
+    return this.apiService.post('auth/login', body);
   }
 
   /**
@@ -42,22 +34,7 @@ export class AuthService {
     return this.apiService.post('auth/sign-up/email', body);
   }
 
-  /**
-   * To get the current session of the user.
-   * This will return the user details if the user is logged in.
-   * @returns 
-   */
-  getSession(): any {
-    return this.apiService.get<IAuthResponse>('auth/get-session').pipe(
-      tap((user) => {
-        this.user.set(user)
-      }),
-      catchError(() => {
-        this.user.set(null);
-        return of(null);
-      })
-    )
-  }
+
 
   /**
    * To sign out the user.

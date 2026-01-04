@@ -1,0 +1,7 @@
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: transparent !important; /* your light text color */
+  transition: background-color 9999s ease-in-out 0s !important; /* remove fade */
+}

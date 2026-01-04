@@ -1,20 +1,36 @@
 import { Routes } from '@angular/router';
+import { SigninComponent } from './components/signin/signin.component';
+import { SignupComponent } from './components/signup/signup.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 export const routes: Routes = [
-    {
-        path: 'signin',
-        loadComponent: () => import('./signin/signin.component').then(m => m.SigninComponent)
+  {
+    path: 'signin',
+    component: SigninComponent,
+    data: {
+      title: 'Sign In',
     },
-    {
-        path: 'signup',
-        loadComponent: () => import('./signup/signup.component').then(m => m.SignupComponent)
+  },
+  {
+    path: 'signup',
+    component: SignupComponent,
+    data: {
+      title: 'Sign Up',
     },
-    {
-        path: 'forgot-password',
-        loadComponent: () => import('./forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    data: {
+      title: 'Forgot Password',
     },
-    {
-        path: 'reset-password',
-        loadComponent: () => import('./reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
-    }
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+    data: {
+      title: 'Reset Password',
+    },
+  },
 ];

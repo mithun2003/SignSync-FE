@@ -57,6 +57,11 @@
             "styles": [
               "src/styles.css"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "././src/assets/style_variants"
+              ]
+            },
             "outputMode": "static"
           },
           "configurations": {
