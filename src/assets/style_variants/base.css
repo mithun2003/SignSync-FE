@@ -1,8 +1,111 @@
-/* src/styles/base.css */
-
-/* Import all theme partials */
-
 @import "./theme/_colors.css";
 @import "./theme/_typography.css";
 @import "./theme/_spacing.css";
 @import "./theme/_effects.css";
+
+@theme {
+  /* =========================================================
+     CORE
+  ========================================================= */
+  --color-transparent: transparent;
+  --color-white: var(--color-white);
+
+  /* =========================================================
+     BACKGROUNDS
+  ========================================================= */
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+
+  /* =========================================================
+     FONT COLORS
+  ========================================================= */
+  --color-font-primary: var(--color-font-primary);
+  --color-info: var(--color-info);
+
+  /* =========================================================
+     NEUTRAL PALETTE
+  ========================================================= */
+  --color-neutral-black: var(--color-neutral-black);
+  --color-neutral-d-grey: var(--color-neutral-d-grey);
+  --color-neutral-grey: var(--color-neutral-grey);
+  --color-neutral-l-grey: var(--color-neutral-l-grey);
+  --color-neutral-grey-blue: var(--color-neutral-grey-blue);
+  --color-neutral-silver: var(--color-neutral-silver);
+  --color-neutral-white: var(--color-neutral-white);
+
+  /* =========================================================
+     SUCCESS (ALL SHADES & TINTS)
+  ========================================================= */
+  --color-success-shade-3: var(--color-success-shade-3);
+  --color-success-shade-4: var(--color-success-shade-4);
+  --color-success-shade-5: var(--color-success-shade-5);
+  --color-success-tint-1: var(--color-success-tint-1);
+  --color-success-tint-2: var(--color-success-tint-2);
+  --color-success-tint-3: var(--color-success-tint-3);
+  --color-success-tint-4: var(--color-success-tint-4);
+  --color-success-tint-5: var(--color-success-tint-5);
+
+  /* Semantic alias */
+  --color-success: var(--color-success-tint-2);
+
+  /* =========================================================
+     RED / DANGER
+  ========================================================= */
+  --color-red-primary: var(--color-red-primary);
+  --color-red-secondary: var(--color-red-secondary);
+  --color-danger: var(--color-red-primary);
+
+  /* =========================================================
+     VIOLET / PURPLE / PINK
+  ========================================================= */
+  --color-violet-primary: var(--color-violet-primary);
+  --color-violet-secondary: var(--color-violet-secondary);
+  --color-purple-primary: var(--color-purple-primary);
+  --color-pink-primary: var(--color-pink-primary);
+
+  /* =========================================================
+     BORDERS
+  ========================================================= */
+  --color-border-primary: var(--color-border-primary);
+  --color-border-secondary: var(--color-border-secondary);
+
+  /* =========================================================
+     TYPOGRAPHY
+  ========================================================= */
+  --font-manrope: var(--font-manrope);
+  --font-roboto: var(--font-roboto);
+  --font-karla: var(--font-karla);
+
+  --text-headline-1: var(--font-headline-1);
+  --text-headline-2: var(--font-headline-2);
+  --text-headline-3: var(--font-headline-3);
+  --text-body-1: var(--font-body-1);
+  --text-body-2: var(--font-body-2);
+  --text-body-3: var(--font-body-3);
+  --text-body-4: var(--font-body-4);
+  --text-regular: var(--font-regular);
+  --text-medium: var(--font-medium);
+  --text-semibold: var(--font-semibold);
+
+  /* =========================================================
+     SHADOWS
+  ========================================================= */
+  --shadow-common-button-shadow: var(--shadow-common-button-shadow);
+  --shadow-common-box: var(--shadow-common-box);
+  --shadow-common-tab-bottom: var(--shadow-common-tab-bottom);
+  --shadow-nav-bar: var(--shadow-nav-bar);
+  --shadow-button: var(--shadow-button);
+
+  /* =========================================================
+     RADIUS
+  ========================================================= */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  /* =========================================================
+     GRID / BREAKPOINTS
+  ========================================================= */
+  --breakpoint-laptop: 1100px;
+  --grid-template-columns-16: repeat(16, minmax(0, 1fr));
+}

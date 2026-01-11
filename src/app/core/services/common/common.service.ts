@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { IApiRes, IUserData } from '@models/global.model';
-import { tap, catchError, of, Observable } from 'rxjs';
+import { tap, catchError, of } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { Router } from '@angular/router';
 import { LocalStorageService } from '../local-storage/local-storage.service';
@@ -13,8 +13,10 @@ export class CommonService {
   private apiService = inject(ApiService);
   private localStorageService = inject(LocalStorageService);
   private router = inject(Router);
+  private _loading = signal<boolean>(true); // 🔥 NEW
 
   user = this._user.asReadonly();
+  loading = this._loading.asReadonly();
 
   setUser(user: IUserData | null) {
     this._user.set(user);
@@ -33,33 +35,41 @@ export class CommonService {
    * This will return the user details if the user is logged in.
    * @returns
    */
-  getSession(): Observable<IApiRes<IUserData> | null> {
+  getSession() {
+    this._loading.set(true)
     const token = this.localStorageService.getItem('accessToken');
-    if(!token){
+    if (!token) {
       this._user.set(null);
-      return of(null);
+      this._loading.set(false)
+      return;
     }
-
-    return this.apiService.get<IApiRes<IUserData>>('user/me/').pipe(
+    this.apiService.get<IApiRes<IUserData>>('user/me/').pipe(
       tap((user) => {
+        console.log(user.data);
+        
         this.setUser(user.data);
+        this._loading.set(false)
       }),
       catchError(() => {
         this.setUser(null);
+        this._loading.set(false);
         return of(null);
       }),
-    );
+    ).subscribe();
   }
-  
+
   /**
    * To sign out the user.
-   * @returns 
-  */
- signOut() {
-   this.apiService.post('auth/logout', {}).subscribe(() => {
-     this.setUser(null);
-     this.localStorageService.clearLocalStorage();
-     this.router.navigate(['auth/signin']);
-    });
+   * @returns
+   */
+  signOut() {
+    this.apiService
+      .post('auth/logout', {})
+      .pipe(catchError(() => of(null)))
+      .subscribe(() => {
+        this.setUser(null);
+        this.localStorageService.clearLocalStorage();
+        this.router.navigate(['/auth/signin']);
+      });
   }
 }

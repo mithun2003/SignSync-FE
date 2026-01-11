@@ -1,4 +1,4 @@
-@theme {
+:root {
   --color-white: #f4f5f5;
 
   /* Neutral Colors */
@@ -22,25 +22,24 @@
   --color-success-shade-3: #237d31;
   --color-success-shade-4: #1b5e1f;
   --color-success-shade-5: #103e13;
-  --color-success-tint-1: #66bb69;
+  --color-success-tint-1: #3cce41;
   --color-success-tint-2: #81c784;
   --color-success-tint-3: #a5d6a7;
   --color-success-tint-4: #c8e6c9;
   --color-success-tint-5: #e8f5e9;
 
   /* Accents */
-  --color-red-primary: #f07458;
-  --color-red-secondary: #e53835;
+  --color-red-primary: #e53835;
+  --color-red-secondary: #f07458;
   --color-violet-primary: #760ed1;
   --color-violet-secondary: #5a05a4;
-
 
   --color-purple-primary: #a855f7;
   --color-pink-primary: #ec4899;
 
-
   /* --color-border-primary: #eaf1e8; */
   --color-border-primary: #eaf1e836;
+  --color-border-secondary: #727ffd;
 }
 
 @layer utilities {

@@ -19,6 +19,7 @@ import { AlertService } from 'app/shared/alert/service/alert.service';
 import { faRightFromBracket } from '@fortawesome/pro-solid-svg-icons';
 
 import { CommonService } from '@core/services/common/common.service';
+import { IUserData } from '@models/global.model';
 @Component({
   selector: 'app-admin-header',
   imports: [CommonModule, FormsModule, RouterLink],
@@ -39,7 +40,7 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
     private router: Router,
     private elRef: ElementRef,
     private renderer: Renderer2,
-    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(PLATFORM_ID) private platformId: object,
   ) {}
 
   ngAfterViewInit() {
@@ -71,6 +72,8 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+
     if (this.documentClickListener) {
       this.documentClickListener();
       this.documentClickListener = null;
@@ -146,13 +149,15 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
   }
 
   // Mock user data (replace with actual user service)
-  user(): any {
+  user(): IUserData {
     const user = this.commonService.user();
     return {
-      user: {
-        name: user?.name || 'Admin User',
-        email: user?.email || 'admin@example.com',
-      },
+      name: user?.name || 'Admin User',
+      email: user?.email || 'admin@example.com',
+      role: user?.role || 'admin',
+      username: user?.username || 'admin',
+      phone: user?.phone || 0,
+      profile_photo: user?.profile_photo || null,
     };
   }
 }

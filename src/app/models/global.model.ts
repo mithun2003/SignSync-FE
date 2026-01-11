@@ -4,6 +4,7 @@ export interface IUserData {
   phone: number;
   profile_photo: string | null;
   name?: string;
+  role?: string;
 }
 
 

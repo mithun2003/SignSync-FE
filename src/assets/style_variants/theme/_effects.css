@@ -1,6 +1,6 @@
 @import './_typography.css';
 
-@theme {
+:root {
   /* ===== BOX SHADOWS ===== */
   --shadow-common-button-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.06);
   --shadow-common-box: 0px 4px 16px 0px rgba(0, 0, 0, 0.04);
@@ -26,23 +26,27 @@
 @layer utilities {
  
   .common-login-button {
-    @apply flex h-9 items-center justify-center gap-2 overflow-hidden border border-gray-400 bg-violet-primary px-12 py-3 text-center transition-all duration-200 disabled:opacity-70 text-white shadow-button;
+    @apply py-1 border border-border-secondary bg-violet-primary text-center transition-all duration-200 disabled:opacity-70 text-white shadow-button;
   }
   .common-login-button:hover:not(:disabled) {
     @apply shadow-common-button-shadow;
   }
 
   .common-button {
-    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md border border-border-primary bg-white px-12 py-3 text-center text-sm font-bold transition-all duration-200 disabled:opacity-70;
+    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md border border-border-primary bg-white px-12 py-3 text-center text-sm text-black font-bold transition-all duration-200 disabled:opacity-70;
   }
   .common-button:hover:not(:disabled) {
     @apply shadow-common-button-shadow;
   }
 
   .common-gradient-button {
-    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md bg-gradient-to-r from-purple-400 via-pink-500 to-red-secondary p-3 text-center text-sm font-bold text-white transition-all duration-150 disabled:opacity-70;
+    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md bg-linear-to-r from-purple-primary via-pink-primary to-red-secondary p-3 text-center text-sm font-bold text-white transition-all duration-150 disabled:opacity-70;
   }
   .common-gradient-button:hover:not(:disabled) {
-    @apply hover:bg-gradient-to-br;
+    @apply hover:bg-linear-to-br;
+  }
+
+  .hover-effect {
+    @apply absolute w-0 h-0 transition-all duration-500 ease-out  rounded-full group-hover:w-56 group-hover:h-56;
   }
 }

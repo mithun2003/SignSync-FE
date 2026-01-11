@@ -1,18 +1,20 @@
 import { Routes } from '@angular/router';
+import { GestureDetectionComponent } from './components/gesture-detection/gesture-detection.component';
+import { HomeComponent } from './components/home/home.component';
 
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./components/home/home.component').then(
-        (m) => m.HomeComponent,
-      ),
+    component: HomeComponent,
+    data: {
+      title: 'Home',
+    },
   },
   {
     path: 'gesture-detection',
-    loadComponent: () =>
-      import(
-        './components/gesture-detection/gesture-detection.component'
-      ).then((m) => m.GestureDetectionComponent),
+    component: GestureDetectionComponent,
+    data: {
+      title: 'Detect Hand Gestures',
+    },
   },
 ];

@@ -37,13 +37,13 @@
     <!-- User Menu -->
     <div class="relative">
       <button (click)="toggleUserMenu()"
-        class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors user-menu-button" aria-label="User menu">
-        <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+        class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors user-menu-button bg-white" aria-label="User menu">
+        <div class="w-8 h-8 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
           <span class="text-sm font-medium text-white">{{ getUserInitials() }}</span>
         </div>
         <div class="hidden md:block text-left">
-          <p class="text-sm font-medium text-gray-900">{{ user()?.user?.name || 'Admin User' }}</p>
-          <p class="text-xs text-gray-500">{{ user()?.user?.email || 'admin@example.com' }}</p>
+          <p class="text-sm font-medium text-gray-900">{{ user().name || 'Admin User' }}</p>
+          <p class="text-xs text-gray-500">{{ user().email || 'admin@example.com' }}</p>
         </div>
         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -54,8 +54,8 @@
       @if (showUserMenu()) {
       <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 user-menu-dropdown">
         <div class="p-4 border-b border-gray-200">
-          <p class="text-sm font-medium text-gray-900">{{ user()?.user?.name || 'Admin User' }}</p>
-          <p class="text-sm text-gray-500">{{ user()?.user?.email || 'admin@example.com' }}</p>
+          <p class="text-sm font-medium text-gray-900">{{ user().name || 'Admin User' }}</p>
+          <p class="text-sm text-gray-500">{{ user().email || 'admin@example.com' }}</p>
         </div>
         <div class="py-2">
           <a href="#"

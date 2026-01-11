@@ -7,8 +7,8 @@ import { NavbarComponent } from '@layouts/navbar/navbar.component';
   selector: 'app-user-layout',
   imports: [RouterOutlet, NavbarComponent, FooterComponent],
   templateUrl: './user-layout.component.html',
-  standalone: true
+  standalone: true,
 })
-export class UserLayoutComponent {
+export class UserLayoutComponent  {
 
 }

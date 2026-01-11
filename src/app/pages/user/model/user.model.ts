@@ -1,4 +1,4 @@
 export interface IPredictResponse {
-  class_name: string;
+  label: string;
   confidence: number;
 }

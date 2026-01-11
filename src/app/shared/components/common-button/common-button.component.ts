@@ -3,7 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   output,
-  input
+  input,
 } from '@angular/core';
 import { MatBadgeModule, MatBadgeSize } from '@angular/material/badge';
 import { ThemePalette } from '@angular/material/core';
@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FontAwesomeModule, SizeProp } from '@fortawesome/angular-fontawesome';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { faArrowRight, IconDefinition } from '@fortawesome/pro-solid-svg-icons';
+import { COLOR_THEME_MAP } from './button-data';
 
 export type TCommonButtonAnimationValues = 'animation-arrow-icon' | false;
 
@@ -20,13 +21,20 @@ export type TCommonButtonAnimationValues = 'animation-arrow-icon' | false;
   styleUrls: ['./common-button.component.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatBadgeModule, MatTooltipModule, FontAwesomeModule]
+  imports: [CommonModule, MatBadgeModule, MatTooltipModule, FontAwesomeModule],
 })
 export class CommonButtonComponent {
   isSubmitButton = input<boolean>(false);
   buttonType = input<'filled' | 'outline'>('filled');
   buttonClass = input<string>('text-white'); // Input for custom button class
   text = input<string | number | undefined>(); //  Text to be displayed on the button
+  textClass = input<string>(''); // it represents the style for text
+
+  textColor = input<string>(''); // it represents the color for text
+  bgColor = input<string>('');
+  hoverColor = input<string>(''); // it represents the color for text
+  color = input<string>('violet'); // it represents the color for text
+
   prefix = input<boolean>(false); // Boolean value to determine whether to display icon on beginning of the button if false it show at end and if true it show at beginning
   isIcon = input<boolean | undefined>(false); // flag indicating whether the button to show icon or not
   icon = input<IconDefinition | undefined>(undefined); // it represents the icon
@@ -45,7 +53,7 @@ export class CommonButtonComponent {
   badgeColor = input<ThemePalette>('warn');
   badgeSize = input<MatBadgeSize>('small');
   badgeValue = input<string | number>(0);
-  outlineColor = input<string>('green');
+  outlineColor = input<string>('white');
   toolTipMsg = input<string | undefined>();
 
   clickEmit = output<Event>();
@@ -56,9 +64,50 @@ export class CommonButtonComponent {
     this.clickEmit.emit(event);
   }
 
+  /**
+   * ✅ Resolve TEXT color
+   * Priority:
+   * 1. textColor input
+   * 2. color theme
+   * 3. fallback
+   */
+  get resolvedTextClass(): string {
+    if (this.textColor()) return this.textColor();
+
+    const theme = COLOR_THEME_MAP[this.color()];
+    if (theme?.text) return theme.text;
+
+    return 'text-white';
+  }
+
+  /** ✅ Background (base) */
+  get resolvedBgClass(): string {
+    if (this.bgColor()) return this.bgColor();
+
+    const theme = COLOR_THEME_MAP[this.color()];
+    if (theme?.bg) return theme.bg;
+
+    return 'bg-violet-primary';
+  }
+  /**
+   * ✅ Resolve HOVER background
+   * Priority:
+   * 1. hoverColor input
+   * 2. color theme
+   * 3. fallback
+   */
+  get resolvedHoverClass(): string {
+    if (this.hoverColor()) return this.hoverColor();
+
+    const theme = COLOR_THEME_MAP[this.color()];
+    if (theme?.hoverBg) return theme.hoverBg;
+
+    return 'bg-violet-secondary';
+  }
+
   get outlineTheme(): string {
-    if (this.outlineColor() === 'green') {
-      return `${this.buttonClass()} text-common-green-color outline-common-green-color`;
+    if (this.outlineColor() === 'white') {
+      return `${this.buttonClass()} text-white outline-border-primary`;
     }
     if (this.outlineColor() === 'black') {
       return `${this.buttonClass()}`;
