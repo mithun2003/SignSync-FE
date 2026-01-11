@@ -1,5 +1,4 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 interface SettingsTab {
@@ -51,8 +50,10 @@ interface AppSettings {
 
 @Component({
   selector: 'app-settings',
-  imports: [CommonModule, FormsModule],
-  templateUrl: './settings.component.html'
+  templateUrl: './settings.component.html',
+  standalone: true,
+  imports: [FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent {
   // Settings tabs
@@ -125,7 +126,7 @@ export class SettingsComponent {
       console.log('Saving settings:', this.settings());
       
       this.showMessage('Settings saved successfully!', 'success');
-    } catch (error) {
+    } catch {
       this.showMessage('Failed to save settings. Please try again.', 'error');
     } finally {
       this.saving.set(false);

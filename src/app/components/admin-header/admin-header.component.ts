@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AlertService } from 'app/shared/alert/service/alert.service';
 import { faRightFromBracket } from '@fortawesome/pro-solid-svg-icons';
@@ -22,7 +22,7 @@ import { CommonService } from '@core/services/common/common.service';
 import { IUserData } from '@models/global.model';
 @Component({
   selector: 'app-admin-header',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './admin-header.component.html',
 })
 export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
