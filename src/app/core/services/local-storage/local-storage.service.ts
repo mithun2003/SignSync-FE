@@ -8,11 +8,11 @@ import { AES, enc } from 'crypto-js';
   providedIn: 'root'
 })
 export class LocalStorageService {
-  ignoreClear: Array<string> = ['tempRoot', 'user-theme'];
+  ignoreClear: string[] = ['tempRoot', 'user-theme'];
 
-  ignoreEncryption: Array<string> = [];
+  ignoreEncryption: string[] = [];
   environment = environment;
-  isBrowser: boolean = false;
+  isBrowser = false;
 
   constructor(@Inject(PLATFORM_ID) platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);

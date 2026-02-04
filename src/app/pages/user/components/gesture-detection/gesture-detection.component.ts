@@ -5,6 +5,7 @@ import {
   computed,
   effect,
   ElementRef,
+  HostListener,
   inject,
   OnDestroy,
   signal,
@@ -14,14 +15,17 @@ import {
 import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { HAND_CONNECTIONS } from '@mediapipe/hands';
 
-import { HandDetectService } from '@pages/user/service/hand-detect.service';
-import { UserService } from '@pages/user/service/user.service';
+import { HandDetectService } from '@pages/user/service/hand-detect-service/hand-detect.service';
+import { UserService } from '@pages/user/service/user-service/user.service';
 import { Subscription } from 'rxjs';
 import { CommonService } from '@core/services/common/common.service';
 import { RouterModule } from '@angular/router';
 import { CommonButtonComponent } from 'app/shared/components/common-button/common-button.component';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FaceDetectService } from '@pages/user/service/face-detect-service/face-detect.service';
+import { EMOTION_WORD_MAP } from '@pages/user/service/face-detect-service/emotion-word-map';
+import { speakText } from 'app/shared/utils/speech.util';
 
 @Component({
   selector: 'app-gesture-detection',
@@ -42,6 +46,7 @@ export class GestureDetectionComponent implements OnDestroy {
 
   public userService = inject(UserService);
   public handDetectService = inject(HandDetectService);
+  public faceDetectService = inject(FaceDetectService);
   public commonService = inject(CommonService);
 
   isRecording = signal(false);
@@ -57,6 +62,11 @@ export class GestureDetectionComponent implements OnDestroy {
   private wsSubscription?: Subscription;
   faSpinner = faSpinner;
 
+  currentMood = signal<string>('Neutral 😐');
+
+  suggestedWords = signal<string[]>([]);
+  private lastSpokenLabel: string | null = null;
+  isSpeechEnabled = signal(true);
   // 🔥 FLOW CONTROL FLAG
   // This prevents the "20 second lag". We only send when we are free.
   private isProcessingBackend = false;
@@ -69,11 +79,15 @@ export class GestureDetectionComponent implements OnDestroy {
     }
 
     // ✅ Runs exactly ONCE when user becomes available
-    if (!this.handDetectService.isReady()) {
-      this.feedbackText = 'Loading AI model...';
-      await this.handDetectService.preloadModel();
-      this.feedbackText = 'Click Start to begin';
-    }
+    // if (!this.handDetectService.isReady()) {
+    this.feedbackText = 'Loading AI model...';
+    // await this.handDetectService.preloadModel();
+    await Promise.all([
+      this.handDetectService.preloadModel(),
+      this.faceDetectService.preloadModel(),
+    ]);
+    this.feedbackText = 'Click Start to begin';
+    // }
   });
   // constructor() {
   getProcess = effect(() => {
@@ -83,7 +97,40 @@ export class GestureDetectionComponent implements OnDestroy {
     }
   });
   // }
+  normalizeEmotion(emotion: string): string {
+    return emotion.split(' ')[0]; // "Happy 😄" → "Happy"
+  }
 
+  getWords = effect(() => {
+    const letter = this.userService.predictionResult()?.label;
+    const emotionRaw = this.currentMood();
+    console.log('Detected Letter:', letter);
+    console.log('Detected Emotion:', emotionRaw);
+
+    if (!letter || !emotionRaw) {
+      this.suggestedWords.set([]);
+      return;
+    }
+
+    if (this.isSpeechEnabled()) {
+      if (this.lastSpokenLabel === letter) return;
+
+      this.lastSpokenLabel = letter;
+      speakText(letter);
+    }
+
+    const emotion = this.normalizeEmotion(emotionRaw);
+    console.log('Normalized Emotion:', emotion);
+
+    const words =
+      EMOTION_WORD_MAP[emotion]?.[letter] ??
+      EMOTION_WORD_MAP['Neutral']?.[letter] ??
+      [];
+
+    console.log('Suggested Words:', words);
+
+    this.suggestedWords.set(words);
+  });
   // async ngOnInit() {
   //   // ✅ Check login FIRST
 
@@ -153,12 +200,20 @@ export class GestureDetectionComponent implements OnDestroy {
     if (!this.isLoggedIn() || !this.isRecording()) return;
 
     const video = this.videoElement.nativeElement;
+    const now = performance.now();
 
     // 1. Get Landmarks & Crop
     // This is fast (runs locally in browser)
     const result = this.handDetectService.getHandCrop(video);
     const canvas = this.overlayCanvas.nativeElement;
     const ctx = canvas.getContext('2d')!;
+
+    // 2. FACE/EMOTION DETECTION (New Logic)
+    // We pass 'now' timestamp required by FaceLandmarker
+    const faceResult = this.faceDetectService.detectEmotion(video, now);
+    if (faceResult) {
+      this.currentMood.set(faceResult.emotion);
+    }
 
     if (
       canvas.width !== video.videoWidth ||
@@ -282,6 +337,13 @@ export class GestureDetectionComponent implements OnDestroy {
       ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], { type: 'image/png' });
+  }
+
+  @HostListener('document:visibilitychange')
+  handleVisibilityChange() {
+    if (document.hidden && this.isRecording()) {
+      this.stopRecording();
+    }
   }
 
   ngOnDestroy(): void {

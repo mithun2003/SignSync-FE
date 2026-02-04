@@ -1,124 +1,169 @@
 <div
-  class="flex flex-col md:flex-row justify-center items-center p-6 gap-8 bg-gray-900 text-gray-100 min-h-screen">
-  @if(commonService.loading()) {
-  <div
-    class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button">
-    <fa-icon
-      size="xl"
-      [icon]="faSpinner"
-      class=" text-base text-white animate-spin [animation-duration:1.8s]"></fa-icon>
-  </div>
-  }
-  @else if(isLoggedIn()) {
-  <!-- Webcam preview -->
-  <div class="w-full md:w-1/2 flex flex-col items-center">
-    <h2 class="text-lg font-semibold mb-2 text-gray-300">Live Camera Feed</h2>
-    <!-- <video #videoElement playsinline autoplay
-      class="rounded-2xl shadow-lg border-4 border-primary w-full max-w-md scale-x-[-1]"></video>
-      <canvas
-      #overlayCanvas
-      class="absolute top-0 left-0 w-full h-full pointer-events-none">
-    </canvas> -->
-    <div class="relative w-full max-w-md">
-      <video
-        #videoElement
-        autoplay
-        muted
-        playsinline
-        class="rounded-2xl shadow-lg border-4 border-primary w-full max-w-md scale-x-[-1]">
-      </video>
-
-      <canvas
-        #overlayCanvas
-        class="absolute top-0 left-0 w-full h-full pointer-events-none scale-x-[-1]">
-      </canvas>
+  class="flex flex-col md:flex-row justify-center items-center p-6 gap-8 bg-gray-900 text-gray-100 min-h-screen"
+>
+  @if (commonService.loading()) {
+    <div
+      class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button"
+    >
+      <fa-icon
+        size="xl"
+        [icon]="faSpinner"
+        class="text-base text-white animate-spin [animation-duration:1.8s]"
+      ></fa-icon>
     </div>
+  } @else if (isLoggedIn()) {
+    <!-- Webcam preview -->
+    <div class="w-full md:w-1/2 flex flex-col items-center">
+      <h2 class="text-lg font-semibold mb-2 text-gray-300">Live Camera Feed</h2>
 
-    <div class="mt-4 flex gap-4">
+      <div class="relative w-full max-w-md">
+        <video
+          #videoElement
+          autoplay
+          muted
+          playsinline
+          class="rounded-2xl shadow-lg border-4 border-primary w-full max-w-md scale-x-[-1]"
+        ></video>
 
-      <app-common-button
-        [text]="handDetectService.isReady() ? '▶ Start' : '⌛ Loading Model...'"
-        textClass="body-3-medium"
-        color="green"
-        [disabled]="isRecording() || !handDetectService.isReady()"
-        (click)="startRecording()">
-      </app-common-button>
-
-      <app-common-button
-        text="⏹ Stop"
-        textClass="body-3-medium"
-        color="red"
-        (click)="stopRecording()"
-        [disabled]="!isRecording()">
-      </app-common-button>
-    </div>
-
-  </div>
-
-  <!-- Prediction Result -->
-  <div
-    class=" w-full md:w-1/3 bg-gray-800 rounded-2xl p-6 shadow-lg flex flex-col items-center">
-    <h2 class="text-lg font-semibold text-gray-300 mb-4">Recognition Result</h2>
-
-    <div class="text-center">
-      <div class="text-7xl font-bold text-primary mb-2">
-        {{ userService.predictionResult()?.label || '-' }}
-      </div>
-      <div class="text-lg text-gray-400 mb-4">
-        Confidence:
-        <span class="font-semibold text-white">
-          {{ userService.predictionResult()?.confidence | number : '1.0-2' }}%
-        </span>
+        <canvas
+          #overlayCanvas
+          class="absolute top-0 left-0 w-full h-full pointer-events-none scale-x-[-1]"
+        >
+        </canvas>
       </div>
 
-      <!-- Confidence bar -->
-      <div class="w-64 h-4 bg-gray-700 rounded-full overflow-hidden mb-3">
-        <div
-          class="h-full bg-primary transition-all duration-500"
-          [style.width.%]="userService.predictionResult()?.confidence">
+      <div class="mt-4 flex gap-4">
+        <app-common-button
+          [text]="
+            handDetectService.isReady()
+              ? '▶ Start'
+              : '⌛
+        Loading Model...'
+          "
+          textClass="body-3-medium"
+          color="green"
+          [disabled]="isRecording() || !handDetectService.isReady()"
+          (click)="startRecording()"
+        >
+        </app-common-button>
+
+        <app-common-button
+          text="⏹ Stop"
+          textClass="body-3-medium"
+          color="red"
+          (click)="stopRecording()"
+          [disabled]="!isRecording()"
+        >
+        </app-common-button>
+      </div>
+      <label class="flex items-center gap-2 text-gray-300 mt-4">
+  <input
+    type="checkbox"
+    [checked]="isSpeechEnabled()"
+    (change)="isSpeechEnabled.set(!isSpeechEnabled())"
+  />
+  Enable Voice
+</label>
+    </div>
+
+    <!-- Prediction Result -->
+    <div
+      class="w-full md:w-1/3 bg-gray-800 rounded-2xl p-6 shadow-lg flex flex-col items-center"
+    >
+      <h2 class="text-lg font-semibold text-gray-300 mb-4">
+        Recognition Result
+      </h2>
+
+      <div class="text-center">
+        <div class="text-7xl font-bold text-primary mb-2">
+          {{ userService.predictionResult()?.label || "-" }}
         </div>
+        <div class="text-lg text-gray-400 mb-4">
+          Confidence:
+          <span class="font-semibold text-white">
+            {{ userService.predictionResult()?.confidence | number: "1.0-2" }}%
+          </span>
+        </div>
+        <div class="text-lg text-gray-400 mb-4">
+          Emotion:
+          <span class="font-semibold text-white">
+            <div class="text-6xl mb-3 animate-bounce-short">
+              {{ currentMood().split(" ")[1] }}
+            </div>
+
+            <div class="text-2xl font-bold text-white tracking-wide">
+              {{ currentMood().split(" ")[0] }}
+            </div>
+          </span>
+        </div>
+
+        @if (suggestedWords().length > 0) {
+  <div class="mb-4 text-center">
+    <h3 class="text-lg font-semibold text-gray-300">
+      Suggested Words
+    </h3>
+
+    <div class="flex flex-wrap justify-center gap-2 mt-2">
+      @for (word of suggestedWords(); track word) {
+        <span
+          class="px-3 py-1 bg-primary/20 border border-primary
+                 rounded-full text-white text-sm">
+          {{ word }}
+        </span>
+      }
+    </div>
+  </div>
+}
+
+        <!-- Confidence bar -->
+        <div class="w-64 h-4 bg-gray-700 rounded-full overflow-hidden mb-3">
+          <div
+            class="h-full bg-violet-primary transition-all duration-500"
+            [style.width.%]="userService.predictionResult()?.confidence"
+          ></div>
+        </div>
+
+        <p class="text-sm text-gray-400 italic">
+          {{ feedbackText }}
+        </p>
+      </div>
+    </div>
+  } @else {
+    <div
+      class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-center px-6"
+    >
+      <div class="text-6xl mb-4">🔒</div>
+
+      <h2 class="text-2xl font-bold text-white mb-2">
+        Live Gesture Detection Locked
+      </h2>
+
+      <p class="text-gray-400 max-w-md mb-6">
+        SignSync uses AI to recognize real-time hand gestures. Please login to
+        activate camera-based sign detection and track your learning progress.
+      </p>
+
+      <div class="flex gap-4">
+        <app-common-button
+          text="Login"
+          buttonClass="common-login-button"
+          textClass="body-3-medium"
+          routerLink="/auth/signin"
+        >
+        </app-common-button>
+
+        <app-common-button
+          text="Create Account"
+          buttonType="outline"
+          textClass="body-3-medium"
+          routerLink="/auth/signup"
+        >
+        </app-common-button>
       </div>
 
-      <p class="text-sm text-gray-400 italic">
-        {{ feedbackText }}
+      <p class="mt-6 text-sm text-gray-500 italic">
+        Your camera stays OFF until you log in 🔐
       </p>
     </div>
-  </div>
-  } @else{
-  <div
-    class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-center px-6">
-
-    <div class="text-6xl mb-4">🔒</div>
-
-    <h2 class="text-2xl font-bold text-white mb-2">
-      Live Gesture Detection Locked
-    </h2>
-
-    <p class="text-gray-400 max-w-md mb-6">
-      SignSync uses AI to recognize real-time hand gestures.
-      Please login to activate camera-based sign detection
-      and track your learning progress.
-    </p>
-
-    <div class="flex gap-4">
-      <app-common-button
-        text="Login"
-        buttonClass="common-login-button"
-        textClass="body-3-medium"
-        routerLink="/auth/signin">
-      </app-common-button>
-
-      <app-common-button
-        text="Create Account"
-        buttonType="outline"
-        textClass="body-3-medium"
-        routerLink="/auth/signup">
-      </app-common-button>
-    </div>
-
-    <p class="mt-6 text-sm text-gray-500 italic">
-      Your camera stays OFF until you log in 🔐
-    </p>
-  </div>
   }
 </div>

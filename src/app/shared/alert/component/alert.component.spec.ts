@@ -1,4 +1,4 @@
-/* tslint:disable:no-unused-variable */
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AlertComponent } from './alert.component';
 
