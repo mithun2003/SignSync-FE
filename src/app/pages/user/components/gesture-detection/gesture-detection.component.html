@@ -57,13 +57,13 @@
         </app-common-button>
       </div>
       <label class="flex items-center gap-2 text-gray-300 mt-4">
-  <input
-    type="checkbox"
-    [checked]="isSpeechEnabled()"
-    (change)="isSpeechEnabled.set(!isSpeechEnabled())"
-  />
-  Enable Voice
-</label>
+        <input
+          type="checkbox"
+          [checked]="isSpeechEnabled()"
+          (change)="isSpeechEnabled.set(!isSpeechEnabled())"
+        />
+        Enable Voice
+      </label>
     </div>
 
     <!-- Prediction Result -->
@@ -98,28 +98,26 @@
         </div>
 
         @if (suggestedWords().length > 0) {
-  <div class="mb-4 text-center">
-    <h3 class="text-lg font-semibold text-gray-300">
-      Suggested Words
-    </h3>
+          <div class="mb-4 text-center">
+            <h3 class="text-lg font-semibold text-gray-300">Suggested Words</h3>
 
-    <div class="flex flex-wrap justify-center gap-2 mt-2">
-      @for (word of suggestedWords(); track word) {
-        <span
-          class="px-3 py-1 bg-primary/20 border border-primary
-                 rounded-full text-white text-sm">
-          {{ word }}
-        </span>
-      }
-    </div>
-  </div>
-}
+            <div class="flex flex-wrap justify-center gap-2 mt-2">
+              @for (word of suggestedWords(); track word) {
+                <span
+                  class="px-3 py-1 bg-primary/20 border border-primary rounded-full text-white text-sm"
+                >
+                  {{ word }}
+                </span>
+              }
+            </div>
+          </div>
+        }
 
         <!-- Confidence bar -->
         <div class="w-64 h-4 bg-gray-700 rounded-full overflow-hidden mb-3">
           <div
             class="h-full bg-violet-primary transition-all duration-500"
-            [style.width.%]="userService.predictionResult()?.confidence"
+            [style.width.%]="userService.predictionResult()?.confidence || 0"
           ></div>
         </div>
 

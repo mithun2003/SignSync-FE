@@ -70,6 +70,11 @@ export class GestureDetectionComponent implements OnDestroy {
   // 🔥 FLOW CONTROL FLAG
   // This prevents the "20 second lag". We only send when we are free.
   private isProcessingBackend = false;
+
+  private lastLandmarks: NormalizedLandmark[] | null = null;
+  private missingFrames = 0;
+  private readonly MAX_MISSING_FRAMES = 5;
+
   getChanges = effect(async () => {
     const loggedIn = this.isLoggedIn();
 
@@ -112,7 +117,7 @@ export class GestureDetectionComponent implements OnDestroy {
       return;
     }
 
-    if (this.isSpeechEnabled()) {
+    if (this.isSpeechEnabled() && this.isRecording()) {
       if (this.lastSpokenLabel === letter) return;
 
       this.lastSpokenLabel = letter;
@@ -195,26 +200,15 @@ export class GestureDetectionComponent implements OnDestroy {
     }
   }
 
-  // ================= RENDER LOOP (The Core) =================
+  // ================= RENDER LOOP =================
   private renderLoop() {
     if (!this.isLoggedIn() || !this.isRecording()) return;
 
     const video = this.videoElement.nativeElement;
-    const now = performance.now();
-
-    // 1. Get Landmarks & Crop
-    // This is fast (runs locally in browser)
-    const result = this.handDetectService.getHandCrop(video);
     const canvas = this.overlayCanvas.nativeElement;
     const ctx = canvas.getContext('2d')!;
 
-    // 2. FACE/EMOTION DETECTION (New Logic)
-    // We pass 'now' timestamp required by FaceLandmarker
-    const faceResult = this.faceDetectService.detectEmotion(video, now);
-    if (faceResult) {
-      this.currentMood.set(faceResult.emotion);
-    }
-
+    // Resize canvas if needed
     if (
       canvas.width !== video.videoWidth ||
       canvas.height !== video.videoHeight
@@ -223,29 +217,49 @@ export class GestureDetectionComponent implements OnDestroy {
       canvas.height = video.videoHeight;
     }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (result) {
-      console.log(result.landmarks);
+    // 1. Get Landmarks & Crop
+    const result = this.handDetectService.getHandCrop(video);
 
-      // 2. Draw Landmarks (Real-time Visual Feedback)
+    // 2. FACE/EMOTION DETECTION
+    const now = performance.now();
+    const faceResult = this.faceDetectService.detectEmotion(video, now);
+    if (faceResult) {
+      this.currentMood.set(faceResult.emotion);
+    }
+
+    // Clear previous frame
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // ================= SMOOTHING LOGIC =================
+    if (result && result.landmarks) {
+      // ✅ HIT: Hand found
+      this.missingFrames = 0;
+      this.lastLandmarks = result.landmarks;
+
       this.draw(ctx, result.landmarks);
 
-      // 3. SMART SENDING LOGIC
-      // Rule A: Must have hand crop
-      // Rule B: Backend must be free (This fixes the 30s lag)
+      // --- Backend Sending Logic ---
       if (result.crop && !this.isProcessingBackend) {
-        // 🔒 LOCK: Don't send more until this one finishes
         this.isProcessingBackend = true;
-
         const blob = this.base64ToBlob(result.crop);
         this.userService.sendImage(blob);
       }
+    } else if (
+      this.lastLandmarks &&
+      this.missingFrames < this.MAX_MISSING_FRAMES
+    ) {
+      // ⚠️ MISS: Hand lost briefly (Flicker prevention)
+      this.missingFrames++;
+
+      // Draw the LAST KNOWN position so it doesn't blink
+      this.draw(ctx, this.lastLandmarks);
     } else {
-      // No hand detected: Clear canvas
-      this.clearCanvas();
+      // ❌ LOST: Hand truly gone (after 2 frames/60ms)
+      this.lastLandmarks = null;
+      this.missingFrames = 0;
+      // Canvas is already cleared above, so hand disappears
     }
 
-    // 4. Schedule next frame (Using RequestAnimationFrame for smooth drawing)
     this.animationId = requestAnimationFrame(() => this.renderLoop());
   }
 
@@ -264,7 +278,11 @@ export class GestureDetectionComponent implements OnDestroy {
 
     this.clearCanvas();
     this.feedbackText = 'Stopped';
-    this.predictionLabel = null;
+    this.userService.predictionResult.set(null);
+    this.lastSpokenLabel = null;
+    this.suggestedWords.set([]);
+    this.lastLandmarks = null;
+    this.missingFrames = 0;
   }
 
   // ================= UTILS =================
