@@ -107,32 +107,42 @@ export class GestureDetectionComponent implements OnDestroy {
   }
 
   getWords = effect(() => {
-    const letter = this.userService.predictionResult()?.label;
+    const result = this.userService.predictionResult();
+    const letter = result?.label;
     const emotionRaw = this.currentMood();
-    console.log('Detected Letter:', letter);
-    console.log('Detected Emotion:', emotionRaw);
 
-    if (!letter || !emotionRaw) {
+    // Handle special backend states
+    if (!letter || letter === 'error' || letter === 'no_hand') {
       this.suggestedWords.set([]);
+      this.predictionLabel = null;
+      if (letter === 'no_hand') this.feedbackText = 'Show hand to camera';
       return;
     }
 
-    if (this.isSpeechEnabled() && this.isRecording()) {
-      if (this.lastSpokenLabel === letter) return;
-
-      this.lastSpokenLabel = letter;
-      speakText(letter);
+    if (letter === 'uncertain') {
+      this.feedbackText = 'Hold steady...';
+      return;
     }
 
-    const emotion = this.normalizeEmotion(emotionRaw);
-    console.log('Normalized Emotion:', emotion);
+    // Handle Speech for valid letters
+    if (this.isSpeechEnabled() && this.isRecording()) {
+      if (this.lastSpokenLabel !== letter) {
+        this.lastSpokenLabel = letter;
+        speakText(letter);
+      }
+    }
 
+    // UI Updates
+    this.predictionLabel = letter;
+    this.confidence = result?.confidence ?? 0;
+    this.feedbackText = `Detected: ${letter}`;
+
+    // Map Emotion + Letter to Suggested Words
+    const emotion = this.normalizeEmotion(emotionRaw);
     const words =
       EMOTION_WORD_MAP[emotion]?.[letter] ??
       EMOTION_WORD_MAP['Neutral']?.[letter] ??
       [];
-
-    console.log('Suggested Words:', words);
 
     this.suggestedWords.set(words);
   });
@@ -241,8 +251,18 @@ export class GestureDetectionComponent implements OnDestroy {
       // --- Backend Sending Logic ---
       if (result.crop && !this.isProcessingBackend) {
         this.isProcessingBackend = true;
-        const blob = this.base64ToBlob(result.crop);
-        this.userService.sendImage(blob);
+        // const blob = this.base64ToBlob(result.crop);
+        // this.userService.sendImage(blob);
+        const base64Data = result.crop.split(',')[1];
+        const binaryString = atob(base64Data);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        // Send the raw bytes, not a Blob or string, to match backend .receive_bytes()
+        this.userService.sendImage(bytes.buffer);
       }
     } else if (
       this.lastLandmarks &&
