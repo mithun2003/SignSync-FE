@@ -40,12 +40,12 @@ export class UserService {
     this.socket.onclose = () => console.log('[WS] Closed');
   }
 
-  sendImage(blob: Blob) {
+  sendImage(data: Blob | ArrayBuffer) {
     console.log('Send Image');
     console.log(this.socket?.readyState, WebSocket.OPEN);
     console.log(this.socket?.readyState !== WebSocket.OPEN);
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return;
-    this.socket.send(blob);
+    this.socket.send(data);
   }
 
   disconnect() {
