@@ -1,123 +1,288 @@
+<!-- text-to-sign.component.html -->
 <div
-    class="flex flex-col md:flex-row justify-center items-center p-6 gap-8 bg-gray-900 text-gray-100 min-h-screen">
-    @if(commonService.loading()) {
+  class="flex flex-col items-center justify-center p-6 bg-gray-900 text-gray-100 min-h-screen"
+>
+  @if (commonService.loading()) {
     <div
-        class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button">
-        <fa-icon
-            size="xl"
-            [icon]="faSpinner"
-            class=" text-base text-white animate-spin [animation-duration:1.8s]"></fa-icon>
+      class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button"
+    >
+      <fa-icon
+        size="xl"
+        [icon]="faSpinner"
+        class="text-base text-white animate-spin [animation-duration:1.8s]"
+      ></fa-icon>
     </div>
-    }
-    @else if(commonService.isSignedIn()) {
-    <!-- Webcam preview -->
-    <div class="w-full md:w-1/2 flex flex-col items-center">
-        <h2 class="text-lg font-semibold mb-2 text-gray-300">Live Camera
-            Feed</h2>
-        <!-- <video #videoElement playsinline autoplay
-      class="rounded-2xl shadow-lg border-4 border-primary w-full max-w-md scale-x-[-1]"></video>
-      <canvas
-      #overlayCanvas
-      class="absolute top-0 left-0 w-full h-full pointer-events-none">
-    </canvas> -->
-        <div class="relative w-full max-w-md">
-            <video
-                #videoElement
-                autoplay
-                muted
-                playsinline
-                class="rounded-2xl shadow-lg border-4 border-primary w-full max-w-md scale-x-[-1]">
-            </video>
-
-            <canvas
-                #overlayCanvas
-                class="absolute top-0 left-0 w-full h-full pointer-events-none scale-x-[-1]">
-            </canvas>
-        </div>
-
-        <div class="mt-4 flex gap-4">
-
-            <app-common-button
-                text="▶ Start"
-                textClass="body-3-medium"
-                color="green">
-            </app-common-button>
-
-            <app-common-button
-                text="⏹ Stop"
-                textClass="body-3-medium"
-                color="red">
-            </app-common-button>
-        </div>
-
-    </div>
-
-    <!-- Prediction Result -->
-    <div
-        class=" w-full md:w-1/3 bg-gray-800 rounded-2xl p-6 shadow-lg flex flex-col items-center">
-        <h2 class="text-lg font-semibold text-gray-300 mb-4">Recognition
-            Result</h2>
-
-        <div class="text-center">
-            <div class="text-7xl font-bold text-primary mb-2">
-                <!-- {{ userService.predictionResult()?.label || '-' }} -->
-            </div>
-            <div class="text-lg text-gray-400 mb-4">
-                Confidence:
-                <span class="font-semibold text-white">
-                    <!-- {{ userService.predictionResult()?.confidence | number : '1.0-2' }}% -->
-                </span>
-            </div>
-
-            <!-- Confidence bar -->
-            <!-- <div class="w-64 h-4 bg-gray-700 rounded-full overflow-hidden mb-3">
-        <div
-          class="h-full bg-primary transition-all duration-500"
-          [style.width.%]="userService.predictionResult()?.confidence"
-          >
-        </div>
-      </div> -->
-
-            <!-- <p class="text-sm text-gray-400 italic">
-        {{ feedbackText }}
-      </p> -->
-        </div>
-    </div>
-    } @else{
-    <div
-        class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-center px-6">
-
-        <div class="text-6xl mb-4">🔒</div>
-
-        <h2 class="text-2xl font-bold text-white mb-2">
-            Translation Locked
-        </h2>
-
-        <p class="text-gray-400 max-w-md mb-6">
-            SignSync uses AI to recognize real-time hand gestures.
-            Please login to activate camera-based sign detection
-            and track your learning progress.
+  } @else if (isLoggedIn()) {
+    <div class="w-full max-w-6xl">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-white mb-2">
+          Text to Sign Translation
+        </h1>
+        <p class="text-gray-400">
+          Type any text and watch it translate into ASL sign language
         </p>
+      </div>
 
-        <div class="flex gap-4">
-            <app-common-button
-                text="Login"
-                buttonClass="common-login-button"
+      <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Left Panel: Text Input -->
+        <div class="w-full lg:w-1/2 flex flex-col gap-4">
+          <!-- Text Input Card -->
+          <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
+            <h2 class="text-lg font-semibold text-gray-300 mb-4 flex items-center gap-2">
+              <span class="text-2xl">✍️</span>
+              Enter Text
+            </h2>
+
+            <textarea
+              #textInput
+              [(ngModel)]="inputText"
+              (input)="onTextChange()"
+              placeholder="Type your message here... (e.g., 'Hello World')"
+              class="w-full h-40 p-4 bg-gray-700 text-white rounded-xl border-2 border-gray-600 
+                     focus:border-primary focus:outline-none resize-none transition-colors
+                     placeholder:text-gray-500"
+              [disabled]="isPlaying()"
+            ></textarea>
+
+            <!-- Character counter -->
+            <div class="flex justify-between items-center mt-2 text-sm text-gray-400">
+              <span>{{ currentLetterIndex() + 1 }} / {{ letters().length }}</span>
+              <span>{{ inputText.length }} characters</span>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="flex gap-3 mt-4">
+              <app-common-button
+                [text]="isPlaying() ? '⏸ Pause' : '▶ Play'"
                 textClass="body-3-medium"
-                routerLink="/auth/signin">
-            </app-common-button>
+                [color]="isPlaying() ? 'yellow' : 'green'"
+                [disabled]="!inputText.trim() || letters().length === 0"
+                (click)="togglePlay()"
+              >
+              </app-common-button>
 
-            <app-common-button
-                text="Create Account"
+              <app-common-button
+                text="🔄 Reset"
+                textClass="body-3-medium"
+                color="gray"
+                [disabled]="!inputText.trim()"
+                (click)="reset()"
+              >
+              </app-common-button>
+
+              <app-common-button
+                text="🗑️ Clear"
+                textClass="body-3-medium"
                 buttonType="outline"
-                textClass="body-3-medium"
-                routerLink="/auth/signup">
-            </app-common-button>
+                [disabled]="!inputText.trim()"
+                (click)="clear()"
+              >
+              </app-common-button>
+            </div>
+
+            <!-- Speed Control -->
+            <div class="mt-4">
+              <label class="text-sm text-gray-300 mb-2 block">
+                Animation Speed: {{ animationSpeed() }}ms per sign
+              </label>
+              <input
+                type="range"
+                min="500"
+                max="3000"
+                step="100"
+                [(ngModel)]="animationSpeedValue"
+                (input)="onSpeedChange()"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer
+                       [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                       [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
+                       [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"
+                [disabled]="isPlaying()"
+              />
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>Fast</span>
+                <span>Normal</span>
+                <span>Slow</span>
+              </div>
+            </div>
+
+            <!-- Letter Navigation -->
+            @if (letters().length > 0) {
+              <div class="mt-4">
+                <h3 class="text-sm text-gray-300 mb-2">Letter Sequence:</h3>
+                <div class="flex flex-wrap gap-2">
+                  @for (letter of letters(); track $index) {
+                    <button
+                      (click)="jumpToLetter($index)"
+                      [disabled]="isPlaying()"
+                      class="px-3 py-2 rounded-lg font-semibold text-sm transition-all
+                             hover:scale-110 disabled:cursor-not-allowed"
+                      [ngClass]="{
+                        'bg-primary text-white scale-110 ring-2 ring-primary ring-offset-2 ring-offset-gray-800': 
+                          $index === currentLetterIndex(),
+                        'bg-gray-700 text-gray-300 hover:bg-gray-600': 
+                          $index !== currentLetterIndex()
+                      }"
+                    >
+                      {{ letter }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Instructions Card -->
+          <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
+            <h3 class="text-lg font-semibold text-gray-300 mb-3 flex items-center gap-2">
+              <span class="text-xl">ℹ️</span>
+              How to Use
+            </h3>
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-0.5">1.</span>
+                <span>Type your text in the input box above</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-0.5">2.</span>
+                <span>Click "Play" to see each letter animated as a sign</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-0.5">3.</span>
+                <span>Adjust speed with the slider for learning</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-0.5">4.</span>
+                <span>Click any letter below to jump to that sign</span>
+              </li>
+            </ul>
+
+            <div class="mt-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+              <p class="text-xs text-yellow-200">
+                <strong>Note:</strong> Only A-Z letters are translated. Spaces, numbers, and 
+                special characters are skipped automatically.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <p class="mt-6 text-sm text-gray-500 italic">
-            Your camera stays OFF until you log in 🔐
-        </p>
+        <!-- Right Panel: Sign Display -->
+        <div class="w-full lg:w-1/2">
+          <div class="bg-gray-800 rounded-2xl p-6 shadow-lg sticky top-6">
+            <h2 class="text-lg font-semibold text-gray-300 mb-4 flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <span class="text-2xl">🤟</span>
+                Current Sign
+              </span>
+              @if (isPlaying()) {
+                <span class="flex items-center gap-2 text-sm text-green-400">
+                  <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  Playing
+                </span>
+              }
+            </h2>
+
+            <!-- Sign Image Display -->
+            <div class="relative aspect-square bg-gray-900 rounded-2xl overflow-hidden border-4 border-gray-700 mb-4">
+              @if (currentSignImage()) {
+                <img
+                  [src]="currentSignImage()"
+                  [alt]="'ASL sign for ' + currentLetter()"
+                  class="w-full h-full object-fill transition-opacity duration-300"
+                  [class.opacity-0]="imageLoading()"
+                  (load)="onImageLoad()"
+                  (error)="onImageError()"
+                />
+                
+                @if (imageLoading()) {
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <fa-icon
+                      [icon]="faSpinner"
+                      class="text-4xl text-primary animate-spin"
+                    ></fa-icon>
+                  </div>
+                }
+              } @else {
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+                  <span class="text-6xl mb-4">👋</span>
+                  <p class="text-lg">Type text to see signs</p>
+                </div>
+              }
+            </div>
+
+            <!-- Current Letter Display -->
+            <div class="text-center mb-4">
+              <div class="text-8xl font-bold text-primary mb-2 tracking-wider">
+                {{ currentLetter() || '-' }}
+              </div>
+              <p class="text-gray-400 text-sm">
+                {{ currentLetter() ? 'Letter ' + (currentLetterIndex() + 1) + ' of ' + letters().length : 'Waiting for input...' }}
+              </p>
+            </div>
+
+            <!-- Progress Bar -->
+            @if (letters().length > 0) {
+              <div class="mb-4">
+                <div class="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-gradient-to-r from-primary to-violet-primary transition-all duration-500"
+                    [style.width.%]="progress()"
+                  ></div>
+                </div>
+                <p class="text-center text-xs text-gray-400 mt-2">
+                  {{ progress() | number: '1.0-0' }}% Complete
+                </p>
+              </div>
+            }
+
+            <!-- Full Sentence Display -->
+            @if (inputText.trim()) {
+              <div class="bg-gray-700 rounded-xl p-4">
+                <h3 class="text-sm text-gray-300 mb-2 font-semibold">Your Message:</h3>
+                <p class="text-white text-lg break-words">
+                  {{ inputText }}
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
     </div>
-    }
+  } @else {
+    <!-- Not Logged In State -->
+    <div class="flex flex-col items-center justify-center text-center px-6">
+      <div class="text-6xl mb-4">🔒</div>
+
+      <h2 class="text-2xl font-bold text-white mb-2">
+        Text to Sign Translation Locked
+      </h2>
+
+      <p class="text-gray-400 max-w-md mb-6">
+        Learn ASL by translating your text into sign language. Login to access
+        the interactive text-to-sign translator and practice fingerspelling.
+      </p>
+
+      <div class="flex gap-4">
+        <app-common-button
+          text="Login"
+          buttonClass="common-login-button"
+          textClass="body-3-medium"
+          routerLink="/auth/signin"
+        >
+        </app-common-button>
+
+        <app-common-button
+          text="Create Account"
+          buttonType="outline"
+          textClass="body-3-medium"
+          routerLink="/auth/signup"
+        >
+        </app-common-button>
+      </div>
+
+      <p class="mt-6 text-sm text-gray-500 italic">
+        Start learning ASL alphabet 🤟
+      </p>
+    </div>
+  }
 </div>
