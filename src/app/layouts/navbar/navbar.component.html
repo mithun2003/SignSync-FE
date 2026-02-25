@@ -1,61 +1,39 @@
-
-
-<header class="flex justify-center py-4 fixed w-full z-1">
+<header class="flex justify-center py-4 fixed w-full z-[100]">
   <div
     class="
     block
     w-3/4
-    bg-white/10 rounded-4xl shadow-nav-bar border-white backdrop-blur-md
+    bg-white/10 rounded-4xl shadow-nav-bar border border-white/20 backdrop-blur-md
     px-4
     py-2
     lg:flex lg:items-center lg:justify-between
   ">
-    <div class="flex justify-between lg:block">
-      <!-- Logo -->
+    <div class="flex justify-between items-center w-full lg:w-auto">
       <a routerLink="/home" class="flex items-center">
-        <img ngSrc="images/icon.png" width="40" height="10" alt="SignSync Logo"
-          class="logo" />
+        <img ngSrc="images/icon.png" width="40" height="40" alt="SignSync Logo" class="logo" />
         <span class="ml-1 font-bold text-white text-lg">SignSync</span>
       </a>
 
-      <button class="block bg-transparent lg:hidden">
-        <input #toggleCheckbox class="invisible appearance-none" type="checkbox"
-          id="toggle" />
-
-        <label for="toggle">
-          <svg
-            id="menu-icon"
-            class="cursor-pointer inline-block text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            style="fill: rgba(255, 255, 255, 1);">
+      <button (click)="toggleMenu()" class="block bg-transparent lg:hidden border-none cursor-pointer p-1">
+        @if (!isMenuOpen()) {
+          <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"></path>
           </svg>
-
-          <svg
-            id="close-icon"
-            class="hidden cursor-pointer text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            style="fill: rgba(255, 255, 255, 1);">
-            <path
-              d="m16.192 6.344-4.243 4.242-4.242-4.242-1.414 1.414L10.535 12l-4.242 4.242 1.414 1.414 4.242-4.242 4.243 4.242 1.414-1.414L13.364 12l4.242-4.242z"></path>
+        } @else {
+          <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="m16.192 6.344-4.243 4.242-4.242-4.242-1.414 1.414L10.535 12l-4.242 4.242 1.414 1.414 4.242-4.242 4.243 4.242 1.414-1.414L13.364 12l4.242-4.242z"></path>
           </svg>
-        </label>
+        }
       </button>
     </div>
 
     <div
       #linksDiv
       id="navigation"
-      style="--menu-height: {{ linksDiv.children.length * 3.5 }}rem"
+      [style.height]="isMenuOpen() ? (linksDiv.scrollHeight + 'px') : (isLargeScreen() ? 'auto' : '0')"
       class="
+      basis-full lg:basis-auto
       flex
-      h-0
       flex-col
       items-center
       gap-4
@@ -65,122 +43,68 @@
       transition-all
       duration-500
       ease-in-out
-      lg:h-auto lg:flex-row lg:overflow-auto lg:justify-between lg:w-3/4
-    ">
+      lg:h-auto lg:flex-row lg:overflow-visible lg:justify-between lg:w-3/4"
+      [class.mt-4]="isMenuOpen() && !isLargeScreen()"
+    >
 
       @for (link of navLinks; track link.routerLink) {
       <a
         [routerLink]="link.routerLink"
         [routerLinkActiveOptions]="{ exact: true }"
         routerLinkActive="[&_div]:w-full"
-        class="nav-link text-white group p-2 px-4"
+        class="nav-link text-white group p-2 px-4 lg:w-auto text-center"
         (click)="closeMobileMenu()">
         {{ link.title }}
-        <div
-          class="bg-white h-0.5 w-0 group-hover:w-full transition-all duration-500 ease-in-out"></div>
+        <div class="bg-white h-0.5 w-0 group-hover:w-full transition-all duration-500 ease-in-out"></div>
       </a>
       }
 
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 py-2 lg:py-0">
         @if(commonService.loading()) {
-        <div
-          class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button">
-          <fa-icon
-            size="xl"
-            [icon]="faSpinner"
-            class=" text-base text-white animate-spin [animation-duration:1.8s]"></fa-icon>
+        <div class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button">
+          <fa-icon size="xl" [icon]="faSpinner" class="text-base text-white animate-spin [animation-duration:1.8s]"></fa-icon>
         </div>
         }
         @else if (isLoggedIn()) {
-
-        <!-- User Menu -->
-        <div>
-          <button (click)="toggleUserMenu()"
+        <div class="relative">
+          <button (click)="toggleUserMenu($event)"
             class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button cursor-pointer"
             aria-label="User menu">
-            <!-- <div class="w-8 h-8 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-          <span class="text-sm font-medium text-white">{{ getUserInitials() }}</span>
-        </div> -->
             <span class="hover-effect bg-white/10"></span>
             <img
               [src]="user()?.profile_photo || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
               class="w-9 h-9 rounded-full border border-white/20"
               alt="User Avatar" />
-            <div class="hidden md:block text-left">
-              <p class="text-sm font-medium text-white">{{ user()?.username
-                || 'Admin User' }}</p>
-              <p class="text-xs text-white/60">{{ user()?.email ||
-                'admin@example.com' }}</p>
+            <div class="block md:block text-left">
+              <p class="text-sm font-medium text-white">{{ user()?.username || 'Admin User' }}</p>
+              <p class="text-xs text-white/60">{{ user()?.email || 'admin@example.com' }}</p>
             </div>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" d="M19 9l-7 7-7-7" />
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
-          <!-- User Dropdown -->
           @if (showUserMenu()) {
-          <div
-            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 user-menu-dropdown">
-            <div class="p-4 border-b border-gray-200">
-              <p class="text-sm font-medium text-gray-900">{{ user()?.username
-                || 'Admin User' }}</p>
-              <p class="text-sm text-gray-500">{{ user()?.email ||
-                'admin@example.com' }}</p>
+          <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-[110] user-menu-dropdown overflow-hidden">
+            <div class="p-4 border-b border-gray-200 bg-gray-50">
+              <p class="text-sm font-medium text-gray-900">{{ user()?.username }}</p>
+              <p class="text-xs text-gray-500">{{ user()?.email }}</p>
             </div>
-            <div class="py-2">
-              <a href="#"
-                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Profile
-              </a>
-              <a href="#"
-                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Settings
-              </a>
-              <a href="#"
-                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Help & Support
-              </a>
+            <div class="py-1">
+              <a routerLink="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Profile</a>
+              <a routerLink="/settings" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Settings</a>
+              <a routerLink="/help" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Help & Support</a>
             </div>
-            <div class="border-t border-gray-200 py-2">
-              <button (click)="logout()"
-                class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-100 transition-colors w-full text-left cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" />
-                </svg>
+            <div class="border-t border-gray-200 bg-red-50">
+              <button (click)="logout()" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-100 transition-colors w-full text-left cursor-pointer">
                 Sign out
               </button>
             </div>
           </div>
-          }
+        }
         </div>
+          
         } @else {
-        <!-- Not logged in -->
         <app-common-button
           text="Login"
           buttonClass="common-login-button body-3-medium"

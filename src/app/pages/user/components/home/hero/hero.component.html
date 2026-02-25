@@ -1,81 +1,126 @@
-
-<div class="grid md:grid-cols-[1.5fr_0.5fr] gap-10 items-center mt-16">
-    <div>
-        <h1 class="headline-1 md:headline-3 mb-4 gradient-text">
-            Increase your Cognitive Brain Power with SLR.
-        </h1>
-        <p class="text-font-primary leading-relaxed w-3/4 body-2">
-            It has been proven in studies that learning sign language
-            keeps you on your feet as you age and also increases your
-            thinking power.
-            Learning sign language will help you communicate with 72
-            million speakers worldwide.
-            So test out our tool, Learn and Practice Sign Language and
-            Have Fun.
-        </p>
-    </div>
-
-    <div class="flex justify-end">
-        <img src="images/sign_hand.png" alt="Sign Hand"
-            class="w-72" />
-    </div>
-</div>
-
-<!-- What is Sign Language Section -->
-<div class="mt-16 bg-linear-to-r from-[#0c2248] to-[#0e1f3a] p-8 rounded-2xl">
-    <div class="mb-10 grid gap-4 grid-cols-2">
-        <div class="inline-block">
-            <h2 class="mb-2 body-1-semibold inline-block relative">
-                <span
-                    class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5"></span>
-                What is Sign Language
-            </h2>
+<!-- hero.component.html -->
+<div class="relative overflow-hidden">
+  <!-- Hero Section -->
+  <div class="grid md:grid-cols-[1.2fr_0.8fr] gap-12 items-center py-20">
+    <div class="space-y-6 animate-[fadeIn_0.8s_ease-out]">
+      <div class="inline-block px-4 py-2 bg-primary/10 border border-primary/30 rounded-full">
+        <span class="text-primary text-sm font-medium">AI-Powered Sign Language Recognition</span>
+      </div>
+      
+      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+        Bridge the Gap with
+        <span class="block mt-2 bg-gradient-to-r from-primary via-violet-500 to-primary bg-clip-text text-transparent animate-gradient">
+          Sign Language AI
+        </span>
+      </h1>
+      
+      <p class="text-xl text-gray-300 leading-relaxed max-w-2xl">
+        Real-time sign language detection and translation powered by cutting-edge AI. 
+        Learn, practice, and communicate seamlessly with 72 million sign language users worldwide.
+      </p>
+      
+      <!-- CTA Buttons -->
+      <div class="flex flex-wrap gap-4 pt-4">
+        <app-common-button
+          text="🤟 Start Detecting"
+          routerLink="/detect"
+          color="primary"
+          class="transform hover:scale-105 transition-transform"
+        />
+        
+        <app-common-button
+          text="📝 Try Translation"
+          routerLink="/translate"
+          buttonType="outline"
+          class="transform hover:scale-105 transition-transform"
+        />
+      </div>
+      
+      <!-- Stats -->
+      <div class="flex flex-wrap gap-8 pt-8 border-t border-gray-700/50">
+        <div>
+          <div class="text-3xl font-bold text-primary">96.6%</div>
+          <div class="text-sm text-gray-400">Accuracy Rate</div>
         </div>
         <div>
-            <p class="text-font-primary leading-relaxed body-3">
-                Sign language is a visual means of communication that uses
-                hand gestures, facial expressions, and body language to
-                convey meaning.
-                It is primarily used by individuals who are deaf or hard of
-                hearing, but it can also be used by anyone looking to
-                communicate in a non-verbal way.
-            </p>
+          <div class="text-3xl font-bold text-primary">29</div>
+          <div class="text-sm text-gray-400">ASL Letters</div>
         </div>
+        <div>
+          <div class="text-3xl font-bold text-primary">Real-time</div>
+          <div class="text-sm text-gray-400">Detection</div>
+        </div>
+      </div>
     </div>
-    <div class="grid md:grid-cols-3 gap-8">
-        <div class="inline-block">
-            <h2 class="mb-2 body-1-semibold inline-block relative">
-                <span
-                    class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full"></span>
-                Learn
-            </h2>
-            <p class="text-font-primary leading-relaxed body-3">
-                Start learning interesting sign language basics,
-                including alphabets and common words from our guide
-                section.
-            </p>
-        </div>
-
-                <div class="inline-block">
-            <h2 class="mb-2 body-1-semibold inline-block relative">
-                <span
-                    class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5"></span>Practice</h2>
-            <p class="text-font-primary leading-relaxed body-3">
-                Go to the Detect Section and practice the sign until our
-                model detects and recognizes it completely.
-            </p>
-        </div>
-
-                <div class="inline-block">
-            <h2 class="mb-2 body-1-semibold inline-block relative">
-                <span
-                    class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5"></span>Test</h2>
-            <p class="text-font-primary leading-relaxed body-3">
-                Test yourself by signing without referring to the guide
-                and see if the model recognizes it correctly.
-            </p>
-        </div>
+    
+    <!-- Hero Image/Animation -->
+    <div class="relative">
+      <div class="relative z-10 animate-[float_3s_ease-in-out_infinite]">
+        <img 
+          src="images/sign_hand.png" 
+          alt="Sign Language Hand Gesture"
+          class="w-full max-w-md mx-auto drop-shadow-2xl"
+        />
+      </div>
+      
+      <!-- Decorative Elements -->
+      <div class="absolute -top-10 -right-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl animate-pulse [animation-delay:1s]"></div>
     </div>
+  </div>
+  
+  <!-- Floating Feature Cards -->
+  <div class="grid md:grid-cols-3 gap-6 -mt-8">
+    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 
+                hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105
+                animate-[fadeIn_0.8s_ease-out_0.2s_both]">
+      <div class="text-4xl mb-3">👁️</div>
+      <h3 class="text-lg font-semibold mb-2">Real-time Detection</h3>
+      <p class="text-sm text-gray-400">
+        Instant recognition of ASL gestures using advanced computer vision
+      </p>
+    </div>
+    
+    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 
+                hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105
+                animate-[fadeIn_0.8s_ease-out_0.4s_both]">
+      <div class="text-4xl mb-3">💬</div>
+      <h3 class="text-lg font-semibold mb-2">Two-Way Translation</h3>
+      <p class="text-sm text-gray-400">
+        Sign-to-text and text-to-sign conversion for seamless communication
+      </p>
+    </div>
+    
+    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 
+                hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105
+                animate-[fadeIn_0.8s_ease-out_0.6s_both]">
+      <div class="text-4xl mb-3">😊</div>
+      <h3 class="text-lg font-semibold mb-2">Emotion-Aware</h3>
+      <p class="text-sm text-gray-400">
+        Context-aware suggestions based on facial expressions and mood
+      </p>
+    </div>
+  </div>
 </div>
 
+<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient 3s linear infinite;
+}
+</style>

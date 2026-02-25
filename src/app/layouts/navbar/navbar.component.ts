@@ -2,11 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  ElementRef,
   HostListener,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { INavItem, NAV_LINKS } from './nav-links.data';
@@ -15,63 +13,66 @@ import { CommonButtonComponent } from 'app/shared/components/common-button/commo
 import { CommonService } from '@core/services/common/common.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
-import { AlertService } from 'app/shared/alert/service/alert.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterModule,
-    NgOptimizedImage,
-    CommonButtonComponent,
-    FontAwesomeModule,
-  ],
+  standalone: true,
+  imports: [RouterModule, NgOptimizedImage, CommonButtonComponent, FontAwesomeModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
+  // State
+  isMenuOpen = signal(false);
+  showUserMenu = signal(false);
+  windowWidth = signal(window.innerWidth);
+
+  // Data & Services
   protected readonly navLinks: INavItem[] = NAV_LINKS;
-  readonly toggleCheckbox = viewChild.required<ElementRef<HTMLInputElement>>('toggleCheckbox');
-  showUserMenu = signal<boolean>(false);
-
   commonService = inject(CommonService);
-  alertService = inject(AlertService);
-
   faSpinner = faSpinner;
 
-  // ✅ reactive
+  // Computed
   readonly user = this.commonService.user;
   readonly isLoggedIn = computed(() => this.commonService.isSignedIn());
+  readonly isLargeScreen = computed(() => this.windowWidth() >= 1024);
+
+  @HostListener('window:resize')
+  onResize() {
+    this.windowWidth.set(window.innerWidth);
+    if (this.isLargeScreen()) {
+      this.isMenuOpen.set(false);
+    }
+  }
+
+  toggleMenu() {
+    this.isMenuOpen.update(v => !v);
+  }
 
   closeMobileMenu() {
-    const toggleCheckbox = this.toggleCheckbox();
-    if (toggleCheckbox?.nativeElement) {
-      toggleCheckbox.nativeElement.checked = false;
-    }
+    this.isMenuOpen.set(false);
+  }
+
+  toggleUserMenu(event: Event) {
+    event.stopPropagation();
+    this.showUserMenu.update(v => !v);
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    const header = document.querySelector('header');
-
-    if (
-      this.toggleCheckbox()?.nativeElement?.checked &&
-      header &&
-      !header.contains(target)
-    ) {
+    // Close mobile menu if clicking outside the navbar
+    if (this.isMenuOpen() && !target.closest('header')) {
       this.closeMobileMenu();
+    }
+    // Close user dropdown if clicking outside
+    if (this.showUserMenu() && !target.closest('.relative')) {
+      this.showUserMenu.set(false);
     }
   }
 
-  // Toggle user menu dropdown
-  toggleUserMenu(): void {
-    this.showUserMenu.update((show: boolean) => !show);
-  }
-
   logout() {
-
     this.commonService.logout();
   }
 }

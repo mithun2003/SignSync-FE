@@ -1,128 +1,296 @@
- <!-- Revolutionizing Section -->
-<!-- <div class="mt-20 grid md:grid-cols-2 gap-12 items-center"> -->
-<div class="grid md:grid-cols-2 gap-8 mt-16">
-    <div class="content-center">
-        <h2 class="headline-2 mb-6 gradient-text">
-            Revolutionizing Sign Language Communication with
-            Cutting-Edge Technology
+<!-- features.component.html -->
+<div class="py-20">
+  
+  <!-- What is Sign Language Section -->
+  <div class="mb-20 bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm 
+              border border-gray-700 p-8 md:p-12 rounded-3xl">
+    <div class="grid md:grid-cols-[0.4fr_0.6fr] gap-8 mb-12">
+      <div>
+        <div class="inline-block mb-4">
+          <span class="text-sm font-semibold text-primary uppercase tracking-wider">About Sign Language</span>
+          <div class="h-1 w-20 bg-gradient-to-r from-primary to-violet-500 rounded-full mt-2"></div>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold">
+          What is Sign Language?
         </h2>
-        <span><p class="text-gray-400">Explore
-                the Features</p></span>
-    </div>
-    <div>
-        <div class="mb-8 grid gap-4 grid-cols-2">
-            <div class="inline-block">
-                <h2 class="mb-2 body-1-semibold inline-block relative">
-                    <span
-                        class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5"></span>
-                    Real-Time Recognition
-                </h2>
-            </div>
-            <div>
-                <p class="text-font-primary leading-relaxed body-3">
-                    Our advanced machine learning algorithms
-                    enable real-time recognition of sign
-                    language gestures, making communication
-                    faster and more efficient.
-                </p>
-            </div>
-        </div>
-        <div class="mb-8 grid gap-4 grid-cols-2">
-            <div class="inline-block">
-                <h2 class="mb-2 body-1-semibold inline-block relative">
-                    <span
-                        class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5"></span>
-                    Easy-to-Use-Interface
-                </h2>
-            </div>
-            <div>
-                <p class="text-font-primary leading-relaxed body-3">
-                    Our intuitive user interface is designed to
-                    be easy to use for people of all ages and
-                    skill levels, making it accessible to
-                    everyone.
-                </p>
-            </div>
-        </div>
-        <div class="mb-8 grid gap-4 grid-cols-2">
-            <div class="inline-block">
-                <h2 class="mb-2 body-1-semibold inline-block relative">
-                    <span
-                        class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5"></span>
-                    Adaptive Learning
-                </h2>
-            </div>
-            <div>
-                <p class="text-font-primary leading-relaxed body-3">
-                    Our system uses adaptive learning to
-                    improve recognition accuracy over time,
-                    allowing for continuous improvement and
-                    increased efficiency.
-                </p>
-            </div>
-        </div>
-        <div class="mb-8 grid gap-4 grid-cols-2">
-            <div class="inline-block">
-                <h2 class="mb-2 body-1-semibold inline-block relative">
-                    <span
-                        class="absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5"></span>
-                    High Accuracy
-                </h2>
-            </div>
-            <div>
-                <p class="text-font-primary leading-relaxed body-3">
-                    With a high accuracy rate of over 80%,
-                    our system ensures that sign language
-                    communication is not only faster, but also
-                    more accurate.
-                </p>
-            </div>
-        </div>
-
-        <!-- <ul class="space-y-4 relative">
-                <li><span class="font-semibold absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5">Real-Time
-                        Recognition</span></li>
-                <li><span class="font-semibold">Easy-to-Use
-                        Interface</span></li>
-                <li><span class="font-semibold absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5">Adaptive
-                        Learning</span></li>
-                <li><span class="font-semibold absolute left-0 -top-1 h-0.5 w-full gradient-bg rounded-full mb-5">High Accuracy</span></li>
-            </ul> -->
-    </div>
-</div>
-
-<!-- </div> -->
-<div class="flex justify-between items-center mt-16 gap-16 flex-col md:flex-row">
-    <!-- <div> -->
-
-    <img src="images/sign_girl.png" alt="Sign Girl"
-        class="rounded-2xl w-80 mx-auto mb-4" />
-    <!-- </div> -->
-    <div class>
-
-        <h3 class="headline-3 mb-4 gradient-text">Get to
-            know, How it Works!</h3>
-        <p class="text-gray-300 text-sm leading-relaxed ">
-            To use the sign language recognition system, you simply need to get
-            your hand detected and make a sign. Once you make a sign, refer to
-            the guide for the corresponding words. The system will then scan
-            your hand and use its built-in model to predict the sign you have
-            made. Finally, the predicted class will be displayed, allowing you
-            to communicate effectively through sign language. With this system,
-            you can bridge the communication gap between sign language users and
-            non-sign language users, making it easier for everyone to connect
-            and interact.
+      </div>
+      
+      <div>
+        <p class="text-gray-300 leading-relaxed text-lg">
+          Sign language is a visual means of communication that uses hand gestures, 
+          facial expressions, and body language to convey meaning. It is primarily used 
+          by individuals who are deaf or hard of hearing, connecting 
+          <span class="text-primary font-semibold">72 million speakers worldwide</span>.
         </p>
+      </div>
     </div>
-</div>
-<!-- CTA Section -->
-<!-- class="mt-16 bg-gradient-to-r from-purple-500 to-orange-400 rounded-xl flex justify-between items-center p-6"> -->
-<div
-    class="mt-16 gradient-bg rounded-xl flex justify-between items-center p-6">
-    <h3 class="text-white font-semibold text-lg">Get Started and Try the
-        Model</h3>
-    <button
-        class="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">
-        Try Now!
-    </button>
+    
+    <!-- Learn, Practice, Test Cards -->
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="group bg-gray-800/30 border border-gray-700 rounded-2xl p-6 
+                  hover:border-primary/50 hover:bg-gray-800/50 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center 
+                      group-hover:bg-primary/20 transition-colors">
+            <span class="text-2xl">📚</span>
+          </div>
+          <h3 class="text-xl font-bold">Learn</h3>
+        </div>
+        <p class="text-gray-400 leading-relaxed">
+          Start learning sign language basics, including alphabets and common words 
+          from our comprehensive guide section.
+        </p>
+      </div>
+      
+      <div class="group bg-gray-800/30 border border-gray-700 rounded-2xl p-6 
+                  hover:border-primary/50 hover:bg-gray-800/50 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center 
+                      group-hover:bg-primary/20 transition-colors">
+            <span class="text-2xl">🎯</span>
+          </div>
+          <h3 class="text-xl font-bold">Practice</h3>
+        </div>
+        <p class="text-gray-400 leading-relaxed">
+          Go to the Detect section and practice signs until our AI model recognizes 
+          them perfectly with real-time feedback.
+        </p>
+      </div>
+      
+      <div class="group bg-gray-800/30 border border-gray-700 rounded-2xl p-6 
+                  hover:border-primary/50 hover:bg-gray-800/50 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center 
+                      group-hover:bg-primary/20 transition-colors">
+            <span class="text-2xl">✅</span>
+          </div>
+          <h3 class="text-xl font-bold">Test</h3>
+        </div>
+        <p class="text-gray-400 leading-relaxed">
+          Test yourself by signing without the guide and see if the model recognizes 
+          your gestures correctly.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Features Section -->
+  <div class="grid md:grid-cols-[1fr_1.2fr] gap-12 items-center mb-20">
+    <div>
+      <div class="inline-block mb-4">
+        <span class="text-sm font-semibold text-primary uppercase tracking-wider">Our Technology</span>
+        <div class="h-1 w-20 bg-gradient-to-r from-primary to-violet-500 rounded-full mt-2"></div>
+      </div>
+      
+      <h2 class="text-3xl md:text-4xl font-bold mb-6 leading-tight">
+        Revolutionizing Sign Language Communication with 
+        <span class="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
+          AI Technology
+        </span>
+      </h2>
+      
+      <p class="text-gray-400 mb-8">
+        Powered by advanced machine learning and computer vision, SignSync delivers 
+        unparalleled accuracy and speed in sign language recognition.
+      </p>
+      
+      <app-common-button
+        text="Explore Features →"
+        routerLink="/detect"
+        buttonType="outline"
+      />
+    </div>
+    
+    <div class="space-y-4">
+      <!-- Feature Item -->
+      <div class="flex gap-4 p-5 bg-gray-800/30 border border-gray-700 rounded-2xl 
+                  hover:border-primary/30 hover:bg-gray-800/50 transition-all duration-300
+                  group cursor-pointer">
+        <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-primary/20 to-violet-500/20 
+                    rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+          <span class="text-2xl">⚡</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">
+            Real-Time Recognition
+          </h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Advanced ML algorithms enable instant recognition of sign language gestures 
+            with <span class="text-primary font-semibold">96.6% accuracy</span>.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Feature Item -->
+      <div class="flex gap-4 p-5 bg-gray-800/30 border border-gray-700 rounded-2xl 
+                  hover:border-primary/30 hover:bg-gray-800/50 transition-all duration-300
+                  group cursor-pointer">
+        <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-primary/20 to-violet-500/20 
+                    rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+          <span class="text-2xl">🎨</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">
+            Intuitive Interface
+          </h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Clean, user-friendly design accessible to all ages and skill levels, 
+            making sign language communication effortless.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Feature Item -->
+      <div class="flex gap-4 p-5 bg-gray-800/30 border border-gray-700 rounded-2xl 
+                  hover:border-primary/30 hover:bg-gray-800/50 transition-all duration-300
+                  group cursor-pointer">
+        <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-primary/20 to-violet-500/20 
+                    rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+          <span class="text-2xl">🧠</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">
+            Adaptive Learning
+          </h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Continuous improvement through adaptive learning, getting smarter 
+            with every interaction for better accuracy.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Feature Item -->
+      <div class="flex gap-4 p-5 bg-gray-800/30 border border-gray-700 rounded-2xl 
+                  hover:border-primary/30 hover:bg-gray-800/50 transition-all duration-300
+                  group cursor-pointer">
+        <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-primary/20 to-violet-500/20 
+                    rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+          <span class="text-2xl">🎯</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">
+            High Accuracy
+          </h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Achieve exceptional precision with our model trained on 69,600+ images, 
+            ensuring reliable communication every time.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- How It Works Section -->
+  <div class="flex flex-col md:flex-row gap-12 items-center py-16 px-8 
+              bg-gradient-to-br from-primary/5 to-violet-500/5 rounded-3xl border border-primary/10">
+    <div class="flex-1">
+      <img 
+        src="images/sign_girl.png" 
+        alt="How SignSync Works"
+        class="rounded-2xl shadow-2xl max-w-md mx-auto w-full
+               hover:scale-105 transition-transform duration-500"
+      />
+    </div>
+    
+    <div class="flex-1 space-y-6">
+      <div class="inline-block mb-2">
+        <span class="text-sm font-semibold text-primary uppercase tracking-wider">How It Works</span>
+        <div class="h-1 w-20 bg-gradient-to-r from-primary to-violet-500 rounded-full mt-2"></div>
+      </div>
+      
+      <h3 class="text-3xl md:text-4xl font-bold leading-tight">
+        Simple, Fast, and Accurate
+      </h3>
+      
+      <div class="space-y-4">
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+            <span class="text-primary font-bold">1</span>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-1">Position Your Hand</h4>
+            <p class="text-gray-400 text-sm">
+              Show your hand to the camera and make an ASL sign clearly
+            </p>
+          </div>
+        </div>
+        
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+            <span class="text-primary font-bold">2</span>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-1">AI Analyzes Gesture</h4>
+            <p class="text-gray-400 text-sm">
+              Our neural network processes hand landmarks and predicts the sign
+            </p>
+          </div>
+        </div>
+        
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+            <span class="text-primary font-bold">3</span>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-1">Get Instant Results</h4>
+            <p class="text-gray-400 text-sm">
+              View the detected letter with confidence score in real-time
+            </p>
+          </div>
+        </div>
+        
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+            <span class="text-primary font-bold">4</span>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-1">Build Sentences</h4>
+            <p class="text-gray-400 text-sm">
+              Letters accumulate into words and sentences automatically
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <p class="text-gray-400 leading-relaxed pt-4 border-t border-gray-700">
+        With SignSync, you can bridge the communication gap between sign language 
+        users and non-sign language users, making it easier for everyone to connect 
+        and interact meaningfully.
+      </p>
+    </div>
+  </div>
+  
+  <!-- CTA Banner -->
+  <div class="mt-20 bg-gradient-to-r from-primary via-violet-500 to-primary 
+              rounded-3xl p-8 md:p-12 flex flex-col md:flex-row justify-between items-center gap-6
+              relative overflow-hidden group">
+    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+    
+    <div class="relative z-10">
+      <h3 class="text-2xl md:text-3xl font-bold text-white mb-2">
+        Ready to Get Started?
+      </h3>
+      <p class="text-white/80 max-w-xl">
+        Try our AI-powered sign language recognition system now and experience 
+        seamless communication.
+      </p>
+    </div>
+    
+    <div class="relative z-10 flex gap-4">
+      <app-common-button
+        text="Try Detector"
+        routerLink="/detect"
+        color="white"
+        class="!bg-white !text-primary hover:!bg-gray-100"
+      />
+      
+      <app-common-button
+        text="Try Translator"
+        routerLink="/translate"
+        buttonType="outline"
+        class="!border-white !text-white hover:!bg-white/10"
+      />
+    </div>
+  </div>
+  
 </div>

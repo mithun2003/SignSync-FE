@@ -1,166 +1,346 @@
-<div
-  class="flex flex-col md:flex-row justify-center items-center p-6 gap-8 bg-gray-900 text-gray-100 min-h-screen"
->
+<!-- sign-to-text.component.html -->
+<div class="flex flex-col lg:flex-row justify-center items-start p-6 pt-24 gap-6 bg-gray-900 text-gray-100 min-h-screen">
+  
   @if (commonService.loading()) {
-    <div
-      class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button"
-    >
-      <fa-icon
-        size="xl"
-        [icon]="faSpinner"
-        class="text-base text-white animate-spin [animation-duration:1.8s]"
-      ></fa-icon>
+    <div class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors">
+      <fa-icon size="xl" [icon]="faSpinner" class="text-base text-white animate-spin [animation-duration:1.8s]"></fa-icon>
     </div>
   } @else if (isLoggedIn()) {
-    <!-- Webcam preview -->
-    <div class="w-full md:w-1/2 flex flex-col items-center">
-      <h2 class="text-lg font-semibold mb-2 text-gray-300">Live Camera Feed</h2>
+    
+    <!-- Left: Webcam + Controls -->
+    <div class="w-full lg:w-2/5 flex flex-col gap-4">
+      
+      <!-- Webcam Preview -->
+      <div class="bg-gray-800 rounded-2xl p-4 shadow-lg">
+        <h2 class="text-lg font-semibold mb-3 text-gray-300 flex items-center gap-2">
+          <span class="text-2xl">📹</span>
+          Live Camera Feed
+          @if (isRecording()) {
+            <span class="ml-auto flex items-center gap-2 text-sm text-green-400">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              Recording
+            </span>
+          }
+        </h2>
 
-      <div class="relative w-full max-w-md">
-        <video
-          #videoElement
-          autoplay
-          muted
-          playsinline
-          class="rounded-2xl shadow-lg border-4 border-primary w-full max-w-md scale-x-[-1]"
-        ></video>
+        <div class="relative w-full aspect-video">
+          <video
+            #videoElement
+            autoplay
+            muted
+            playsinline
+            class="rounded-xl shadow-lg border-2 border-gray-700 w-full h-full object-cover scale-x-[-1]"
+          ></video>
 
-        <canvas
-          #overlayCanvas
-          class="absolute top-0 left-0 w-full h-full pointer-events-none scale-x-[-1]"
-        >
-        </canvas>
+          <canvas
+            #overlayCanvas
+            class="absolute top-0 left-0 w-full h-full pointer-events-none scale-x-[-1] rounded-xl"
+          ></canvas>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-4 flex gap-3">
+          <app-common-button
+            [text]="handDetectService.isReady() ? '▶ Start' : '⌛ Loading Model...'"
+            textClass="body-3-medium"
+            color="green"
+            [disabled]="isRecording() || !handDetectService.isReady()"
+            (click)="startRecording()"
+          />
+
+          <app-common-button
+            text="⏹ Stop"
+            textClass="body-3-medium"
+            color="red"
+            (click)="stopRecording()"
+            [disabled]="!isRecording()"
+          />
+
+          <app-common-button
+            text="🔄 Clear Text"
+            textClass="body-3-medium"
+            buttonType="outline"
+            (click)="clearSentence()"
+            [disabled]="!isRecording() && sentenceBuffer().length === 0"
+          />
+        </div>
+
+        <!-- Settings -->
+        <div class="mt-4 flex flex-col gap-3">
+          <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="autoSpace()"
+              (change)="autoSpace.set(!autoSpace())"
+              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-primary focus:ring-primary"
+            />
+            Auto-add spaces (pause = space)
+          </label>
+
+          <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="isSpeechEnabled()"
+              (change)="isSpeechEnabled.set(!isSpeechEnabled())"
+              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-primary focus:ring-primary"
+            />
+            Enable voice feedback
+          </label>
+        </div>
       </div>
 
-      <div class="mt-4 flex gap-4">
-        <app-common-button
-          [text]="
-            handDetectService.isReady()
-              ? '▶ Start'
-              : '⌛
-        Loading Model...'
-          "
-          textClass="body-3-medium"
-          color="green"
-          [disabled]="isRecording() || !handDetectService.isReady()"
-          (click)="startRecording()"
-        >
-        </app-common-button>
+      <!-- Current Detection -->
+      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <h3 class="text-sm font-semibold text-gray-300 mb-3">Current Detection</h3>
+        
+        <div class="text-center">
+          <div class="text-9xl font-bold text-primary mb-3 animate-pulse">
+            {{ currentLetter() || '-' }}
+          </div>
+          
+          <div class="flex items-center justify-center gap-2 mb-3">
+            <span class="text-sm text-gray-400">Confidence:</span>
+            <span class="text-lg font-bold text-white">
+              {{ currentConfidence() | number: '1.0-0' }}%
+            </span>
+          </div>
 
-        <app-common-button
-          text="⏹ Stop"
-          textClass="body-3-medium"
-          color="red"
-          (click)="stopRecording()"
-          [disabled]="!isRecording()"
-        >
-        </app-common-button>
+          <!-- Confidence Bar -->
+          <div class="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-gradient-to-r from-primary to-violet-primary transition-all duration-300"
+              [style.width.%]="currentConfidence()"
+            ></div>
+          </div>
+
+          <p class="text-xs text-gray-500 mt-3 italic">
+            {{ feedbackText }}
+          </p>
+        </div>
       </div>
-      <label class="flex items-center gap-2 text-gray-300 mt-4">
-        <input
-          type="checkbox"
-          [checked]="isSpeechEnabled()"
-          (change)="isSpeechEnabled.set(!isSpeechEnabled())"
-        />
-        Enable Voice
-      </label>
+
     </div>
 
-    <!-- Prediction Result -->
-    <div
-      class="w-full md:w-1/3 bg-gray-800 rounded-2xl p-6 shadow-lg flex flex-col items-center"
-    >
-      <h2 class="text-lg font-semibold text-gray-300 mb-4">
-        Recognition Result
-      </h2>
+    <!-- Right: Sentence Builder -->
+    <div class="w-full lg:w-3/5 flex flex-col gap-4">
+      
+      <!-- Sentence Display -->
+      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg flex-grow">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-300 flex items-center gap-2">
+            <span class="text-2xl">📝</span>
+            Your Message
+          </h2>
+          
+          <div class="flex gap-2">
+            <button
+              (click)="copyToClipboard()"
+              [disabled]="sentenceBuffer().length === 0"
+              class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
+                     rounded-lg text-sm text-gray-300 transition-colors flex items-center gap-2"
+            >
+              📋 Copy
+            </button>
+            
+            <button
+              (click)="speakSentence()"
+              [disabled]="sentenceBuffer().length === 0"
+              class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
+                     rounded-lg text-sm text-gray-300 transition-colors flex items-center gap-2"
+            >
+              🔊 Speak
+            </button>
+          </div>
+        </div>
 
-      <div class="text-center">
-        <div class="text-7xl font-bold text-primary mb-2">
-          {{ userService.predictionResult()?.label || "-" }}
-        </div>
-        <div class="text-lg text-gray-400 mb-4">
-          Confidence:
-          <span class="font-semibold text-white">
-            {{ userService.predictionResult()?.confidence | number: "1.0-2" }}%
-          </span>
-        </div>
-        <div class="text-lg text-gray-400 mb-4">
-          Emotion:
-          <span class="font-semibold text-white">
-            <div class="text-6xl mb-3 animate-bounce-short">
-              {{ currentMood().split(" ")[1] }}
+        <!-- Sentence Text Area -->
+        <div class="bg-gray-900 rounded-xl p-6 min-h-[200px] max-h-[400px] overflow-y-auto border-2 border-gray-700
+                    focus-within:border-primary transition-colors
+                    [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-800 
+                    [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb:hover]:bg-gray-500">
+          @if (sentenceBuffer().length === 0) {
+            <p class="text-gray-500 italic text-center py-8">
+              Start signing to build your message...
+            </p>
+          } @else {
+            <div class="flex flex-wrap gap-2 text-2xl leading-relaxed">
+              @for (item of sentenceBuffer(); track $index) {
+                @if (item === ' ') {
+                  <span class="inline-block w-3"></span>
+                } @else {
+                  <button
+                    type="button"
+                    class="inline-block px-1 py-0.5 rounded hover:bg-gray-800 transition-all duration-300 
+                           cursor-pointer animate-[fadeIn_0.3s_ease-out] bg-transparent border-none text-inherit"
+                    [class.text-primary]="$index === sentenceBuffer().length - 1"
+                    [class.scale-105]="$index === sentenceBuffer().length - 1"
+                    (click)="removeLetterAt($index)"
+                    [title]="'Click to remove ' + item"
+                  >
+                    {{ item }}
+                  </button>
+                }
+              }
+              <span class="inline-block w-0.5 h-8 bg-primary animate-pulse ml-1"></span>
             </div>
-
-            <div class="text-2xl font-bold text-white tracking-wide">
-              {{ currentMood().split(" ")[0] }}
-            </div>
-          </span>
+          }
         </div>
 
+        <!-- Stats -->
+        <div class="mt-4 flex items-center justify-between text-sm text-gray-400">
+          <span>{{ letterCount() }} letters</span>
+          <span>{{ wordCount() }} words</span>
+          <span>Last: {{ timeSinceLastLetter() }}</span>
+        </div>
+      </div>
+
+      <!-- Letter History -->
+      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <h3 class="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+          <span>📜</span>
+          Recent Letters
+        </h3>
+        
+        <div class="flex gap-2 overflow-x-auto pb-2
+                    [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-700 
+                    [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full">
+          @if (letterHistory().length === 0) {
+            <p class="text-gray-500 text-sm italic">No letters detected yet</p>
+          } @else {
+            @for (letter of letterHistory(); track $index) {
+              <div 
+                class="flex-shrink-0 w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center
+                       text-2xl font-bold border-2 transition-all duration-300 hover:scale-110
+                       animate-[fadeIn_0.3s_ease-out]"
+                [class.border-primary]="$index === letterHistory().length - 1"
+                [class.border-gray-600]="$index !== letterHistory().length - 1"
+                [class.shadow-lg]="$index === letterHistory().length - 1"
+                [class.shadow-primary/50]="$index === letterHistory().length - 1"
+              >
+                {{ letter }}
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <h3 class="text-sm font-semibold text-gray-300 mb-3">Quick Actions</h3>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <button
+            (click)="addSpace()"
+            [disabled]="!isRecording()"
+            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
+                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            Add Space
+          </button>
+          
+          <button
+            (click)="backspace()"
+            [disabled]="sentenceBuffer().length === 0"
+            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
+                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            ⌫ Backspace
+          </button>
+          
+          <button
+            (click)="addPunctuation('.')"
+            [disabled]="!isRecording()"
+            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
+                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            Add Period
+          </button>
+          
+          <button
+            (click)="addPunctuation('?')"
+            [disabled]="!isRecording()"
+            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
+                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            Add ?
+          </button>
+        </div>
+      </div>
+      
+      <!-- Emotion & Suggested Words -->
+      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <h3 class="text-sm font-semibold text-gray-300 mb-3">Emotion & Suggestions</h3>
+        
+        <!-- Emotion Display -->
+        <div class="text-center mb-4 pb-4 border-b border-gray-700">
+          <div class="text-6xl mb-2 animate-[bounce_1s_ease-in-out_infinite]">
+            {{ currentMood().split(' ')[1] }}
+          </div>
+          <div class="text-xl font-bold text-white tracking-wide">
+            {{ currentMood().split(' ')[0] }}
+          </div>
+        </div>
+
+        <!-- Suggested Words -->
         @if (suggestedWords().length > 0) {
-          <div class="mb-4 text-center">
-            <h3 class="text-lg font-semibold text-gray-300">Suggested Words</h3>
-
-            <div class="flex flex-wrap justify-center gap-2 mt-2">
+          <div class="text-center">
+            <h4 class="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">
+              Suggested Words
+            </h4>
+            <div class="flex flex-wrap justify-center gap-2">
               @for (word of suggestedWords(); track word) {
-                <span
-                  class="px-3 py-1 bg-primary/20 border border-primary rounded-full text-white text-sm"
+                <button
+                  type="button"
+                  class="px-3 py-1.5 bg-primary/20 border border-primary rounded-full text-white text-sm
+                         hover:bg-primary/30 transition-colors cursor-pointer animate-[fadeIn_0.3s_ease-out]"
+                  (click)="addSuggestedWord(word)"
+                  [title]="'Click to add: ' + word"
                 >
                   {{ word }}
-                </span>
+                </button>
               }
             </div>
           </div>
+        } @else {
+          <p class="text-gray-500 text-sm italic text-center">
+            {{ currentLetter() ? 'No suggestions for ' + currentLetter() : 'Sign a letter to see suggestions' }}
+          </p>
         }
-
-        <!-- Confidence bar -->
-        <div class="w-64 h-4 bg-gray-700 rounded-full overflow-hidden mb-3">
-          <div
-            class="h-full bg-violet-primary transition-all duration-500"
-            [style.width.%]="userService.predictionResult()?.confidence || 0"
-          ></div>
-        </div>
-
-        <p class="text-sm text-gray-400 italic">
-          {{ feedbackText }}
-        </p>
       </div>
     </div>
+
   } @else {
-    <div
-      class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-center px-6"
-    >
+    <!-- Not Logged In -->
+    <div class="flex flex-col items-center justify-center min-h-screen text-center px-6">
       <div class="text-6xl mb-4">🔒</div>
-
+      
       <h2 class="text-2xl font-bold text-white mb-2">
-        Live Gesture Detection Locked
+        Sign to Text Locked
       </h2>
-
+      
       <p class="text-gray-400 max-w-md mb-6">
-        SignSync uses AI to recognize real-time hand gestures. Please login to
-        activate camera-based sign detection and track your learning progress.
+        Convert your sign language gestures into text in real-time. Login to activate AI-powered sign recognition and build sentences with your hands.
       </p>
-
+      
       <div class="flex gap-4">
         <app-common-button
           text="Login"
           buttonClass="common-login-button"
           textClass="body-3-medium"
           routerLink="/auth/signin"
-        >
-        </app-common-button>
-
+        />
+        
         <app-common-button
           text="Create Account"
           buttonType="outline"
           textClass="body-3-medium"
           routerLink="/auth/signup"
-        >
-        </app-common-button>
+        />
       </div>
-
+      
       <p class="mt-6 text-sm text-gray-500 italic">
-        Your camera stays OFF until you log in 🔐
+        Start building sentences with sign language 🤟
       </p>
     </div>
   }

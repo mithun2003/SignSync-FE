@@ -1,4 +1,4 @@
-// text-to-sign.component.ts
+// translate.component.ts
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -15,10 +15,9 @@ import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 
 import { CommonService } from '@core/services/common/common.service';
 import { CommonButtonComponent } from 'app/shared/components/common-button/common-button.component';
-import { getSignImageUrl } from './sign-images.config';
 
 @Component({
-  selector: 'app-text-to-sign',
+  selector: 'app-translate',
   templateUrl: './translate.component.html',
   styleUrls: ['./translate.component.css'],
   standalone: true,
@@ -64,11 +63,12 @@ export class TranslateComponent implements OnDestroy {
   //  TEXT PROCESSING
   // ─────────────────────────────────────────────────────────────────────────
   onTextChange() {
-    // Extract only A-Z letters (case insensitive)
+    // Extract A-Z letters AND spaces
     const cleaned = this.inputText
       .toUpperCase()
       .split('')
-      .filter((char) => /[A-Z]/.test(char));
+      .filter((char) => /[A-Z ]/.test(char))  // ← Added space to the regex
+      .map((char) => char === ' ' ? 'SPACE' : char);  // ← Convert space to 'SPACE'
     
     this.letters.set(cleaned);
     
@@ -176,18 +176,13 @@ export class TranslateComponent implements OnDestroy {
     this.currentLetter.set(letter);
     this.imageLoading.set(true);
     
-    // ✅ USE THIS: Google Drive direct link
-    // this.currentSignImage.set(getSignImageUrl(letter));
+    // Handle space sign separately
+    const fileName = letter === 'SPACE' ? 'SPACE' : letter.toUpperCase();
     
-    // Alternative options:
-    // Option 1: Local assets (requires images in frontend)
-    this.currentSignImage.set(`/asl-signs/${letter.toUpperCase()}.jpg`);
-    
-    // Option 2: Backend API endpoint
-    // this.currentSignImage.set(`/api/signs/${letter.toLowerCase()}`);
-    
-    // Option 3: Imgur CDN (see solution 2 below)
-    // this.currentSignImage.set(`https://i.imgur.com/${IMGUR_HASH[letter]}.jpg`);
+    // 🔥 FIX: Add unique cache buster to force reload on duplicate letters
+    // This ensures "HELLO" shows both L's correctly
+    const cacheBuster = Date.now();
+    this.currentSignImage.set(`/asl-signs/${fileName}.jpg?v=${cacheBuster}`);
   }
 
   onImageLoad() {

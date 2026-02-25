@@ -1,6 +1,6 @@
 <!-- text-to-sign.component.html -->
 <div
-  class="flex flex-col items-center justify-center p-6 bg-gray-900 text-gray-100 min-h-screen"
+  class="flex flex-col items-center justify-center p-6 bg-gray-900 text-gray-100 min-h-screen pt-24"
 >
   @if (commonService.loading()) {
     <div
@@ -83,9 +83,9 @@
 
             <!-- Speed Control -->
             <div class="mt-4">
-              <label class="text-sm text-gray-300 mb-2 block">
+              <p class="text-sm text-gray-300 mb-2 block">
                 Animation Speed: {{ animationSpeed() }}ms per sign
-              </label>
+              </p>
               <input
                 type="range"
                 min="500"
@@ -96,7 +96,7 @@
                 class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer
                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
                        [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
-                       [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer"
+                       [&::-webkit-slider-thumb]:bg-violet-secondary [&::-webkit-slider-thumb]:cursor-pointer"
                 [disabled]="isPlaying()"
               />
               <div class="flex justify-between text-xs text-gray-500 mt-1">
@@ -123,8 +123,9 @@
                         'bg-gray-700 text-gray-300 hover:bg-gray-600': 
                           $index !== currentLetterIndex()
                       }"
+                      [title]="letter === 'SPACE' ? 'Space separator' : 'Letter ' + letter"
                     >
-                      {{ letter }}
+                      {{ letter === 'SPACE' ? '␣' : letter }}
                     </button>
                   }
                 </div>
@@ -212,11 +213,18 @@
 
             <!-- Current Letter Display -->
             <div class="text-center mb-4">
-              <div class="text-8xl font-bold text-primary mb-2 tracking-wider">
-                {{ currentLetter() || '-' }}
-              </div>
+              @if (currentLetter() === 'SPACE') {
+                <div class="text-6xl font-bold text-primary mb-2">
+                  ␣
+                </div>
+                <p class="text-gray-400 text-sm">Space</p>
+              } @else {
+                <div class="text-8xl font-bold text-primary mb-2 tracking-wider">
+                  {{ currentLetter() || '-' }}
+                </div>
+              }
               <p class="text-gray-400 text-sm">
-                {{ currentLetter() ? 'Letter ' + (currentLetterIndex() + 1) + ' of ' + letters().length : 'Waiting for input...' }}
+                {{ currentLetter() ? 'Sign ' + (currentLetterIndex() + 1) + ' of ' + letters().length : 'Waiting for input...' }}
               </p>
             </div>
 
