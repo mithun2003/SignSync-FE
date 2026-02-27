@@ -5,7 +5,7 @@ import { CommonButtonComponent } from 'app/shared/components/common-button/commo
   selector: 'app-hero',
   imports: [CommonButtonComponent],
   templateUrl: './hero.component.html',
-  styleUrl: './hero.component.scss'
+  styleUrl: '../home.component.css'
 })
 export class HeroComponent {
 

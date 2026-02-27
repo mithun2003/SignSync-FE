@@ -1,0 +1,284 @@
+<!-- profile.component.html -->
+<div class="min-h-screen bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary text-white pt-24 pb-12 px-6">
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="headline-2 mb-2">
+        <span class="gradient-text">Your Profile</span>
+      </h1>
+      <p class="text-font-primary body-2">Manage your account information and preferences</p>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      
+      <!-- Left: Avatar & Quick Stats -->
+      <div class="lg:col-span-1">
+        <div class="bg-bg-card rounded-2xl border border-border-primary p-6 text-center">
+          <!-- Avatar -->
+          <div class="relative inline-block mb-4">
+            <div class="absolute -inset-4 bg-linear-to-r from-primary via-violet-500 to-primary 
+                        opacity-20 blur-2xl rounded-full"></div>
+            <img [src]="profilePhoto() || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
+                 class="relative w-32 h-32 rounded-full border-4 border-primary/50 
+                        hover:border-primary transition-all duration-300 hover:scale-105"
+                 alt="Profile Photo" />
+            
+            <!-- Change Photo Button -->
+            <button (click)="changePhoto()" 
+                    class="absolute bottom-0 right-0 w-10 h-10 bg-linear-to-r from-primary via-violet-500 to-primary 
+                           rounded-full flex items-center justify-center
+                           hover:scale-110 transition-transform shadow-lg">
+              <span class="text-white text-lg">📷</span>
+            </button>
+          </div>
+
+          <h3 class="text-xl font-bold mb-1">{{ username() }}</h3>
+          <p class="text-font-muted text-sm mb-4">{{ email() }}</p>
+
+          <!-- Member Since -->
+          <div class="border-t border-border-primary pt-4">
+            <p class="text-font-muted text-xs mb-1">Member Since</p>
+            <p class="text-white font-semibold">{{ memberSince() }}</p>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-2 gap-4 mt-6">
+            <div class="bg-bg-primary/50 rounded-lg p-3">
+              <div class="text-2xl font-bold gradient-text">{{ totalSigns() }}</div>
+              <div class="text-xs text-font-muted">Signs</div>
+            </div>
+            <div class="bg-bg-primary/50 rounded-lg p-3">
+              <div class="text-2xl font-bold gradient-text">{{ streak() }}</div>
+              <div class="text-xs text-font-muted">Day Streak</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Profile Information Form -->
+      <div class="lg:col-span-2">
+        <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+          <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
+            <span class="text-2xl">👤</span>
+            Personal Information
+          </h3>
+
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-5">
+            
+            <!-- Username -->
+            <div>
+              <label for="username" class="block text-sm font-medium text-font-muted mb-2">
+                Username
+              </label>
+              <input id="username"
+                     type="text" 
+                     formControlName="username"
+                     class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
+                            focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
+                            text-white transition-all"
+                     placeholder="Enter your username" />
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label for="email" class="block text-sm font-medium text-font-muted mb-2">
+                Email Address
+              </label>
+              <input id="email"
+                     type="email" 
+                     formControlName="email"
+                     class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
+                            focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
+                            text-white transition-all"
+                     placeholder="your@email.com" />
+            </div>
+
+            <!-- Full Name -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="firstName" class="block text-sm font-medium text-font-muted mb-2">
+                  First Name
+                </label>
+                <input id="firstName"
+                       type="text" 
+                       formControlName="firstName"
+                       class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
+                              focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
+                              text-white transition-all"
+                       placeholder="First name" />
+              </div>
+              <div>
+                <label for="lastName" class="block text-sm font-medium text-font-muted mb-2">
+                  Last Name
+                </label>
+                <input id="lastName"
+                       type="text" 
+                       formControlName="lastName"
+                       class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
+                              focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
+                              text-white transition-all"
+                       placeholder="Last name" />
+              </div>
+            </div>
+
+            <!-- Bio -->
+            <div>
+              <label for="bio" class="block text-sm font-medium text-font-muted mb-2">
+                Bio
+              </label>
+              <textarea id="bio"
+                        formControlName="bio"
+                        rows="4"
+                        class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
+                               focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
+                               text-white transition-all resize-none"
+                        placeholder="Tell us about yourself..."></textarea>
+            </div>
+
+            <!-- Location -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="country" class="block text-sm font-medium text-font-muted mb-2">
+                  Country
+                </label>
+                <select id="country"
+                        formControlName="country"
+                        class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
+                               focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
+                               text-white transition-all">
+                  <option value="">Select country</option>
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="IN">India</option>
+                  <option value="CA">Canada</option>
+                  <option value="AU">Australia</option>
+                </select>
+              </div>
+              <div>
+                <label for="language" class="block text-sm font-medium text-font-muted mb-2">
+                  Language
+                </label>
+                <select id="language"
+                        formControlName="language"
+                        class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
+                               focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
+                               text-white transition-all">
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 pt-4">
+              <button type="submit" 
+                      [disabled]="!profileForm.valid || isSaving()"
+                      class="px-6 py-3 bg-linear-to-r from-primary via-violet-500 to-primary
+                             text-white font-semibold rounded-lg
+                             hover:scale-105 hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]
+                             transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                @if (isSaving()) {
+                  <span class="flex items-center gap-2">
+                    <span class="animate-spin">⏳</span>
+                    Saving...
+                  </span>
+                } @else {
+                  Save Changes
+                }
+              </button>
+              
+              <button type="button" 
+                      (click)="resetForm()"
+                      class="px-6 py-3 bg-bg-primary border border-border-primary
+                             text-white font-semibold rounded-lg
+                             hover:border-primary transition-all duration-300">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Section -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-6 mb-6">
+      <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
+        <span class="text-2xl">🔒</span>
+        Security
+      </h3>
+
+      <div class="space-y-4">
+        <!-- Change Password -->
+        <div class="flex items-center justify-between p-4 bg-bg-primary/50 rounded-lg
+                    border border-border-primary hover:border-primary transition-all group">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center
+                        group-hover:scale-110 transition-transform">
+              <span class="text-xl">🔑</span>
+            </div>
+            <div>
+              <p class="font-medium text-white">Password</p>
+              <p class="text-sm text-font-muted">Last changed 3 months ago</p>
+            </div>
+          </div>
+          <button (click)="changePassword()"
+                  class="px-4 py-2 bg-primary/10 border border-primary/30 text-primary rounded-lg
+                         hover:bg-primary/20 transition-all">
+            Change
+          </button>
+        </div>
+
+        <!-- Two-Factor Authentication -->
+        <div class="flex items-center justify-between p-4 bg-bg-primary/50 rounded-lg
+                    border border-border-primary hover:border-primary transition-all group">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center
+                        group-hover:scale-110 transition-transform">
+              <span class="text-xl">📱</span>
+            </div>
+            <div>
+              <p class="font-medium text-white">Two-Factor Authentication</p>
+              <p class="text-sm text-font-muted">
+                @if (twoFactorEnabled()) {
+                  <span class="text-success">✓ Enabled</span>
+                } @else {
+                  <span class="text-warning">Not enabled</span>
+                }
+              </p>
+            </div>
+          </div>
+          <button (click)="toggle2FA()"
+                  class="px-4 py-2 bg-primary/10 border border-primary/30 text-primary rounded-lg
+                         hover:bg-primary/20 transition-all">
+            {{ twoFactorEnabled() ? 'Disable' : 'Enable' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="bg-bg-card rounded-2xl border border-danger/50 p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 text-danger">
+        <span class="text-2xl">⚠️</span>
+        Danger Zone
+      </h3>
+      
+      <div class="space-y-3">
+        <p class="text-font-muted text-sm">
+          Once you delete your account, there is no going back. All your data will be permanently removed.
+        </p>
+        
+        <button (click)="deleteAccount()"
+                class="px-6 py-3 bg-danger/10 border border-danger text-danger rounded-lg
+                       hover:bg-danger hover:text-white transition-all font-semibold">
+          Delete Account
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

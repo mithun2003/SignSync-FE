@@ -1,53 +1,139 @@
-:root {
-  --color-white: #f4f5f5;
+/* theme/_colors.css - Tailwind v4 Compatible */
 
-  /* Neutral Colors */
-  --color-neutral-black: #263238;
-  --color-neutral-d-grey: #4d4d4d;
-  --color-neutral-grey: #717171;
-  --color-neutral-l-grey: #89939e;
-  --color-neutral-grey-blue: #abbed1;
-  --color-neutral-silver: #f5f7fa;
-  --color-neutral-white: #ffffff;
+@layer theme {
+  :root {
+    /* =========================================================
+       NEUTRALS
+    ========================================================= */
+    --color-white: #f4f5f5;
+    --color-neutral-black: #263238;
+    --color-neutral-d-grey: #4d4d4d;
+    --color-neutral-grey: #717171;
+    --color-neutral-l-grey: #89939e;
+    --color-neutral-grey-blue: #abbed1;
+    --color-neutral-silver: #f5f7fa;
+    --color-neutral-white: #ffffff;
 
-  /* Backgrounds & Semantic */
-  --color-bg-primary: #040c18;
-  --color-bg-secondary: #263238;
+    /* =========================================================
+       PRIMARY BRAND (Violet Scale)
+    ========================================================= */
+    --color-primary-50: #faf5ff;
+    --color-primary-100: #f3e8ff;
+    --color-primary-200: #e9d5ff;
+    --color-primary-300: #d8b4fe;
+    --color-primary-400: #c084fc;
+    --color-primary-500: #a78bfa;
+    --color-primary-600: #8b5cf6;
+    --color-primary-700: #7c3aed;
+    --color-primary-800: #6d28d9;
+    --color-primary-900: #5b21b6;
 
-  /* Font Primary */
-  --color-font-primary: #81afdd;
-  --color-info: #2194f3;
+    --color-primary: var(--color-primary-600);
+    --color-primary-light: var(--color-primary-500);
+    --color-primary-dark: var(--color-primary-700);
 
-  /* Success Green Shades & Tints */
-  --color-success-shade-3: #237d31;
-  --color-success-shade-4: #1b5e1f;
-  --color-success-shade-5: #103e13;
-  --color-success-tint-1: #3cce41;
-  --color-success-tint-2: #81c784;
-  --color-success-tint-3: #a5d6a7;
-  --color-success-tint-4: #c8e6c9;
-  --color-success-tint-5: #e8f5e9;
+    /* =========================================================
+       BACKGROUNDS
+    ========================================================= */
+    --color-bg-primary: #0a0118;
+    --color-bg-secondary: #1a1625;
+    --color-bg-card: #211834;
+    --color-bg-hover: #2a2038;
 
-  /* Accents */
-  --color-red-primary: #e53835;
-  --color-red-secondary: #f07458;
-  --color-red-bg: #e9575577;
-  --color-violet-primary: #760ed1;
-  --color-violet-secondary: #5a05a4;
+    /* =========================================================
+       FONT COLORS
+    ========================================================= */
+    --color-font-primary: #c4b5fd;
+    --color-font-secondary: #ddd6fe;
+    --color-font-muted: #a78bfa;
 
-  --color-purple-primary: #a855f7;
-  --color-pink-primary: #ec4899;
+    /* =========================================================
+       SEMANTIC COLORS
+    ========================================================= */
+    --color-success: #34d399;
+    --color-success-light: #6ee7b7;
+    --color-success-dark: #10b981;
 
-  /* --color-border-primary: #eaf1e8; */
-  --color-border-primary: #eaf1e836;
-  --color-border-secondary: #727ffd;
+    --color-warning: #fbbf24;
+    
+    --color-danger: #f87171;
+    --color-danger-dark: #ef4444;
+
+    --color-info: #60a5fa;
+
+    /* =========================================================
+       ACCENTS
+    ========================================================= */
+    --color-accent-purple: #a855f7;
+    --color-accent-pink: #d946ef;
+    --color-accent-blue: #3b82f6;
+
+    /* =========================================================
+       BORDERS
+    ========================================================= */
+    --color-border-primary: rgb(139 92 246 / 0.15);
+    --color-border-secondary: rgb(167 139 250 / 0.25);
+    --color-border-muted: rgb(139 92 246 / 0.08);
+
+    /* =========================================================
+       SHADOWS WITH GLOW
+    ========================================================= */
+    --shadow-glow-sm: 0 0 10px rgb(139 92 246 / 0.3);
+    --shadow-glow-md: 0 0 20px rgb(139 92 246 / 0.4);
+    --shadow-glow-lg: 0 0 30px rgb(139 92 246 / 0.5);
+  }
 }
 
 @layer utilities {
+  /* =========================================================
+     GRADIENT UTILITIES
+  ========================================================= */
   .gradient-text {
-    @apply text-transparent bg-clip-text bg-linear-to-r from-purple-primary via-pink-primary to-red-secondary;
+    @apply bg-linear-to-r from-primary via-violet-500 to-primary;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
+  
   .gradient-bg {
-    @apply bg-linear-to-r from-purple-primary via-pink-primary to-red-secondary;
+    @apply bg-linear-to-r from-primary via-violet-500 to-primary;
+  }
+
+  /* =========================================================
+     GLASS MORPHISM
+  ========================================================= */
+  .glass {
+    background: rgb(255 255 255 / 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgb(255 255 255 / 0.1);
+  }
+  
+  .glass-dark {
+    background: rgb(0 0 0 / 0.2);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgb(255 255 255 / 0.05);
+  }
+
+  /* =========================================================
+     GLOW EFFECTS
+  ========================================================= */
+  .glow-primary-sm {
+    box-shadow: var(--shadow-glow-sm);
+  }
+  
+  .glow-primary-md {
+    box-shadow: var(--shadow-glow-md);
+  }
+  
+  .glow-primary-lg {
+    box-shadow: var(--shadow-glow-lg);
+  }
+
+  .hover-glow {
+    transition: box-shadow 300ms ease;
+  }
+  
+  .hover-glow:hover {
+    box-shadow: var(--shadow-glow-md);
   }
 }

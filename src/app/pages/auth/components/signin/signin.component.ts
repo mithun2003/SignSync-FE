@@ -31,7 +31,7 @@ export class SigninComponent {
 
   constructor() {
     this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
@@ -65,7 +65,7 @@ export class SigninComponent {
     this.error.set(null);
 
     const formData = new FormData();
-    formData.append('username', this.form.get('email')?.value ?? '');
+    formData.append('username', this.form.get('username')?.value ?? '');
     formData.append('password', this.form.get('password')?.value ?? '');
 
     this.authService.login(formData).subscribe({

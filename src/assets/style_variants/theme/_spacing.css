@@ -1,13 +1,167 @@
-:root {
-  --radius: 0.625rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+/* theme/_spacing.css - Tailwind v4 Compatible */
 
-  /* Spacing (optional) */
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
+@layer theme {
+  :root {
+    /* =========================================================
+       BORDER RADIUS
+    ========================================================= */
+    --radius-xs: 0.25rem;    /* 4px - small chips/badges */
+    --radius-sm: 0.375rem;   /* 6px - small buttons */
+    --radius-md: 0.5rem;     /* 8px - inputs, small cards */
+    --radius-lg: 0.75rem;    /* 12px - buttons, cards */
+    --radius-xl: 1rem;       /* 16px - large cards */
+    --radius-2xl: 1.5rem;    /* 24px - dashboard cards */
+    --radius-3xl: 2rem;      /* 32px - hero sections */
+    --radius-4xl: 3rem;      /* 48px - navbar */
+    --radius-full: 9999px;   /* Fully rounded - pills/circles */
+
+    /* Legacy support (maps to new values) */
+    --radius: var(--radius-lg);
+
+    /* =========================================================
+       SPACING SCALE
+    ========================================================= */
+    --space-0: 0;
+    --space-px: 1px;
+    --space-0-5: 0.125rem;   /* 2px */
+    --space-1: 0.25rem;      /* 4px */
+    --space-1-5: 0.375rem;   /* 6px */
+    --space-2: 0.5rem;       /* 8px */
+    --space-2-5: 0.625rem;   /* 10px */
+    --space-3: 0.75rem;      /* 12px */
+    --space-3-5: 0.875rem;   /* 14px */
+    --space-4: 1rem;         /* 16px */
+    --space-5: 1.25rem;      /* 20px */
+    --space-6: 1.5rem;       /* 24px */
+    --space-7: 1.75rem;      /* 28px */
+    --space-8: 2rem;         /* 32px */
+    --space-9: 2.25rem;      /* 36px */
+    --space-10: 2.5rem;      /* 40px */
+    --space-11: 2.75rem;     /* 44px */
+    --space-12: 3rem;        /* 48px */
+    --space-14: 3.5rem;      /* 56px */
+    --space-16: 4rem;        /* 64px */
+    --space-20: 5rem;        /* 80px */
+    --space-24: 6rem;        /* 96px */
+    --space-28: 7rem;        /* 112px */
+    --space-32: 8rem;        /* 128px */
+
+    /* Legacy support (maps to new values) */
+    --space-xs: var(--space-1);
+    --space-sm: var(--space-2);
+    --space-md: var(--space-4);
+    --space-lg: var(--space-6);
+    --space-xl: var(--space-8);
+    --space-2xl: var(--space-12);
+    --space-3xl: var(--space-16);
+
+    /* =========================================================
+       CONTAINER WIDTHS
+    ========================================================= */
+    --container-sm: 640px;
+    --container-md: 768px;
+    --container-lg: 1024px;
+    --container-xl: 1280px;
+    --container-2xl: 1536px;
+
+    /* =========================================================
+       Z-INDEX SCALE
+    ========================================================= */
+    --z-0: 0;
+    --z-10: 10;
+    --z-20: 20;
+    --z-30: 30;
+    --z-40: 40;
+    --z-50: 50;         /* Dropdown menus */
+    --z-modal: 100;     /* Modals */
+    --z-popover: 200;   /* Popovers */
+    --z-tooltip: 300;   /* Tooltips */
+    --z-navbar: 1000;   /* Fixed navbar */
+    --z-max: 9999;      /* Always on top */
+
+    /* =========================================================
+       GAP UTILITIES (For flex/grid)
+    ========================================================= */
+    --gap-xs: var(--space-1);
+    --gap-sm: var(--space-2);
+    --gap-md: var(--space-4);
+    --gap-lg: var(--space-6);
+    --gap-xl: var(--space-8);
+
+    /* =========================================================
+       SECTION SPACING (For page layouts)
+    ========================================================= */
+    --section-padding-y: var(--space-16);
+    --section-padding-x: var(--space-6);
+    --section-gap: var(--space-12);
+
+    /* =========================================================
+       CARD SPACING
+    ========================================================= */
+    --card-padding: var(--space-6);
+    --card-gap: var(--space-4);
+    --card-radius: var(--radius-2xl);
+
+    /* =========================================================
+       BUTTON SPACING
+    ========================================================= */
+    --button-padding-x: var(--space-6);
+    --button-padding-y: var(--space-3);
+    --button-gap: var(--space-2);
+    --button-radius: var(--radius-lg);
+  }
+}
+
+/* =========================================================
+   SPACING UTILITIES
+========================================================= */
+@layer utilities {
+  /* Card Spacing Preset */
+  .card-spacing {
+    padding: var(--card-padding);
+    gap: var(--card-gap);
+    border-radius: var(--card-radius);
+  }
+
+  /* Section Spacing Preset */
+  .section-spacing {
+    padding-top: var(--section-padding-y);
+    padding-bottom: var(--section-padding-y);
+    padding-left: var(--section-padding-x);
+    padding-right: var(--section-padding-x);
+  }
+
+  /* Button Spacing Preset */
+  .button-spacing {
+    padding-left: var(--button-padding-x);
+    padding-right: var(--button-padding-x);
+    padding-top: var(--button-padding-y);
+    padding-bottom: var(--button-padding-y);
+    gap: var(--button-gap);
+    border-radius: var(--button-radius);
+  }
+
+  /* Container with max-width */
+  .container-responsive {
+    width: 100%;
+    max-width: var(--container-2xl);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  /* Stack (vertical spacing) */
+  .stack-xs { display: flex; flex-direction: column; gap: var(--gap-xs); }
+  .stack-sm { display: flex; flex-direction: column; gap: var(--gap-sm); }
+  .stack-md { display: flex; flex-direction: column; gap: var(--gap-md); }
+  .stack-lg { display: flex; flex-direction: column; gap: var(--gap-lg); }
+  .stack-xl { display: flex; flex-direction: column; gap: var(--gap-xl); }
+
+  /* Inline (horizontal spacing) */
+  .inline-xs { display: flex; gap: var(--gap-xs); }
+  .inline-sm { display: flex; gap: var(--gap-sm); }
+  .inline-md { display: flex; gap: var(--gap-md); }
+  .inline-lg { display: flex; gap: var(--gap-lg); }
+  .inline-xl { display: flex; gap: var(--gap-xl); }
 }

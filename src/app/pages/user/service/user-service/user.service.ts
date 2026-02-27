@@ -1,8 +1,9 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { ApiService } from '@core/services/api/api.service';
 import { IApiRes } from '@models/global.model';
-import { IPredictResponse } from '../../model/user.model';
+import { IPredictResponse, IUserResponse, IUserUpdate } from '../../model/user.model';
 import { environment } from 'environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -66,5 +67,12 @@ export class UserService {
           }
         },
       });
+  }
+
+
+
+  //PROFILE SERVICES
+  updateProfile(data: IUserUpdate):Observable<IUserResponse>{
+    return this.apiService.patch("user/me", data)
   }
 }

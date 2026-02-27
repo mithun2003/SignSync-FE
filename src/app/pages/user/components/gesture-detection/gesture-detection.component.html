@@ -108,7 +108,7 @@
           <!-- Confidence Bar -->
           <div class="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
             <div
-              class="h-full bg-gradient-to-r from-primary to-violet-primary transition-all duration-300"
+              class="h-full bg-linear-to-r from-primary to-violet-primary transition-all duration-300"
               [style.width.%]="currentConfidence()"
             ></div>
           </div>
@@ -125,7 +125,7 @@
     <div class="w-full lg:w-3/5 flex flex-col gap-4">
       
       <!-- Sentence Display -->
-      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg flex-grow">
+      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg grow">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-gray-300 flex items-center gap-2">
             <span class="text-2xl">📝</span>
@@ -154,7 +154,7 @@
         </div>
 
         <!-- Sentence Text Area -->
-        <div class="bg-gray-900 rounded-xl p-6 min-h-[200px] max-h-[400px] overflow-y-auto border-2 border-gray-700
+        <div class="bg-gray-900 rounded-xl p-6 min-h-50 max-h-100 overflow-y-auto border-2 border-gray-700
                     focus-within:border-primary transition-colors
                     [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-800 
                     [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full
@@ -210,7 +210,7 @@
           } @else {
             @for (letter of letterHistory(); track $index) {
               <div 
-                class="flex-shrink-0 w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center
+                class="shrink-0 w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center
                        text-2xl font-bold border-2 transition-all duration-300 hover:scale-110
                        animate-[fadeIn_0.3s_ease-out]"
                 [class.border-primary]="$index === letterHistory().length - 1"

@@ -1,3 +1,4 @@
+// common-button.component.ts - Updated for Tailwind v4
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -18,124 +19,186 @@ export type TCommonButtonAnimationValues = 'animation-arrow-icon' | false;
 @Component({
   selector: 'app-common-button',
   templateUrl: './common-button.component.html',
-  styleUrls: ['./common-button.component.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MatBadgeModule, MatTooltipModule, FontAwesomeModule],
 })
 export class CommonButtonComponent {
+  // Button type & behavior
   isSubmitButton = input<boolean>(false);
   buttonType = input<'filled' | 'outline'>('filled');
-  buttonClass = input<string>(''); // Input for custom button class
-  text = input<string | number | undefined>(); //  Text to be displayed on the button
-  textClass = input<string>(''); // it represents the style for text
+  disabled = input<boolean>(false);
+  isLoading = input<boolean | undefined>(false);
 
-  textColor = input<string>(''); // it represents the color for text
-  bgColor = input<string>('');
-  hoverColor = input<string>(''); // it represents the color for text
-  color = input<string>('violet'); // it represents the color for text
+  // Text & content
+  text = input<string | number | undefined>();
+  textClass = input<string>('');
 
-  prefix = input<boolean>(false); // Boolean value to determine whether to display icon on beginning of the button if false it show at end and if true it show at beginning
-  isIcon = input<boolean | undefined>(false); // flag indicating whether the button to show icon or not
-  icon = input<IconDefinition | undefined>(undefined); // it represents the icon
-  iconClass = input<string>('text-primary-icon-color'); // it represents the style for icon
-  iconSize = input<SizeProp | undefined>(undefined); // it represents the style for icon
+  // Colors (priority: explicit colors > theme colors > defaults)
+  color = input<string>('primary'); // Theme name: 'primary', 'success', 'danger', etc.
+  textColor = input<string>(''); // Override text color
+  bgColor = input<string>(''); // Override background color
+  hoverColor = input<string>(''); // Override hover color
+
+  // Custom classes
+  buttonClass = input<string>('');
+  disabledButtonClass = input<string>('');
+
+  // Icon
+  isIcon = input<boolean | undefined>(false);
+  icon = input<IconDefinition | undefined>(undefined);
+  iconClass = input<string>('');
+  iconSize = input<SizeProp | undefined>(undefined);
   iconStyle = input<'rounded' | 'sharp' | 'outlined'>('sharp');
-  isLoading = input<boolean | undefined>(false); // flag indicating whether the button is in a loading state
-  loaderColor = input<string>('white'); // it represents the color of the loading
-  animation = input<TCommonButtonAnimationValues>(false); // Boolean value to determine whether to display animation to a button
-  disabled = input<boolean>(false); // Boolean value to determine whether to display the icon on the button.
-  disabledButtonClass = input<string>(''); // Input for button when it is disabled
-  loaderSize = input<string>('base'); // it represents the font size of loader
-  hover = input<boolean>(true); // it represents the font size of loader
+  prefix = input<boolean>(false); // Icon position: true = before text, false = after
 
+  // Animation & effects
+  animation = input<TCommonButtonAnimationValues>(false);
+  hover = input<boolean>(true); // Enable hover effect
+
+  // Loading
+  loaderColor = input<string>('white');
+  loaderSize = input<string>('base');
+
+  // Badge
   showBadge = input<boolean | undefined>(false);
   badgeColor = input<ThemePalette>('warn');
   badgeSize = input<MatBadgeSize>('small');
   badgeValue = input<string | number>(0);
-  // outlineColor = input<string>('white');
+
+  // Tooltip
   toolTipMsg = input<string | undefined>();
 
+  // Events
   clickEmit = output<Event>();
+
+  // Icons
   faArrowRight = faArrowRight;
   faSpinner = faSpinner;
 
+  /**
+   * Button click handler
+   */
   buttonClick(event: Event) {
-    this.clickEmit.emit(event);
+    if (!this.disabled() && !this.isLoading()) {
+      this.clickEmit.emit(event);
+    }
   }
 
   /**
-   * ✅ Resolve TEXT color
-   * Priority:
-   * 1. textColor input
-   * 2. color theme
-   * 3. fallback
+   * ✅ Get theme from COLOR_THEME_MAP
+   */
+  private get theme() {
+    return COLOR_THEME_MAP[this.color()] || COLOR_THEME_MAP['primary'];
+  }
+
+  /**
+   * ✅ Resolve TEXT color (for filled buttons)
+   * Priority: textColor input > theme > default
    */
   get resolvedTextClass(): string {
     if (this.textColor()) return this.textColor();
-
-    const theme = COLOR_THEME_MAP[this.color()];
-    if (theme?.text) return theme.text;
-
-    return 'text-white';
+    return this.theme.text;
   }
 
-  /** ✅ Background (base) */
+  /**
+   * ✅ Resolve BACKGROUND color (for filled buttons)
+   * Priority: bgColor input > theme > default
+   */
   get resolvedBgClass(): string {
     if (this.bgColor()) return this.bgColor();
-
-    const theme = COLOR_THEME_MAP[this.color()];
-    if (theme?.bg) return theme.bg;
-
-    return 'bg-violet-primary';
+    return this.theme.bg;
   }
+
   /**
-   * ✅ Resolve HOVER background
-   * Priority:
-   * 1. hoverColor input
-   * 2. color theme
-   * 3. fallback
+   * ✅ Resolve HOVER background (for filled buttons)
+   * Priority: hoverColor input > theme > default
    */
   get resolvedHoverClass(): string {
     if (this.hoverColor()) return this.hoverColor();
-
-    const theme = COLOR_THEME_MAP[this.color()];
-    if (theme?.hoverBg) return theme.hoverBg;
-
-    return 'bg-violet-secondary';
+    return this.theme.hoverBg;
   }
 
+  /**
+   * ✅ Resolve OUTLINE text color
+   * Priority: textColor input > theme > default
+   */
   get resolvedOutlineTextClass(): string {
     if (this.textColor()) return this.textColor();
-
-    const theme = COLOR_THEME_MAP[this.color()];
-    return theme?.outlineText ?? 'text-white';
+    return this.theme.outlineText;
   }
 
+  /**
+   * ✅ Resolve OUTLINE border color
+   */
   get resolvedOutlineBorderClass(): string {
-    const theme = COLOR_THEME_MAP[this.color()];
-    return theme?.outlineBorder ?? 'border-border-primary';
+    return this.theme.outlineBorder;
   }
 
+  /**
+   * ✅ Resolve OUTLINE hover background
+   * Priority: hoverColor input > theme > default
+   */
   get resolvedOutlineHoverClass(): string {
     if (this.hoverColor()) return this.hoverColor();
-
-    const theme = COLOR_THEME_MAP[this.color()];
-    return theme?.outlineHoverBg ?? 'bg-white/10';
+    return this.theme.outlineHoverBg;
   }
 
+  /**
+   * ✅ Complete outline theme classes
+   */
   get outlineTheme(): string {
-    return `
-    bg-transparent
-    border
-    ${this.resolvedOutlineBorderClass}
-  `;
+    return `border-2 ${this.resolvedOutlineBorderClass}`;
   }
 
+  /**
+   * ✅ Final text class based on button type
+   */
   get resolvedFinalTextClass(): string {
-  return this.buttonType() === 'outline'
-    ? this.resolvedOutlineTextClass
-    : this.resolvedTextClass;
-}
+    return this.buttonType() === 'outline'
+      ? this.resolvedOutlineTextClass
+      : this.resolvedTextClass;
+  }
 
+  /**
+   * ✅ Base button classes
+   */
+  get baseButtonClasses(): string {
+    return `
+      group relative inline-flex items-center justify-center
+      min-w-fit h-9
+      px-4 sm:px-6 py-2
+      rounded-lg
+      text-nowrap font-semibold
+      select-none cursor-pointer
+      overflow-hidden
+      transition-all duration-300
+      disabled:opacity-50 disabled:cursor-not-allowed
+    `.trim().replace(/\s+/g, ' ');
+  }
+
+  /**
+   * ✅ Get complete button class string
+   */
+  get completeButtonClass(): string {
+    const base = this.baseButtonClasses;
+    const typeClasses = this.buttonType() === 'outline' 
+      ? `bg-transparent ${this.outlineTheme} ${this.resolvedOutlineTextClass}`
+      : `${this.resolvedBgClass} ${this.resolvedTextClass}`;
+    const custom = this.buttonClass();
+
+    return `${base} ${typeClasses} ${custom}`.trim().replace(/\s+/g, ' ');
+  }
+
+  /**
+   * ✅ Hover effect class
+   */
+  get hoverEffectClass(): string {
+    const baseEffect = 'hover-effect';
+    const colorClass = this.buttonType() === 'outline'
+      ? this.resolvedOutlineHoverClass
+      : this.resolvedHoverClass;
+    
+    return `${baseEffect} ${colorClass}`;
+  }
 }

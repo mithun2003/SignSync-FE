@@ -1,0 +1,337 @@
+<!-- dashboard.component.html -->
+<div class="min-h-screen bg-gradient-to-b from-bg-primary via-bg-secondary to-bg-primary text-white pt-24 pb-12 px-6">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header with Animated Gradient -->
+    <div class="mb-8 relative">
+      <div class="absolute -inset-4 bg-gradient-to-r from-primary via-violet-500 to-primary opacity-10 blur-3xl rounded-full"></div>
+      <div class="relative">
+        <h1 class="headline-2 mb-2">
+          <span class="gradient-text">Your Dashboard</span>
+        </h1>
+        <p class="text-font-primary body-2">Track your sign language learning progress and activity</p>
+      </div>
+    </div>
+
+    <!-- Stats Cards Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      
+      <!-- Total Signs Card -->
+      <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
+                  hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+        <!-- Animated gradient overlay -->
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div class="relative p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+                        flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <span class="text-3xl">🤟</span>
+            </div>
+            <div class="px-3 py-1 rounded-full bg-success/20 border border-success/30">
+              <span class="text-success text-xs font-semibold">+{{ todaySignsCount() }}</span>
+            </div>
+          </div>
+          <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
+                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:to-primary transition-all duration-300">
+            {{ totalSignsDetected() }}
+          </div>
+          <p class="text-font-muted body-3">Total Signs Detected</p>
+        </div>
+      </div>
+
+      <!-- Practice Time Card -->
+      <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
+                  hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div class="relative p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+                        flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <span class="text-3xl">⏱️</span>
+            </div>
+            <div class="px-3 py-1 rounded-full bg-success/20 border border-success/30">
+              <span class="text-success text-xs font-semibold">+{{ todayMinutes() }}m</span>
+            </div>
+          </div>
+          <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
+                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:to-primary transition-all duration-300">
+            {{ totalPracticeTime() }}
+          </div>
+          <p class="text-font-muted body-3">Practice Hours</p>
+        </div>
+      </div>
+
+      <!-- Accuracy Card -->
+      <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
+                  hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div class="relative p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+                        flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <span class="text-3xl">🎯</span>
+            </div>
+            <div class="px-3 py-1 rounded-full bg-success/20 border border-success/30">
+              <span class="text-success text-xs font-semibold">+{{ accuracyChange() }}%</span>
+            </div>
+          </div>
+          <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
+                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:to-primary transition-all duration-300">
+            {{ averageAccuracy() }}%
+          </div>
+          <p class="text-font-muted body-3">Average Accuracy</p>
+        </div>
+      </div>
+
+      <!-- Streak Card -->
+      <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
+                  hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div class="relative p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+                        flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <span class="text-3xl animate-pulse">🔥</span>
+            </div>
+            <div class="px-3 py-1 rounded-full bg-primary/20 border border-primary/30">
+              <span class="text-primary text-xs font-semibold">{{ streakDays() }} days</span>
+            </div>
+          </div>
+          <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
+                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:to-primary transition-all duration-300">
+            {{ currentStreak() }}
+          </div>
+          <p class="text-font-muted body-3">Day Streak</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      
+      <!-- Most Frequent Signs (Bar Chart) -->
+      <div class="rounded-2xl bg-bg-card border border-border-primary p-6 hover:border-primary/50 transition-all duration-300">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="body-1-semibold mb-1 gradient-text">Most Practiced Signs</h3>
+            <p class="text-font-muted body-3">Your top 10 letters this week</p>
+          </div>
+          <button (click)="changeTimeFilter('week')" 
+                  class="px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/30 
+                         text-primary body-4 transition-all duration-300 hover:scale-105">
+            This Week
+          </button>
+        </div>
+        <div class="h-80 relative">
+          <canvas #frequentSignsChart></canvas>
+        </div>
+      </div>
+
+      <!-- Daily Activity (Line Chart) -->
+      <div class="rounded-2xl bg-bg-card border border-border-primary p-6 hover:border-primary/50 transition-all duration-300">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="body-1-semibold mb-1 gradient-text">Daily Activity</h3>
+            <p class="text-font-muted body-3">Signs detected per day</p>
+          </div>
+          <div class="flex gap-2">
+            <button 
+              [class]="selectedPeriod() === '7d' ? 'bg-gradient-to-r from-primary via-violet-500 to-primary text-white' : 'bg-primary/10 text-font-muted hover:bg-primary/20'"
+              (click)="changePeriod('7d')"
+              class="px-4 py-2 rounded-lg body-4 transition-all duration-300 hover:scale-105 border border-primary/30">
+              7D
+            </button>
+            <button 
+              [class]="selectedPeriod() === '30d' ? 'bg-gradient-to-r from-primary via-violet-500 to-primary text-white' : 'bg-primary/10 text-font-muted hover:bg-primary/20'"
+              (click)="changePeriod('30d')"
+              class="px-4 py-2 rounded-lg body-4 transition-all duration-300 hover:scale-105 border border-primary/30">
+              30D
+            </button>
+          </div>
+        </div>
+        <div class="h-80 relative">
+          <canvas #dailyActivityChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      
+      <!-- Accuracy by Letter (Doughnut) -->
+      <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+        <div class="mb-6">
+          <h3 class="body-1-semibold mb-1">Accuracy Distribution</h3>
+          <p class="text-neutral-l-grey body-3">Letters by accuracy level</p>
+        </div>
+        <div class="h-64">
+          <canvas #accuracyDistChart></canvas>
+        </div>
+        <div class="mt-4 space-y-2">
+          <div class="flex items-center justify-between body-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-success-tint-2"></div>
+              <span class="text-neutral-l-grey">High (90%+)</span>
+            </div>
+            <span class="text-white">{{ highAccuracyCount() }}</span>
+          </div>
+          <div class="flex items-center justify-between body-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-primary"></div>
+              <span class="text-neutral-l-grey">Medium (70-90%)</span>
+            </div>
+            <span class="text-white">{{ mediumAccuracyCount() }}</span>
+          </div>
+          <div class="flex items-center justify-between body-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-red-primary"></div>
+              <span class="text-neutral-l-grey">Low (<70%)</span>
+            </div>
+            <span class="text-white">{{ lowAccuracyCount() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Learning Progress (Radial) -->
+      <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+        <div class="mb-6">
+          <h3 class="body-1-semibold mb-1">Learning Progress</h3>
+          <p class="text-neutral-l-grey body-3">Letters mastered</p>
+        </div>
+        <div class="h-64 flex items-center justify-center">
+          <div class="relative w-48 h-48">
+            <svg class="transform -rotate-90 w-48 h-48">
+              <circle
+                cx="96"
+                cy="96"
+                r="80"
+                stroke="currentColor"
+                class="text-neutral-d-grey"
+                stroke-width="12"
+                fill="transparent"
+              />
+              <circle
+                cx="96"
+                cy="96"
+                r="80"
+                stroke="url(#gradient)"
+                stroke-width="12"
+                fill="transparent"
+                [attr.stroke-dasharray]="circumference()"
+                [attr.stroke-dashoffset]="progressOffset()"
+                class="transition-all duration-1000 ease-out"
+                stroke-linecap="round"
+              />
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#a855f7" />
+                  <stop offset="50%" style="stop-color:#ec4899" />
+                  <stop offset="100%" style="stop-color:#f07458" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <div class="headline-2">{{ masteredLetters() }}</div>
+              <div class="text-neutral-l-grey body-3">of 26</div>
+              <div class="text-success-tint-2 body-4 mt-1">{{ masteryPercentage() }}%</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 text-center">
+          <p class="text-neutral-l-grey body-4">
+            {{ remainingLetters() }} more to go! Keep practicing 🎯
+          </p>
+        </div>
+      </div>
+
+      <!-- Recent Activity Feed -->
+      <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+        <div class="mb-6">
+          <h3 class="body-1-semibold mb-1">Recent Activity</h3>
+          <p class="text-neutral-l-grey body-3">Your last 5 sessions</p>
+        </div>
+        <div class="space-y-4 max-h-80 overflow-y-auto 
+                    [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-neutral-black
+                    [&::-webkit-scrollbar-thumb]:bg-neutral-grey [&::-webkit-scrollbar-thumb]:rounded-full">
+          @for (activity of recentActivities(); track activity.id) {
+            <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-black/30 hover:bg-neutral-black/50 transition-colors">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-primary/20 to-pink-primary/20 
+                          flex items-center justify-center flex-shrink-0">
+                <span class="text-xl">{{ activity.emoji }}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="body-4 text-white mb-1">{{ activity.description }}</p>
+                <p class="text-neutral-l-grey body-4">{{ activity.timeAgo }}</p>
+              </div>
+              @if (activity.badge) {
+                <div class="px-2 py-1 rounded-full text-white body-4"
+                     [class.bg-success-tint-2]="activity.badge === 'success'"
+                     [class.bg-primary]="activity.badge === 'practice'"
+                     [class.bg-pink-primary]="activity.badge === 'streak'">
+                  {{ activity.badgeText }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Practice Recommendations -->
+    <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+      <div class="mb-6">
+        <h3 class="body-1-semibold mb-1">Practice Recommendations</h3>
+        <p class="text-neutral-l-grey body-3">Letters you should focus on</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @for (letter of recommendedLetters(); track letter.char) {
+          <div class="flex items-center gap-4 p-4 rounded-lg bg-neutral-black/30 
+                      border border-neutral-d-grey hover:border-violet-primary transition-all group">
+            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-violet-primary/20 to-pink-primary/20 
+                        flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <span class="text-3xl font-bold gradient-text">{{ letter.char }}</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="body-3 text-white">{{ letter.char }}</span>
+                <span class="px-2 py-0.5 rounded-full body-4"
+                      [class.bg-red-primary/20]="letter.accuracy < 70"
+                      [class.text-red-primary]="letter.accuracy < 70"
+                      [class.bg-primary/20]="letter.accuracy >= 70 && letter.accuracy < 90"
+                      [class.text-violet-primary]="letter.accuracy >= 70 && letter.accuracy < 90">
+                  {{ letter.accuracy }}%
+                </span>
+              </div>
+              <p class="text-neutral-l-grey body-4">{{ letter.count }} attempts</p>
+              <div class="mt-2 w-full h-1.5 bg-neutral-d-grey rounded-full overflow-hidden">
+                <div class="h-full gradient-bg transition-all duration-500"
+                     [style.width.%]="letter.accuracy"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      
+      @if (recommendedLetters().length === 0) {
+        <div class="text-center py-8">
+          <span class="text-6xl mb-4 block">🎉</span>
+          <p class="text-neutral-l-grey body-2">Great job! All letters are above 70% accuracy!</p>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

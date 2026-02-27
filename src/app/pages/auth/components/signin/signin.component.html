@@ -17,7 +17,7 @@
   <!-- Email Field -->
   <div>
     <label for="email" class="block text-sm font-medium text-gray-300 mb-2"
-    >Email address</label >
+    >Username or Email</label >
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center
       pointer-events-none" >
@@ -28,14 +28,14 @@
           10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
         </svg>
       </div>
-      <input id="email" type="email" formControlName="email"
-      autocomplete="email" required class="block w-full pl-10 pr-3 py-3 border
+      <input id="username" type="username" formControlName="username"
+      autocomplete="username" required class="block w-full pl-10 pr-3 py-3 border
       border-gray-300 rounded-xl placeholder-gray-500 focus:outline-none
       focus:ring-2 focus:ring-violet-secondary focus:border-transparent
-      transition-colors duration-200 text-white" placeholder="Enter your email"
-      [class.border-red-primary]=" form.get('email')?.invalid &&
-      form.get('email')?.touched " [class.focus:ring-red-secondary]="
-      form.get('email')?.invalid && form.get('email')?.touched " />
+      transition-colors duration-200 text-white" placeholder="Enter your username or email"
+      [class.border-red-primary]=" form.get('username')?.invalid &&
+      form.get('username')?.touched " [class.focus:ring-red-secondary]="
+      form.get('username')?.invalid && form.get('username')?.touched " />
     </div>
     @if (form.get("email")?.invalid && form.get("email")?.touched) {
       <div class="flex items-center gap-1 text-red-secondary text-sm mt-2">

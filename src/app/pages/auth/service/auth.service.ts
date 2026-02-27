@@ -28,7 +28,7 @@ export class AuthService {
      * @returns 
      */
     signUp(body: IUser) {
-      return this.apiService.post('auth/user', body);
+      return this.apiService.post('auth/register', body);
     }
   
 

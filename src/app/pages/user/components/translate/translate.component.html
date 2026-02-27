@@ -233,7 +233,7 @@
               <div class="mb-4">
                 <div class="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    class="h-full bg-gradient-to-r from-primary to-violet-primary transition-all duration-500"
+                    class="h-full bg-linear-to-r from-primary to-violet-primary transition-all duration-500"
                     [style.width.%]="progress()"
                   ></div>
                 </div>
@@ -247,7 +247,7 @@
             @if (inputText.trim()) {
               <div class="bg-gray-700 rounded-xl p-4">
                 <h3 class="text-sm text-gray-300 mb-2 font-semibold">Your Message:</h3>
-                <p class="text-white text-lg break-words">
+                <p class="text-white text-lg wrap-break-word">
                   {{ inputText }}
                 </p>
               </div>

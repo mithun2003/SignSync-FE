@@ -1,20 +1,29 @@
-<header class="flex justify-center py-4 fixed w-full z-[100]">
-  <div
-    class="
-    block
-    w-3/4
-    bg-white/10 rounded-4xl shadow-nav-bar border border-white/20 backdrop-blur-md
-    px-4
-    py-2
-    lg:flex lg:items-center lg:justify-between
-  ">
+<!-- navbar.component.html - Improved with Dashboard -->
+<header class="flex justify-center py-4 fixed w-full z-100">
+  <div class="block w-3/4 bg-linear-to-r from-bg-primary/80 via-bg-secondary/80 to-bg-primary/80
+              rounded-4xl shadow-nav-bar border border-border-primary backdrop-blur-md
+              px-4 py-2 lg:flex lg:items-center lg:justify-between">
+    
+    <!-- Logo & Mobile Menu Toggle -->
     <div class="flex justify-between items-center w-full lg:w-auto">
-      <a routerLink="/home" class="flex items-center">
-        <img ngSrc="images/icon.png" width="40" height="40" alt="SignSync Logo" class="logo" />
-        <span class="ml-1 font-bold text-white text-lg">SignSync</span>
+      <a routerLink="/home" class="flex items-center group">
+        <div class="relative">
+          <div class="absolute -inset-2 bg-linear-to-r from-primary via-violet-500 to-primary 
+                      opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-500"></div>
+          <img ngSrc="images/icon.png" width="40" height="40" alt="SignSync Logo" 
+               class="logo relative group-hover:scale-110 transition-transform duration-300" />
+        </div>
+        <span class="ml-3 font-bold text-white text-lg group-hover:text-transparent 
+                     group-hover:bg-clip-text group-hover:bg-linear-to-r 
+                     group-hover:from-primary group-hover:via-violet-500 group-hover:to-primary
+                     transition-all duration-300">
+          SignSync
+        </span>
       </a>
 
-      <button (click)="toggleMenu()" class="block bg-transparent lg:hidden border-none cursor-pointer p-1">
+      <button (click)="toggleMenu()" 
+              class="block bg-transparent lg:hidden border-none cursor-pointer p-2 
+                     hover:bg-white/10 rounded-lg transition-colors">
         @if (!isMenuOpen()) {
           <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"></path>
@@ -27,91 +36,190 @@
       </button>
     </div>
 
-    <div
-      #linksDiv
-      id="navigation"
-      [style.height]="isMenuOpen() ? (linksDiv.scrollHeight + 'px') : (isLargeScreen() ? 'auto' : '0')"
-      class="
-      basis-full lg:basis-auto
-      flex
-      flex-col
-      items-center
-      gap-4
-      w-full
-      overflow-hidden
-      text-white
-      transition-all
-      duration-500
-      ease-in-out
-      lg:h-auto lg:flex-row lg:overflow-visible lg:justify-between lg:w-3/4"
-      [class.mt-4]="isMenuOpen() && !isLargeScreen()"
-    >
+    <!-- Navigation Links -->
+    <div #linksDiv id="navigation"
+         [style.height]="isMenuOpen() ? (linksDiv.scrollHeight + 'px') : (isLargeScreen() ? 'auto' : '0')"
+         class="basis-full lg:basis-auto flex flex-col items-center gap-4 w-full overflow-hidden text-white
+                transition-all duration-500 ease-in-out lg:h-auto lg:flex-row lg:overflow-visible 
+                lg:justify-between lg:w-3/4"
+         [class.mt-4]="isMenuOpen() && !isLargeScreen()">
 
+      <!-- Main Navigation Links -->
       @for (link of navLinks; track link.routerLink) {
-      <a
-        [routerLink]="link.routerLink"
-        [routerLinkActiveOptions]="{ exact: true }"
-        routerLinkActive="[&_div]:w-full"
-        class="nav-link text-white group p-2 px-4 lg:w-auto text-center"
-        (click)="closeMobileMenu()">
-        {{ link.title }}
-        <div class="bg-white h-0.5 w-0 group-hover:w-full transition-all duration-500 ease-in-out"></div>
-      </a>
+        <a [routerLink]="link.routerLink"
+           [routerLinkActiveOptions]="{ exact: link.routerLink === '/' }"
+           routerLinkActive="active-nav-link"
+           class="relative nav-link text-white group p-2 px-4 lg:w-auto text-center 
+                  hover:text-primary transition-colors duration-300"
+           (click)="closeMobileMenu()">
+          {{ link.title }}
+          <div class="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 
+                      bg-linear-to-r from-primary via-violet-500 to-primary 
+                      group-hover:w-full transition-all duration-500 ease-in-out"></div>
+        </a>
       }
 
+      <!-- User Menu / Login -->
       <div class="flex items-center gap-4 py-2 lg:py-0">
         @if(commonService.loading()) {
-        <div class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button">
-          <fa-icon size="xl" [icon]="faSpinner" class="text-base text-white animate-spin [animation-duration:1.8s]"></fa-icon>
-        </div>
-        }
-        @else if (isLoggedIn()) {
-        <div class="relative">
-          <button (click)="toggleUserMenu($event)"
-            class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors user-menu-button cursor-pointer"
-            aria-label="User menu">
-            <span class="hover-effect bg-white/10"></span>
-            <img
-              [src]="user()?.profile_photo || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
-              class="w-9 h-9 rounded-full border border-white/20"
-              alt="User Avatar" />
-            <div class="block md:block text-left">
-              <p class="text-sm font-medium text-white">{{ user()?.username || 'Admin User' }}</p>
-              <p class="text-xs text-white/60">{{ user()?.email || 'admin@example.com' }}</p>
-            </div>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          @if (showUserMenu()) {
-          <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-[110] user-menu-dropdown overflow-hidden">
-            <div class="p-4 border-b border-gray-200 bg-gray-50">
-              <p class="text-sm font-medium text-gray-900">{{ user()?.username }}</p>
-              <p class="text-xs text-gray-500">{{ user()?.email }}</p>
-            </div>
-            <div class="py-1">
-              <a routerLink="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Profile</a>
-              <a routerLink="/settings" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Settings</a>
-              <a routerLink="/help" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Help & Support</a>
-            </div>
-            <div class="border-t border-gray-200 bg-red-50">
-              <button (click)="logout()" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-100 transition-colors w-full text-left cursor-pointer">
-                Sign out
-              </button>
-            </div>
+          <div class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 
+                      rounded-lg border border-border-primary transition-colors">
+            <fa-icon size="xl" [icon]="faSpinner" 
+                     class="text-base text-primary animate-spin [animation-duration:1.8s]"></fa-icon>
           </div>
         }
-        </div>
+        @else if (isLoggedIn()) {
+          <!-- User Menu Dropdown -->
+          <div class="relative">
+            <button (click)="toggleUserMenu($event)"
+                    class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 pr-3
+                           rounded-xl border border-border-primary hover:border-primary
+                           transition-all duration-300 cursor-pointer
+                           hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]"
+                    aria-label="User menu">
+              
+              <!-- Gradient overlay on hover -->
+              <div class="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 
+                          opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              <img [src]="user()?.profile_photo || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
+                   class="relative w-9 h-9 rounded-full border-2 border-primary/50 
+                          group-hover:border-primary transition-colors"
+                   alt="User Avatar" />
+              
+              <div class="relative hidden md:block text-left">
+                <p class="text-sm font-medium text-white group-hover:text-primary transition-colors">
+                  {{ user()?.username || 'Admin User' }}
+                </p>
+                <p class="text-xs text-white/60">{{ user()?.email || 'admin@example.com' }}</p>
+              </div>
+              
+              <svg class="relative w-4 h-4 text-gray-400 group-hover:text-primary 
+                          transition-all duration-300"
+                   [class.rotate-180]="showUserMenu()"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Dropdown Menu -->
+            @if (showUserMenu()) {
+              <div class="absolute right-0 mt-2 w-64 bg-bg-card/95 backdrop-blur-xl 
+                          rounded-2xl shadow-[0_8px_32px_rgba(139,92,246,0.3)] 
+                          border border-border-primary z-110 overflow-hidden
+                          animate-[fadeIn_0.3s_ease-out]">
+                
+                <!-- User Info Header -->
+                <div class="p-4 border-b border-border-primary 
+                            bg-linear-to-r from-primary/5 via-violet-500/5 to-primary/5">
+                  <div class="flex items-center gap-3">
+                    <img [src]="user()?.profile_photo || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
+                         class="w-12 h-12 rounded-full border-2 border-primary/50"
+                         alt="User Avatar" />
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold text-white truncate">
+                        {{ user()?.username }}
+                      </p>
+                      <p class="text-xs text-font-muted truncate">{{ user()?.email }}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Menu Items -->
+                <div class="py-2">
+                  <!-- Dashboard -->
+                  <a routerLink="/dashboard" 
+                     (click)="closeUserMenu()"
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                            hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
+                            transition-all group">
+                    <span class="text-xl group-hover:scale-110 transition-transform">📊</span>
+                    <div class="flex-1">
+                      <div class="font-medium group-hover:text-primary transition-colors">Dashboard</div>
+                      <div class="text-xs text-font-muted">View your stats & progress</div>
+                    </div>
+                  </a>
+                  
+                  <!-- Profile -->
+                  <a routerLink="/profile" 
+                     (click)="closeUserMenu()"
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                            hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
+                            transition-all group">
+                    <span class="text-xl group-hover:scale-110 transition-transform">👤</span>
+                    <div class="flex-1">
+                      <div class="font-medium group-hover:text-primary transition-colors">Profile</div>
+                      <div class="text-xs text-font-muted">Manage your account</div>
+                    </div>
+                  </a>
+                  
+                  <!-- Settings -->
+                  <a routerLink="/settings" 
+                     (click)="closeUserMenu()"
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                            hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
+                            transition-all group">
+                    <span class="text-xl group-hover:scale-110 transition-transform">⚙️</span>
+                    <div class="flex-1">
+                      <div class="font-medium group-hover:text-primary transition-colors">Settings</div>
+                      <div class="text-xs text-font-muted">Preferences & privacy</div>
+                    </div>
+                  </a>
+                  
+                  <!-- Help & Support -->
+                  <a routerLink="/help" 
+                     (click)="closeUserMenu()"
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                            hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
+                            transition-all group">
+                    <span class="text-xl group-hover:scale-110 transition-transform">❓</span>
+                    <div class="flex-1">
+                      <div class="font-medium group-hover:text-primary transition-colors">Help & Support</div>
+                      <div class="text-xs text-font-muted">Get assistance</div>
+                    </div>
+                  </a>
+                </div>
+                
+                <!-- Logout -->
+                <div class="border-t border-border-primary bg-danger/5">
+                  <button (click)="logout()" 
+                          class="flex items-center gap-3 px-4 py-3 text-sm text-danger 
+                                 hover:bg-danger/10 transition-all w-full text-left cursor-pointer group">
+                    <span class="text-xl group-hover:scale-110 transition-transform">🚪</span>
+                    <div class="flex-1">
+                      <div class="font-medium">Sign out</div>
+                      <div class="text-xs text-danger/60">End your session</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
           
         } @else {
-        <app-common-button
-          text="Login"
-          buttonClass="common-login-button body-3-medium"
-          routerLink="/auth/signin">
-        </app-common-button>
+          <app-common-button
+            text="Login"
+            buttonClass="common-login-button body-3-medium"
+            routerLink="/auth/signin">
+          </app-common-button>
         }
       </div>
     </div>
   </div>
 </header>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Active nav link styling */
+.active-nav-link {
+  color: var(--color-primary);
+}
+
+.active-nav-link div {
+  width: 100%;
+}
+</style>

@@ -1,52 +1,220 @@
-@import './_typography.css';
+/* theme/_effects.css - Tailwind v4 Compatible */
 
-:root {
-  /* ===== BOX SHADOWS ===== */
-  --shadow-common-button-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.06);
-  --shadow-common-box: 0px 4px 16px 0px rgba(0, 0, 0, 0.04);
-  --shadow-common-tab-bottom: 0px 5px 4px -4px rgba(45, 87, 237, 0.15);
-
-  --shadow-nav-bar:
-    -1px -1px 10px rgba(255, 255, 255, 0.1),
-    1px 1px 1px rgba(255, 255, 255, 0.2), 1px 1px 5px rgba(255, 255, 255, 0.2),
-    1px 1px 2px rgba(0, 0, 0, 0.17), 0px 2px 8px rgba(0, 0, 0, 0.1);
-
-  --shadow-button: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25)), drop-shadow(0px 0px 0px 2px rgba(58, 17, 95, 100));
+@layer theme {
+  :root {
+    /* ===== BOX SHADOWS ===== */
+    --shadow-common-button: 0 8px 16px 0 rgb(0 0 0 / 0.06);
+    --shadow-common-box: 0 4px 16px 0 rgb(0 0 0 / 0.04);
+    --shadow-common-tab: 0 5px 4px -4px rgb(45 87 237 / 0.15);
+    
+    --shadow-nav-bar: 
+      -1px -1px 10px rgb(255 255 255 / 0.1),
+      1px 1px 1px rgb(255 255 255 / 0.2),
+      1px 1px 5px rgb(255 255 255 / 0.2),
+      1px 1px 2px rgb(0 0 0 / 0.17),
+      0 2px 8px rgb(0 0 0 / 0.1);
+    
+    --shadow-button: 
+      0 1px 1px rgb(0 0 0 / 0.25),
+      0 0 0 2px rgb(139 92 246 / 0.3);
+  }
 }
+
 /* ===== KEYFRAMES ===== */
 @keyframes marquee {
-  0% {
-    transform: translateX(0%);
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
   }
-  100% {
-    transform: translateX(-100%);
+  to { 
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgb(139 92 246 / 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgb(139 92 246 / 0.6);
+  }
+}
+
+/* ===== BUTTON UTILITIES ===== */
 @layer utilities {
- 
+  /* Login Button */
   .common-login-button {
-    @apply py-1 border border-border-secondary bg-violet-primary text-center transition-all duration-200 disabled:opacity-70 text-white shadow-button;
+    @apply py-2 px-6 
+           border border-border-secondary 
+           bg-linear-to-r from-primary via-violet-500 to-primary
+           text-center text-white font-semibold
+           rounded-lg
+           transition-all duration-200 
+           disabled:opacity-50 disabled:cursor-not-allowed;
+    box-shadow: var(--shadow-button);
   }
+  
   .common-login-button:hover:not(:disabled) {
-    @apply shadow-common-button-shadow;
+    @apply scale-105;
+    box-shadow: var(--shadow-common-button);
   }
 
+  .common-login-button:active:not(:disabled) {
+    @apply scale-95;
+  }
+
+  /* Standard Button */
   .common-button {
-    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md px-4 sm:px-6 py-2 text-center text-sm font-bold transition-all duration-200 disabled:opacity-70;
+    @apply flex h-9 items-center justify-center gap-2 
+           overflow-hidden rounded-lg 
+           px-4 sm:px-6 py-2 
+           text-center text-sm font-semibold
+           transition-all duration-200 
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
+  
   .common-button:hover:not(:disabled) {
-    @apply shadow-common-button-shadow;
+    box-shadow: var(--shadow-common-button);
   }
 
+  /* Gradient Button */
   .common-gradient-button {
-    @apply flex h-9 items-center justify-center gap-2 overflow-hidden rounded-md bg-linear-to-r from-purple-primary via-pink-primary to-red-secondary p-3 text-center text-sm font-bold text-white transition-all duration-150 disabled:opacity-70;
+    @apply flex h-9 items-center justify-center gap-2 
+           overflow-hidden rounded-lg
+           bg-linear-to-r from-primary via-violet-500 to-primary
+           px-6 py-2
+           text-center text-sm font-bold text-white
+           transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
+  
   .common-gradient-button:hover:not(:disabled) {
-    @apply hover:bg-linear-to-br;
+    @apply scale-105;
+    box-shadow: 0 0 20px rgb(139 92 246 / 0.5);
   }
 
+  .common-gradient-button:active:not(:disabled) {
+    @apply scale-95;
+  }
+
+  /* Outline Button */
+  .common-outline-button {
+    @apply flex h-9 items-center justify-center gap-2
+           border-2 border-primary
+           bg-transparent
+           px-6 py-2
+           rounded-lg
+           text-primary font-semibold
+           transition-all duration-200
+           hover:bg-primary hover:text-white
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Ghost Button */
+  .common-ghost-button {
+    @apply flex h-9 items-center justify-center gap-2
+           bg-transparent
+           px-6 py-2
+           rounded-lg
+           text-font-primary font-semibold
+           transition-all duration-200
+           hover:bg-primary/10 hover:text-primary
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Hover Effect (Expanding Circle) */
   .hover-effect {
-    @apply absolute w-0 h-0 transition-all duration-500 ease-out  rounded-full group-hover:w-60 group-hover:h-60;
+    @apply absolute 
+           w-0 h-0 
+           rounded-full
+           transition-all duration-500 ease-out
+           group-hover:w-60 group-hover:h-60;
+    pointer-events: none;
+  }
+
+  /* Card Hover Effect */
+  .card-hover {
+    @apply transition-all duration-300
+           hover:border-primary
+           hover:-translate-y-1;
+    box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+  }
+  
+  .card-hover:hover {
+    box-shadow: 0 0 20px rgb(139 92 246 / 0.3);
+  }
+
+  /* Glow Animation */
+  .animate-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Fade In Animation */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  /* Slide In Animation */
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  /* Bounce Animation */
+  .animate-bounce-short {
+    animation: bounce 0.5s ease-in-out;
+  }
+
+  /* Marquee Animation */
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
+  }
+
+  /* Shimmer Effect */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(139 92 246 / 0.2),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
   }
 }

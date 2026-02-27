@@ -17,7 +17,12 @@ import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule, NgOptimizedImage, CommonButtonComponent, FontAwesomeModule],
+  imports: [
+    RouterModule,
+    NgOptimizedImage,
+    CommonButtonComponent,
+    FontAwesomeModule,
+  ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,7 +52,7 @@ export class NavbarComponent {
   }
 
   toggleMenu() {
-    this.isMenuOpen.update(v => !v);
+    this.isMenuOpen.update((v) => !v);
   }
 
   closeMobileMenu() {
@@ -56,7 +61,7 @@ export class NavbarComponent {
 
   toggleUserMenu(event: Event) {
     event.stopPropagation();
-    this.showUserMenu.update(v => !v);
+    this.showUserMenu.update((v) => !v);
   }
 
   @HostListener('document:click', ['$event'])
@@ -72,7 +77,14 @@ export class NavbarComponent {
     }
   }
 
+  closeUserMenu() {
+    this.showUserMenu.set(false);
+    this.closeMobileMenu();
+  }
+
+  // Update logout method
   logout() {
     this.commonService.logout();
+    this.showUserMenu.set(false); // Add this line
   }
 }

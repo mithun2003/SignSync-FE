@@ -1,132 +1,109 @@
-<!-- <button
-  class="group relative inline-flex min-w-fit h-10 px-4 sm:px-6 py-2
-         select-none rounded-md items-center justify-center
-         text-nowrap cursor-pointer {{
-    buttonType() === 'outline'
-      ? 'flex items-center justify-center p-3 outline hover:shadow-xl ' +
-        outlineTheme
-      : buttonClass()
-  }}" -->
+<!-- common-button.component.html - Updated for Tailwind v4 -->
+
 <button
-  class="group relative inline-flex min-w-fit h-9 px-4 sm:px-6 py-2
-         overflow-hidden
-         select-none rounded-md
-         items-center justify-center
-         text-nowrap cursor-pointer
-         disabled:opacity-50
-         disabled:cursor-not-allowed
-         {{
-          buttonType() === 'outline'
-          ? 'hover:shadow-xl ' + outlineTheme
-          : resolvedBgClass
-          }} {{buttonClass()}}"
+  [class]="completeButtonClass"
   [disabled]="isLoading() || disabled()"
-  (click)="buttonClick($event)"
   [type]="isSubmitButton() ? 'submit' : 'button'"
   [ngClass]="disabled() ? disabledButtonClass() : ''"
-  [matTooltip]="toolTipMsg() ?? ''">
+  [matTooltip]="toolTipMsg() ?? ''"
+  (click)="buttonClick($event)">
 
+  <!-- Hover Effect (Expanding Circle) -->
   @if (hover() && !disabled() && !isLoading()) {
-  <span
-    class="hover-effect {{
-      buttonType() === 'outline'
-        ? resolvedOutlineHoverClass
-        : resolvedHoverClass
-    }}">
-  </span>
+    <!-- <span class="hover-effect"></span> -->
+
+    <span [class]="hoverEffectClass"></span>
   }
 
-  <span
-    class="relative z-10 inline-flex items-center gap-2
-           {{ resolvedFinalTextClass }} {{ textClass() }}">
-    @if (prefix() && isIcon()) {
-    @if (showBadge()) {
-    <span
-      [matBadge]="badgeValue()"
-      [matBadgeColor]="badgeColor()"
-      [matBadgeSize]="badgeSize()">
-      <fa-icon
-        [size]="iconSize()"
-        [icon]="icon() ?? ''"
-        class="{{ iconClass() }}"></fa-icon>
-    </span>
-    } @else {
-    <fa-icon
-      [size]="iconSize()"
-      [icon]="icon() ?? ''"
-      class="{{ iconClass() }}"></fa-icon>
-    }
-    }
-
-    @if (text()) {
-    <span class="relative text-nowrap px-3">
-      {{ text() }}
-    </span>
-    }
-
-    @if (
-    !isLoading() &&
-    !prefix() &&
-    (isIcon() || animation() === "animation-arrow-icon")
-    ) {
-    @if (animation() === "animation-arrow-icon") {
-    @if (showBadge()) {
-    <span
-      [matBadge]="badgeValue()"
-      [matBadgeColor]="badgeColor()"
-      [matBadgeSize]="badgeSize()">
-      <fa-icon
-        [size]="iconSize()"
-        [icon]="
-              animation() === 'animation-arrow-icon'
-                ? (icon() ?? faArrowRight)
-                : (icon() ?? '')
-            "
-        class="{{ iconClass() }}"
-        [ngClass]="{
-              'duration-400 -ms-7 opacity-0 transition-all group-hover:m-0 group-hover:opacity-100':
-                animation() === 'animation-arrow-icon'
-            }"></fa-icon>
-    </span>
-    } @else {
-    <span
-      class="{{ iconClass() }}"
-      [ngClass]="{
-            'duration-400 -ms-7 opacity-0 transition-all group-hover:m-0 group-hover:opacity-100':
-              animation() === 'animation-arrow-icon'
-          }">
-      @if (animation() === "animation-arrow-icon") {
-      {{ icon() ?? "arrow_forward" }}
+  <!-- Button Content -->
+  <span class="relative z-10 inline-flex items-center gap-2 {{ textClass() }}">
+    
+    <!-- Prefix Icon (Before Text) -->
+    @if (prefix() && isIcon() && icon()) {
+      @if (showBadge()) {
+        <span
+          [matBadge]="badgeValue()"
+          [matBadgeColor]="badgeColor()"
+          [matBadgeSize]="badgeSize()">
+          <fa-icon
+            [size]="iconSize()"
+            [icon]="icon()!"
+            [class]="iconClass()">
+          </fa-icon>
+        </span>
       } @else {
-      {{ icon() }}
+        <fa-icon
+          [size]="iconSize()"
+          [icon]="icon()!"
+          [class]="iconClass()">
+        </fa-icon>
       }
-    </span>
-    }
-    } @else {
-    @if (showBadge()) {
-    <span
-      [matBadge]="badgeValue()"
-      [matBadgeColor]="badgeColor()"
-      [matBadgeSize]="badgeSize()">
-      <fa-icon
-        [size]="iconSize()"
-        [icon]="icon() ?? ''"
-        class="{{ iconClass() }}"></fa-icon>
-    </span>
-    } @else {
-    <fa-icon
-      [size]="iconSize()"
-      [icon]="icon() ?? ''"
-      class="{{ iconClass() }}"></fa-icon>
-    }
-    }
     }
 
+    <!-- Button Text -->
+    @if (text()) {
+      <span class="text-nowrap">
+        {{ text() }}
+      </span>
+    }
+
+    <!-- Suffix Icon (After Text) or Loading -->
+    @if (!isLoading() && !prefix() && isIcon() && icon()) {
+      
+      <!-- Animated Arrow Icon -->
+      @if (animation() === 'animation-arrow-icon') {
+        @if (showBadge()) {
+          <span
+            [matBadge]="badgeValue()"
+            [matBadgeColor]="badgeColor()"
+            [matBadgeSize]="badgeSize()">
+            <fa-icon
+              [size]="iconSize()"
+              [icon]="icon() ?? faArrowRight"
+              [class]="iconClass()"
+              class="transition-all duration-400 -ms-7 opacity-0 group-hover:ms-0 group-hover:opacity-100">
+            </fa-icon>
+          </span>
+        } @else {
+          <fa-icon
+            [size]="iconSize()"
+            [icon]="icon() ?? faArrowRight"
+            [class]="iconClass()"
+            class="transition-all duration-400 -ms-7 opacity-0 group-hover:ms-0 group-hover:opacity-100">
+          </fa-icon>
+        }
+      } 
+      
+      <!-- Regular Icon -->
+      @else {
+        @if (showBadge()) {
+          <span
+            [matBadge]="badgeValue()"
+            [matBadgeColor]="badgeColor()"
+            [matBadgeSize]="badgeSize()">
+            <fa-icon
+              [size]="iconSize()"
+              [icon]="icon()!"
+              [class]="iconClass()">
+            </fa-icon>
+          </span>
+        } @else {
+          <fa-icon
+            [size]="iconSize()"
+            [icon]="icon()!"
+            [class]="iconClass()">
+          </fa-icon>
+        }
+      }
+    }
+
+    <!-- Loading Spinner -->
     @if (isLoading()) {
-    <fa-icon
-      [size]="iconSize()"
-      [icon]="faSpinner"
-      class=" text-{{ loaderSize() }} text-{{ loaderColor() }} animate-spin"></fa-icon>
+      <fa-icon
+        [size]="iconSize()"
+        [icon]="faSpinner"
+        class="animate-spin text-{{ loaderSize() }} text-{{ loaderColor() }}">
+      </fa-icon>
     }
   </span>
 </button>

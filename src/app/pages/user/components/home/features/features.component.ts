@@ -5,7 +5,7 @@ import { CommonButtonComponent } from 'app/shared/components/common-button/commo
   selector: 'app-features',
   imports: [CommonButtonComponent],
   templateUrl: './features.component.html',
-  styleUrl: './features.component.scss'
+  styleUrl: '../home.component.css'
 })
 export class FeaturesComponent {
 
