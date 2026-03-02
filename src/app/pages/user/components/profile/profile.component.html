@@ -1,4 +1,4 @@
-<!-- profile.component.html -->
+<!-- profile.component.html — FULLY UPDATED -->
 <div class="min-h-screen bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary text-white pt-24 pb-12 px-6">
   <div class="max-w-5xl mx-auto">
     
@@ -16,20 +16,29 @@
       <!-- Left: Avatar & Quick Stats -->
       <div class="lg:col-span-1">
         <div class="bg-bg-card rounded-2xl border border-border-primary p-6 text-center">
-          <!-- Avatar -->
           <div class="relative inline-block mb-4">
             <div class="absolute -inset-4 bg-linear-to-r from-primary via-violet-500 to-primary 
                         opacity-20 blur-2xl rounded-full"></div>
             <img [src]="profilePhoto() || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
                  class="relative w-32 h-32 rounded-full border-4 border-primary/50 
-                        hover:border-primary transition-all duration-300 hover:scale-105"
+                        hover:border-primary transition-all duration-300 hover:scale-105 object-cover"
+                 [class.opacity-50]="isUploading()"
                  alt="Profile Photo" />
             
-            <!-- Change Photo Button -->
+            <!-- ✅ Upload spinner overlay -->
+            @if (isUploading()) {
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            }
+
+           <!-- Change Photo Button -->
             <button (click)="changePhoto()" 
+                    [disabled]="isUploading()"
                     class="absolute bottom-0 right-0 w-10 h-10 bg-linear-to-r from-primary via-violet-500 to-primary 
                            rounded-full flex items-center justify-center
-                           hover:scale-110 transition-transform shadow-lg">
+                           hover:scale-110 transition-transform shadow-lg
+                           disabled:opacity-50 disabled:cursor-not-allowed">
               <span class="text-white text-lg">📷</span>
             </button>
           </div>
@@ -37,13 +46,20 @@
           <h3 class="text-xl font-bold mb-1">{{ username() }}</h3>
           <p class="text-font-muted text-sm mb-4">{{ email() }}</p>
 
-          <!-- Member Since -->
+           @if (profilePhoto()) {
+            <button (click)="removePhoto()"
+                    [disabled]="isUploading()"
+                    class="text-xs text-font-muted hover:text-danger transition-colors mb-4
+                           disabled:opacity-50 disabled:cursor-not-allowed">
+              Remove photo
+            </button>
+          }
+
           <div class="border-t border-border-primary pt-4">
             <p class="text-font-muted text-xs mb-1">Member Since</p>
             <p class="text-white font-semibold">{{ memberSince() }}</p>
           </div>
 
-          <!-- Quick Stats -->
           <div class="grid grid-cols-2 gap-4 mt-6">
             <div class="bg-bg-primary/50 rounded-lg p-3">
               <div class="text-2xl font-bold gradient-text">{{ totalSigns() }}</div>
@@ -69,53 +85,44 @@
             
             <!-- Username -->
             <div>
-              <label for="username" class="block text-sm font-medium text-font-muted mb-2">
-                Username
-              </label>
-              <input id="username"
-                     type="text" 
-                     formControlName="username"
+              <label for="username" class="block text-sm font-medium text-font-muted mb-2">Username</label>
+              <input id="username" type="text" formControlName="username"
                      class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
                             focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
                             text-white transition-all"
                      placeholder="Enter your username" />
+              <!-- ✅ NEW: Validation error -->
+              @if (profileForm.get('username')?.invalid && profileForm.get('username')?.touched) {
+                <p class="text-danger text-xs mt-1">Username is required (2-20 characters)</p>
+              }
             </div>
 
             <!-- Email -->
             <div>
-              <label for="email" class="block text-sm font-medium text-font-muted mb-2">
-                Email Address
-              </label>
-              <input id="email"
-                     type="email" 
-                     formControlName="email"
+              <label for="email" class="block text-sm font-medium text-font-muted mb-2">Email Address</label>
+              <input id="email" type="email" formControlName="email"
                      class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
                             focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
                             text-white transition-all"
                      placeholder="your@email.com" />
+              @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                <p class="text-danger text-xs mt-1">Valid email is required</p>
+              }
             </div>
 
             <!-- Full Name -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label for="firstName" class="block text-sm font-medium text-font-muted mb-2">
-                  First Name
-                </label>
-                <input id="firstName"
-                       type="text" 
-                       formControlName="firstName"
+                <label for="firstName" class="block text-sm font-medium text-font-muted mb-2">First Name</label>
+                <input id="firstName" type="text" formControlName="firstName"
                        class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
                               focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
                               text-white transition-all"
                        placeholder="First name" />
               </div>
               <div>
-                <label for="lastName" class="block text-sm font-medium text-font-muted mb-2">
-                  Last Name
-                </label>
-                <input id="lastName"
-                       type="text" 
-                       formControlName="lastName"
+                <label for="lastName" class="block text-sm font-medium text-font-muted mb-2">Last Name</label>
+                <input id="lastName" type="text" formControlName="lastName"
                        class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
                               focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
                               text-white transition-all"
@@ -125,26 +132,19 @@
 
             <!-- Bio -->
             <div>
-              <label for="bio" class="block text-sm font-medium text-font-muted mb-2">
-                Bio
-              </label>
-              <textarea id="bio"
-                        formControlName="bio"
-                        rows="4"
+              <label for="bio" class="block text-sm font-medium text-font-muted mb-2">Bio</label>
+              <textarea id="bio" formControlName="bio" rows="4"
                         class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
                                focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
                                text-white transition-all resize-none"
                         placeholder="Tell us about yourself..."></textarea>
             </div>
 
-            <!-- Location -->
+            <!-- Country & Language -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label for="country" class="block text-sm font-medium text-font-muted mb-2">
-                  Country
-                </label>
-                <select id="country"
-                        formControlName="country"
+                <label for="country" class="block text-sm font-medium text-font-muted mb-2">Country</label>
+                <select id="country" formControlName="country"
                         class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
                                focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
                                text-white transition-all">
@@ -157,11 +157,8 @@
                 </select>
               </div>
               <div>
-                <label for="language" class="block text-sm font-medium text-font-muted mb-2">
-                  Language
-                </label>
-                <select id="language"
-                        formControlName="language"
+                <label for="language" class="block text-sm font-medium text-font-muted mb-2">Language</label>
+                <select id="language" formControlName="language"
                         class="w-full px-4 py-3 bg-bg-primary rounded-lg border border-border-primary
                                focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none
                                text-white transition-all">
@@ -183,16 +180,14 @@
                              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                 @if (isSaving()) {
                   <span class="flex items-center gap-2">
-                    <span class="animate-spin">⏳</span>
-                    Saving...
+                    <span class="animate-spin">⏳</span> Saving...
                   </span>
                 } @else {
                   Save Changes
                 }
               </button>
               
-              <button type="button" 
-                      (click)="resetForm()"
+              <button type="button" (click)="resetForm()"
                       class="px-6 py-3 bg-bg-primary border border-border-primary
                              text-white font-semibold rounded-lg
                              hover:border-primary transition-all duration-300">
@@ -207,8 +202,7 @@
     <!-- Security Section -->
     <div class="bg-bg-card rounded-2xl border border-border-primary p-6 mb-6">
       <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
-        <span class="text-2xl">🔒</span>
-        Security
+        <span class="text-2xl">🔒</span> Security
       </h3>
 
       <div class="space-y-4">
@@ -263,21 +257,24 @@
     <!-- Danger Zone -->
     <div class="bg-bg-card rounded-2xl border border-danger/50 p-6">
       <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 text-danger">
-        <span class="text-2xl">⚠️</span>
-        Danger Zone
+        <span class="text-2xl">⚠️</span> Danger Zone
       </h3>
-      
-      <div class="space-y-3">
-        <p class="text-font-muted text-sm">
-          Once you delete your account, there is no going back. All your data will be permanently removed.
-        </p>
-        
-        <button (click)="deleteAccount()"
-                class="px-6 py-3 bg-danger/10 border border-danger text-danger rounded-lg
-                       hover:bg-danger hover:text-white transition-all font-semibold">
+      <p class="text-font-muted text-sm mb-4">
+        Once you delete your account, there is no going back. All your data will be permanently removed.
+      </p>
+      <button (click)="deleteAccount()"
+              [disabled]="isDeleting()"
+              class="px-6 py-3 bg-danger/10 border border-danger text-danger rounded-lg
+                     hover:bg-danger hover:text-white transition-all font-semibold
+                     disabled:opacity-50 disabled:cursor-not-allowed">
+        @if (isDeleting()) {
+          <span class="flex items-center gap-2">
+            <span class="animate-spin">⏳</span> Deleting...
+          </span>
+        } @else {
           Delete Account
-        </button>
-      </div>
+        }
+      </button>
     </div>
 
   </div>

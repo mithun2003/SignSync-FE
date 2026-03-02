@@ -82,7 +82,7 @@
               <div class="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 
                           opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
-              <img [src]="user()?.profile_photo || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
+              <img [src]="user()?.profile_image_url || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
                    class="relative w-9 h-9 rounded-full border-2 border-primary/50 
                           group-hover:border-primary transition-colors"
                    alt="User Avatar" />
@@ -113,7 +113,7 @@
                 <div class="p-4 border-b border-border-primary 
                             bg-linear-to-r from-primary/5 via-violet-500/5 to-primary/5">
                   <div class="flex items-center gap-3">
-                    <img [src]="user()?.profile_photo || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
+                    <img [src]="user()?.profile_image_url || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
                          class="w-12 h-12 rounded-full border-2 border-primary/50"
                          alt="User Avatar" />
                     <div class="flex-1 min-w-0">

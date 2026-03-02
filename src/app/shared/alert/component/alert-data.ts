@@ -1,3 +1,4 @@
+// alert-data.ts - Updated with new design system
 import {
   faCircleCheck,
   faCircleExclamation,
@@ -22,7 +23,7 @@ export class AlertData {
           isCancel: false,
           icon: faCircleExclamation,
           btnClass: '',
-          iconClass: 'text-common-blue-color',
+          iconClass: 'text-info',  // ✅ Updated
           iconBgColor: 'blue'
         }
       },
@@ -37,10 +38,9 @@ export class AlertData {
           timeout: 1000,
           isOk: true,
           isCancel: false,
-          refresh: false,
           icon: faCircleExclamation,
           btnClass: '',
-          iconClass: 'text-common-primary-red-color',
+          iconClass: 'text-danger',  // ✅ Updated
           iconBgColor: 'red'
         }
       },
@@ -57,7 +57,7 @@ export class AlertData {
           isCancel: false,
           icon: faCircleCheck,
           btnClass: '',
-          iconClass: 'text-common-green-color',
+          iconClass: 'text-success',  // ✅ Updated
           iconBgColor: 'green'
         }
       },
@@ -66,7 +66,7 @@ export class AlertData {
         data: {
           title: 'Confirm',
           content: "You won't be able to revert this!",
-          doneMsg: 'OK',
+          doneMsg: 'Confirm',
           cancelMsg: 'Cancel',
           close: false,
           timeout: 1000,
@@ -74,15 +74,15 @@ export class AlertData {
           isCancel: true,
           icon: faCircleQuestion,
           btnClass: '',
-          iconClass: 'text-common-yellow-color',
-          iconBgColor: 'green'
+          iconClass: 'text-primary',  // ✅ Updated
+          iconBgColor: 'blue'
         }
       },
       {
         alertType: 'warning',
         data: {
-          title: 'Oops!',
-          content: 'Some error occur.',
+          title: 'Warning',
+          content: 'Please review before continuing.',
           doneMsg: 'OK',
           cancelMsg: 'Cancel',
           close: false,
@@ -91,7 +91,7 @@ export class AlertData {
           isCancel: false,
           icon: faTriangleExclamation,
           btnClass: '',
-          iconClass: 'text-common-yellow-color',
+          iconClass: 'text-warning',  // ✅ Updated
           iconBgColor: 'yellow'
         }
       }

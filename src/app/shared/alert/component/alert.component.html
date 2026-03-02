@@ -1,49 +1,50 @@
-<div class="alert-section relative rounded-xl px-8">
+<!-- alert.component.html - Updated with new design system -->
+
+<div class="alert-section relative rounded-xl px-8 bg-bg-card border border-border-primary">
+  
+  <!-- Alert Icon -->
   <div class="alert-head flex justify-center pt-6">
-    <div
-      class="h-16 w-16 rounded-full flex justify-center items-center {{
-        iconBgColor
-      }}">
-      <div
-        class="h-12 w-12 rounded-full flex justify-center items-center {{
-          iconInnerBgColor
-        }}">
+    <div class="h-16 w-16 rounded-full flex justify-center items-center {{ iconBgColor }}">
+      <div class="h-12 w-12 rounded-full flex justify-center items-center {{ iconInnerBgColor }}">
         <fa-icon
           [icon]="alertContent.icon"
           [ngClass]="alertData.alertType"
-          class="{{ alertContent.iconClass }}"
-          size="2xl"></fa-icon>
+          class="{{ alertContent.iconClass }} text-2xl"
+          size="2xl">
+        </fa-icon>
       </div>
     </div>
   </div>
-  <div class="alert-body text-main-font-color mt-3 text-center">
-    <h2 class="mb-2 text-xl font-bold leading-6 tracking-[0.3px]">
+  
+  <!-- Alert Content -->
+  <div class="alert-body text-font-primary mt-4 text-center">
+    <h2 class="mb-2 text-xl font-bold leading-6 tracking-wide text-font-secondary">
       {{ alertContent.title }}
     </h2>
-    <h3 class="text-secondary-font-color m-auto max-w-[40ch] text-sm">
+    <p class="text-font-muted m-auto max-w-[40ch] text-sm leading-relaxed">
       {{ alertContent.content }}
-    </h3>
+    </p>
   </div>
-  <div class="alertButton-btn flex justify-center gap-2 pb-8 pt-8">
+  
+  <!-- Alert Buttons -->
+  <div class="alertButton-btn flex justify-center gap-3 pb-8 pt-6">
     @if (alertContent.isCancel) {
-    <app-common-button
-      [text]="alertContent.cancelMsg"
-      (clickEmit)="cancel()"
-      buttonType="outline"
-      color="black"
-      buttonClass="
-          common-button !shadow-none
-        "></app-common-button>
+      <app-common-button
+        [text]="alertContent.cancelMsg"
+        (clickEmit)="cancel()"
+        buttonType="outline"
+        color="secondary"
+        buttonClass="common-button !shadow-none min-w-[100px]">
+      </app-common-button>
     }
+    
     @if (alertContent.isOk) {
-    <app-common-button
-      [text]="alertContent.doneMsg"
-      (clickEmit)="done()"
-      color="red"
-      buttonClass="
-          {{alertContent.btnClass}} common-button 
-          
-        "></app-common-button>
+      <app-common-button
+        [text]="alertContent.doneMsg"
+        (clickEmit)="done()"
+        [color]="getButtonColor()"
+        buttonClass="{{ alertContent.btnClass }} common-button min-w-[100px]">
+      </app-common-button>
     }
   </div>
 </div>

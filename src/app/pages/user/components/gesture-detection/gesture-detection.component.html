@@ -1,5 +1,5 @@
 <!-- sign-to-text.component.html -->
-<div class="flex flex-col lg:flex-row justify-center items-start p-6 pt-24 gap-6 bg-gray-900 text-gray-100 min-h-screen">
+<div class="flex flex-col lg:flex-row justify-center items-center p-6 pt-24 gap-6 bg-gray-900 text-gray-100 min-h-screen">
   
   @if (commonService.loading()) {
     <div class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors">
@@ -312,7 +312,7 @@
 
   } @else {
     <!-- Not Logged In -->
-    <div class="flex flex-col items-center justify-center min-h-screen text-center px-6">
+    <div class="flex flex-col items-center justify-center text-center px-6">
       <div class="text-6xl mb-4">🔒</div>
       
       <h2 class="text-2xl font-bold text-white mb-2">

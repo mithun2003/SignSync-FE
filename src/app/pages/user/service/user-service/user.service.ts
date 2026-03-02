@@ -72,7 +72,25 @@ export class UserService {
 
 
   //PROFILE SERVICES
-  updateProfile(data: IUserUpdate):Observable<IUserResponse>{
-    return this.apiService.patch("user/me", data)
+   updateProfile(data: IUserUpdate): Observable<IUserResponse> {
+    return this.apiService.patch('user/me', data);
+  }
+
+ uploadProfileImage(file: File): Observable<IUserResponse> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.apiService.post<IUserResponse>('user/me/profile-image', formData);
+  }
+
+  getProfile(): Observable<IUserResponse> {
+    return this.apiService.get('user/me');
+  }
+
+  deleteAccount(): Observable<{ message: string }> {
+    return this.apiService.delete('user/me');
+  }
+
+  deleteProfileImage(): Observable<IUserResponse> {
+    return this.apiService.delete('user/me/profile-image');
   }
 }

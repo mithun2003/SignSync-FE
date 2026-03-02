@@ -11,3 +11,17 @@ export interface ILoginResponse {
   access_token: string;
   user_role: TokenType;
 }
+
+export interface HttpErrorResponse {
+  error?: FastAPIErrorResponse;
+  status?: number;
+}
+
+export interface FastAPIErrorResponse {
+  detail?: string | ValidationError[];
+  message?: string;
+}
+
+export interface ValidationError {
+  msg?: string;
+}

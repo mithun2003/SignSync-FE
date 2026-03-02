@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from "@angular/common";
-import { Injectable, Inject, PLATFORM_ID } from "@angular/core";
+import { Injectable, PLATFORM_ID, inject } from "@angular/core";
 import { LocalStorageKeys } from "@models/localStorage";
 import { environment } from "environments/environment";
 import { AES, enc } from 'crypto-js';
@@ -12,11 +12,8 @@ export class LocalStorageService {
 
   ignoreEncryption: string[] = [];
   environment = environment;
-  isBrowser = false;
-
-  constructor(@Inject(PLATFORM_ID) platformId: object) {
-    this.isBrowser = isPlatformBrowser(platformId);
-  }
+  private platformId = inject(PLATFORM_ID);
+  isBrowser = isPlatformBrowser(this.platformId);
 
   set appToken(token: string) {
     if (this.isBrowser) {
@@ -74,7 +71,7 @@ export class LocalStorageService {
         );
 
       return JSON.parse(value);
-    } catch (_) {
+    } catch {
       return null;
     }
   }

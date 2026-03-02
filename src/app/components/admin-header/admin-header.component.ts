@@ -107,7 +107,7 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
   // Get user initials for avatar
   getUserInitials(): string {
     // const name = 'Admin User'; // Replace with actual user name
-    const name = this.commonService.user()?.name || 'User';
+    const name = this.commonService.user()?.first_name || 'User';
     return name
       .split(' ')
       .map((n) => n[0])
@@ -154,12 +154,12 @@ export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
   user(): IUserData {
     const user = this.commonService.user();
     return {
-      name: user?.name || 'Admin User',
+      name: user?.first_name || 'Admin User',
       email: user?.email || 'admin@example.com',
-      role: user?.role || 'admin',
+      role: 'admin',
       username: user?.username || 'admin',
-      phone: user?.phone || 0,
-      profile_photo: user?.profile_photo || null,
+      phone: 0,
+      profile_photo: user?.profile_image_url || null,
     };
   }
 }

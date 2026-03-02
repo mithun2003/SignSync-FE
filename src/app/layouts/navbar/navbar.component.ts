@@ -43,6 +43,7 @@ export class NavbarComponent {
   readonly isLoggedIn = computed(() => this.commonService.isSignedIn());
   readonly isLargeScreen = computed(() => this.windowWidth() >= 1024);
 
+
   @HostListener('window:resize')
   onResize() {
     this.windowWidth.set(window.innerWidth);
