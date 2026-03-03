@@ -50,7 +50,7 @@
             <button (click)="removePhoto()"
                     [disabled]="isUploading()"
                     class="text-xs text-font-muted hover:text-danger transition-colors mb-4
-                           disabled:opacity-50 disabled:cursor-not-allowed">
+                           disabled:opacity-50 disabled:cursor-not-allowed border border-font-muted px-2 py-1 rounded-lg hover:border-danger">
               Remove photo
             </button>
           }
@@ -259,7 +259,8 @@
       <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 text-danger">
         <span class="text-2xl">⚠️</span> Danger Zone
       </h3>
-      <p class="text-font-muted text-sm mb-4">
+      <div class="flex-wrap items-center justify-between flex gap-3">
+      <p class="text-font-muted text-sm ">
         Once you delete your account, there is no going back. All your data will be permanently removed.
       </p>
       <button (click)="deleteAccount()"
@@ -275,6 +276,7 @@
           Delete Account
         }
       </button>
+    </div>
     </div>
 
   </div>

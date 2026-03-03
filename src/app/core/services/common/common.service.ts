@@ -18,7 +18,7 @@ export class CommonService {
   private alertService = inject(AlertService);
 
   private _user = signal<IUserRead | null>(null);
-  private _loading = signal<boolean>(true); // 🔥 NEW
+  private _loading = signal<boolean>(true);
 
   user = this._user.asReadonly();
   loading = this._loading.asReadonly();
@@ -62,6 +62,7 @@ export class CommonService {
           };
           console.log(updatedUser);
           this.setUser(updatedUser);
+          console.log(this.user());
           this._loading.set(false);
         }),
         catchError(() => {

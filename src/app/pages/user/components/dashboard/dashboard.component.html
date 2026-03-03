@@ -1,10 +1,10 @@
 <!-- dashboard.component.html -->
-<div class="min-h-screen bg-gradient-to-b from-bg-primary via-bg-secondary to-bg-primary text-white pt-24 pb-12 px-6">
+<div class="min-h-screen bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary text-white pt-24 pb-12 px-6">
   <div class="max-w-7xl mx-auto">
     
     <!-- Header with Animated Gradient -->
     <div class="mb-8 relative">
-      <div class="absolute -inset-4 bg-gradient-to-r from-primary via-violet-500 to-primary opacity-10 blur-3xl rounded-full"></div>
+      <div class="absolute -inset-4 bg-linear-to-r from-primary via-violet-500 to-primary opacity-10 blur-3xl rounded-full"></div>
       <div class="relative">
         <h1 class="headline-2 mb-2">
           <span class="gradient-text">Your Dashboard</span>
@@ -20,12 +20,12 @@
       <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
                   hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
         <!-- Animated gradient overlay -->
-        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+        <div class="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 
                     opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         
         <div class="relative p-6">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+            <div class="w-14 h-14 rounded-xl bg-linear-to-br from-primary/20 to-violet-500/20 
                         flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <span class="text-3xl">🤟</span>
             </div>
@@ -34,7 +34,7 @@
             </div>
           </div>
           <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
-                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:bg-linear-to-r group-hover:from-primary group-hover:via-violet-500 
                       group-hover:to-primary transition-all duration-300">
             {{ totalSignsDetected() }}
           </div>
@@ -45,12 +45,12 @@
       <!-- Practice Time Card -->
       <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
                   hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
-        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+        <div class="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 
                     opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         
         <div class="relative p-6">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+            <div class="w-14 h-14 rounded-xl bg-linear-to-br from-primary/20 to-violet-500/20 
                         flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <span class="text-3xl">⏱️</span>
             </div>
@@ -59,7 +59,7 @@
             </div>
           </div>
           <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
-                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:bg-linear-to-r group-hover:from-primary group-hover:via-violet-500 
                       group-hover:to-primary transition-all duration-300">
             {{ totalPracticeTime() }}
           </div>
@@ -70,12 +70,12 @@
       <!-- Accuracy Card -->
       <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
                   hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
-        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+        <div class="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 
                     opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         
         <div class="relative p-6">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+            <div class="w-14 h-14 rounded-xl bg-linear-to-br from-primary/20 to-violet-500/20 
                         flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <span class="text-3xl">🎯</span>
             </div>
@@ -84,7 +84,7 @@
             </div>
           </div>
           <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
-                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:bg-linear-to-r group-hover:from-primary group-hover:via-violet-500 
                       group-hover:to-primary transition-all duration-300">
             {{ averageAccuracy() }}%
           </div>
@@ -95,12 +95,12 @@
       <!-- Streak Card -->
       <div class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary 
                   hover:border-primary transition-all duration-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]">
-        <div class="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 
+        <div class="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 
                     opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         
         <div class="relative p-6">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-violet-500/20 
+            <div class="w-14 h-14 rounded-xl bg-linear-to-br from-primary/20 to-violet-500/20 
                         flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <span class="text-3xl animate-pulse">🔥</span>
             </div>
@@ -109,7 +109,7 @@
             </div>
           </div>
           <div class="headline-3 mb-1 group-hover:text-transparent group-hover:bg-clip-text 
-                      group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-violet-500 
+                      group-hover:bg-linear-to-r group-hover:from-primary group-hover:via-violet-500 
                       group-hover:to-primary transition-all duration-300">
             {{ currentStreak() }}
           </div>
@@ -148,13 +148,13 @@
           </div>
           <div class="flex gap-2">
             <button 
-              [class]="selectedPeriod() === '7d' ? 'bg-gradient-to-r from-primary via-violet-500 to-primary text-white' : 'bg-primary/10 text-font-muted hover:bg-primary/20'"
+              [class]="selectedPeriod() === '7d' ? 'bg-linear-to-r from-primary via-violet-500 to-primary text-white' : 'bg-primary/10 text-font-muted hover:bg-primary/20'"
               (click)="changePeriod('7d')"
               class="px-4 py-2 rounded-lg body-4 transition-all duration-300 hover:scale-105 border border-primary/30">
               7D
             </button>
             <button 
-              [class]="selectedPeriod() === '30d' ? 'bg-gradient-to-r from-primary via-violet-500 to-primary text-white' : 'bg-primary/10 text-font-muted hover:bg-primary/20'"
+              [class]="selectedPeriod() === '30d' ? 'bg-linear-to-r from-primary via-violet-500 to-primary text-white' : 'bg-primary/10 text-font-muted hover:bg-primary/20'"
               (click)="changePeriod('30d')"
               class="px-4 py-2 rounded-lg body-4 transition-all duration-300 hover:scale-105 border border-primary/30">
               30D
@@ -171,7 +171,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
       <!-- Accuracy by Letter (Doughnut) -->
-      <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+      <div class="bg-bg-secondary rounded-(--radius) p-6 border border-border-primary">
         <div class="mb-6">
           <h3 class="body-1-semibold mb-1">Accuracy Distribution</h3>
           <p class="text-neutral-l-grey body-3">Letters by accuracy level</p>
@@ -205,7 +205,7 @@
       </div>
 
       <!-- Learning Progress (Radial) -->
-      <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+      <div class="bg-bg-secondary rounded-(--radius) p-6 border border-border-primary">
         <div class="mb-6">
           <h3 class="body-1-semibold mb-1">Learning Progress</h3>
           <p class="text-neutral-l-grey body-3">Letters mastered</p>
@@ -257,7 +257,7 @@
       </div>
 
       <!-- Recent Activity Feed -->
-      <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+      <div class="bg-bg-secondary rounded-(--radius) p-6 border border-border-primary">
         <div class="mb-6">
           <h3 class="body-1-semibold mb-1">Recent Activity</h3>
           <p class="text-neutral-l-grey body-3">Your last 5 sessions</p>
@@ -267,8 +267,8 @@
                     [&::-webkit-scrollbar-thumb]:bg-neutral-grey [&::-webkit-scrollbar-thumb]:rounded-full">
           @for (activity of recentActivities(); track activity.id) {
             <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-black/30 hover:bg-neutral-black/50 transition-colors">
-              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-primary/20 to-pink-primary/20 
-                          flex items-center justify-center flex-shrink-0">
+              <div class="w-10 h-10 rounded-lg bg-linear-to-br from-violet-primary/20 to-pink-primary/20 
+                          flex items-center justify-center shrink-0">
                 <span class="text-xl">{{ activity.emoji }}</span>
               </div>
               <div class="flex-1 min-w-0">
@@ -290,7 +290,7 @@
     </div>
 
     <!-- Practice Recommendations -->
-    <div class="bg-bg-secondary rounded-[var(--radius)] p-6 border border-border-primary">
+    <div class="bg-bg-secondary rounded-(--radius) p-6 border border-border-primary">
       <div class="mb-6">
         <h3 class="body-1-semibold mb-1">Practice Recommendations</h3>
         <p class="text-neutral-l-grey body-3">Letters you should focus on</p>
@@ -300,8 +300,8 @@
         @for (letter of recommendedLetters(); track letter.char) {
           <div class="flex items-center gap-4 p-4 rounded-lg bg-neutral-black/30 
                       border border-neutral-d-grey hover:border-violet-primary transition-all group">
-            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-violet-primary/20 to-pink-primary/20 
-                        flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <div class="w-16 h-16 rounded-lg bg-linear-to-br from-violet-primary/20 to-pink-primary/20 
+                        flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
               <span class="text-3xl font-bold gradient-text">{{ letter.char }}</span>
             </div>
             <div class="flex-1">

@@ -39,7 +39,7 @@ export class NavbarComponent {
   faSpinner = faSpinner;
 
   // Computed
-  readonly user = this.commonService.user;
+  readonly user = this.commonService.user();
   readonly isLoggedIn = computed(() => this.commonService.isSignedIn());
   readonly isLargeScreen = computed(() => this.windowWidth() >= 1024);
 
