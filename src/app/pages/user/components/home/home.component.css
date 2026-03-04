@@ -1,19 +1,32 @@
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+/* home.component.css
+   ─────────────────
+   All keyframes (float, fadeIn, gradient) are now in _effects.css.
+   This file only has component-specific overrides if needed.
+*/
+
+/* Component-specific: Override stagger timing for this page if needed */
+:host {
+  --hero-stagger-base: 0.15s;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Fix for app-common-button inside CTA banner */
+:host ::ng-deep .common-gradient-button {
+  /* In CTA context, make buttons white */
 }
 
-@keyframes gradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* Ensure images don't overflow on mobile */
+:host img {
+  max-width: 100%;
+  height: auto;
 }
 
-.animate-gradient {
-  background-size: 200% auto;
-  animation: gradient 3s linear infinite;
+/* Optional: Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  :host .animate-float,
+  :host .animate-gradient,
+  :host .animate-stagger-fade-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

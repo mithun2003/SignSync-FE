@@ -35,3 +35,54 @@ export interface IUserResponse {
   data: IUserRead;
   message?: string;
 }
+
+export interface IDashboardResponse {
+  stats: IDashboardStats;
+  frequent_signs: IFrequentSign[];
+  daily_activity: IDailyActivity[];
+  accuracy_distribution: IAccuracyDistribution;
+  mastered_letters: number;
+  recent_activities: IRecentActivity[];
+  recommended_letters: IRecommendedLetter[];
+}
+
+export interface IDashboardStats {
+  total_signs_detected: number;
+  today_signs_count: number;
+  total_practice_hours: number;
+  today_minutes: number;
+  average_accuracy: number;
+  accuracy_change: number;
+  current_streak: number;
+}
+
+export interface IFrequentSign {
+  sign: string;
+  count: number;
+}
+
+export interface IDailyActivity {
+  date: string;
+  count: number;
+}
+
+export interface IAccuracyDistribution {
+  high: number;
+  medium: number;
+  low: number;
+}
+
+export interface IRecentActivity {
+  id: number;
+  emoji: string;
+  description: string;
+  time_ago: string;
+  badge?: 'success' | 'practice' | 'streak';
+  badge_text?: string;
+}
+
+export interface IRecommendedLetter {
+  char: string;
+  count: number;
+  accuracy: number;
+}

@@ -13,7 +13,7 @@
           <img ngSrc="images/icon.png" width="40" height="40" alt="SignSync Logo" 
                class="logo relative group-hover:scale-110 transition-transform duration-300" />
         </div>
-        <span class="ml-3 font-bold text-white text-lg group-hover:text-transparent 
+        <span class="ml-3 font-bold text-font-muted text-lg group-hover:text-transparent 
                      group-hover:bg-clip-text group-hover:bg-linear-to-r 
                      group-hover:from-primary group-hover:via-violet-500 group-hover:to-primary
                      transition-all duration-300">
@@ -25,11 +25,11 @@
               class="block bg-transparent lg:hidden border-none cursor-pointer p-2 
                      hover:bg-white/10 rounded-lg transition-colors">
         @if (!isMenuOpen()) {
-          <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <svg class="text-font-muted" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"></path>
           </svg>
         } @else {
-          <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <svg class="text-font-muted" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="m16.192 6.344-4.243 4.242-4.242-4.242-1.414 1.414L10.535 12l-4.242 4.242 1.414 1.414 4.242-4.242 4.243 4.242 1.414-1.414L13.364 12l4.242-4.242z"></path>
           </svg>
         }
@@ -39,7 +39,7 @@
     <!-- Navigation Links -->
     <div #linksDiv id="navigation"
          [style.height]="isMenuOpen() ? (linksDiv.scrollHeight + 'px') : (isLargeScreen() ? 'auto' : '0')"
-         class="basis-full lg:basis-auto flex flex-col items-center gap-4 w-full overflow-hidden text-white
+         class="basis-full lg:basis-auto flex flex-col items-center gap-4 w-full overflow-hidden text-font-muted
                 transition-all duration-500 ease-in-out lg:h-auto lg:flex-row lg:overflow-visible 
                 lg:justify-between lg:w-3/4"
          [class.mt-4]="isMenuOpen() && !isLargeScreen()">
@@ -49,12 +49,12 @@
         <a [routerLink]="link.routerLink"
            [routerLinkActiveOptions]="{ exact: link.routerLink === '/' }"
            routerLinkActive="active-nav-link"
-           class="relative nav-link text-white group p-2 px-4 lg:w-auto text-center 
+           class="relative nav-link text-font-muted group p-2 px-4 lg:w-auto text-center 
                   hover:text-primary transition-colors duration-300"
            (click)="closeMobileMenu()">
           {{ link.title }}
           <div class="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 
-                      bg-linear-to-r from-primary via-violet-500 to-primary 
+                      bg-linear-to-r from-transparent via-primary to-transparent 
                       group-hover:w-full transition-all duration-500 ease-in-out"></div>
         </a>
       }
@@ -88,10 +88,10 @@
                    alt="User Avatar" />
               
               <div class="relative hidden md:block text-left">
-                <p class="text-sm font-medium text-white group-hover:text-primary transition-colors">
+                <p class="text-sm font-medium text-font-muted group-hover:text-primary transition-colors">
                   {{ user?.username || 'Admin User' }}
                 </p>
-                <p class="text-xs text-white/60">{{ user?.email || 'admin@example.com' }}</p>
+                <p class="text-xs text-font-muted/60">{{ user?.email || 'admin@example.com' }}</p>
               </div>
               
               <svg class="relative w-4 h-4 text-gray-400 group-hover:text-primary 
@@ -117,7 +117,7 @@
                          class="w-12 h-12 rounded-full border-2 border-primary/50"
                          alt="User Avatar" />
                     <div class="flex-1 min-w-0">
-                      <p class="text-sm font-semibold text-white truncate">
+                      <p class="text-sm font-semibold text-font-muted truncate">
                         {{ user?.username }}
                       </p>
                       <p class="text-xs text-font-muted truncate">{{ user?.email }}</p>
@@ -130,7 +130,7 @@
                   <!-- Dashboard -->
                   <a routerLink="/dashboard" 
                      (click)="closeUserMenu()"
-                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-font-muted 
                             hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
                             transition-all group">
                     <span class="text-xl group-hover:scale-110 transition-transform">📊</span>
@@ -143,7 +143,7 @@
                   <!-- Profile -->
                   <a routerLink="/profile" 
                      (click)="closeUserMenu()"
-                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-font-muted 
                             hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
                             transition-all group">
                     <span class="text-xl group-hover:scale-110 transition-transform">👤</span>
@@ -156,7 +156,7 @@
                   <!-- Settings -->
                   <a routerLink="/settings" 
                      (click)="closeUserMenu()"
-                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-font-muted 
                             hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
                             transition-all group">
                     <span class="text-xl group-hover:scale-110 transition-transform">⚙️</span>
@@ -169,7 +169,7 @@
                   <!-- Help & Support -->
                   <a routerLink="/help" 
                      (click)="closeUserMenu()"
-                     class="flex items-center gap-3 px-4 py-3 text-sm text-white 
+                     class="flex items-center gap-3 px-4 py-3 text-sm text-font-muted 
                             hover:bg-primary/10 hover:border-l-2 hover:border-l-primary
                             transition-all group">
                     <span class="text-xl group-hover:scale-110 transition-transform">❓</span>

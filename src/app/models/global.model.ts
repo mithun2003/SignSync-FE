@@ -21,12 +21,14 @@ export interface IUserRead {
   tier_id: number | null;
   created_at?: string;  
   updated_at?: string;
+  is_superuser?: boolean;
 }
 
 
 export interface IApiRes<TData = unknown> {
-  status_code: number;
+  status_code: 200 | 401 | 404;
   success: boolean;
   message: string;
   data: TData;
+  queryGeneratedTime: number;
 }

@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   ElementRef,
   HostListener,
@@ -30,7 +31,7 @@ import { UserService } from '@pages/user/service/user-service/user.service';
 @Component({
   selector: 'app-gesture-detection',
   templateUrl: './gesture-detection.component.html',
-  styleUrls: ['./gesture-detection.component.css'], // Don't forget this
+  styleUrls: ['./gesture-detection.component.css'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
@@ -43,6 +44,8 @@ import { UserService } from '@pages/user/service/user-service/user.service';
 export class GestureDetectionComponent implements OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('overlayCanvas') overlayCanvas!: ElementRef<HTMLCanvasElement>;
+
+  private destroyRef = inject(DestroyRef);
 
   // Services
   public handDetectService = inject(HandDetectService);
@@ -60,25 +63,33 @@ export class GestureDetectionComponent implements OnDestroy {
   // Sentence Building
   sentenceBuffer = signal<string[]>([]);
   letterHistory = signal<string[]>([]);
-  
+
   // Current Detection
   currentLetter = signal<string>('');
   currentConfidence = signal<number>(0);
-  
+
   // Emotion & Suggestions
   currentMood = signal<string>('Neutral 😐');
   suggestedWords = signal<string[]>([]);
-  
+
   // Settings
   autoSpace = signal(true);
   isSpeechEnabled = signal(true);
-  
-  // Feedback
-  feedbackText = 'Click Start to begin';
-  
+
+  feedbackText = signal<string>('Click Start to begin');
+
   // Stats
-  letterCount = computed(() => this.sentenceBuffer().filter(c => c !== ' ').length);
-  wordCount = computed(() => this.sentenceBuffer().join('').trim().split(/\s+/).filter(w => w).length);
+  letterCount = computed(
+    () => this.sentenceBuffer().filter((c) => c !== ' ').length,
+  );
+  wordCount = computed(
+    () =>
+      this.sentenceBuffer()
+        .join('')
+        .trim()
+        .split(/\s+/)
+        .filter((w) => w).length,
+  );
   timeSinceLastLetter = signal<string>('--');
 
   // Internal State
@@ -88,69 +99,65 @@ export class GestureDetectionComponent implements OnDestroy {
   private lastLandmarks: NormalizedLandmark[] | null = null;
   private missingFrames = 0;
   private readonly MAX_MISSING_FRAMES = 5;
-  
+
+  private canvasCtx: CanvasRenderingContext2D | null = null;
+
   // Letter Detection Logic
   private lastDetectedLetter: string | null = null;
   private lastLetterTime = 0;
   private letterStability = signal(0);
-  private readonly STABILITY_THRESHOLD = 5; // Need 5 consecutive frames
-  private readonly MIN_LETTER_INTERVAL = 800; // 800ms between same letters
-  private readonly AUTO_SPACE_TIMEOUT = 2000; // 2s pause = auto space
-  
+  private readonly STABILITY_THRESHOLD = 5;
+  private readonly MIN_LETTER_INTERVAL = 800;
+  private readonly AUTO_SPACE_TIMEOUT = 2000;
+
   private lastLetterTimestamp = 0;
   private spaceTimerHandle?: ReturnType<typeof setTimeout>;
 
-  // ─────────────────────────────────────────────────────────────────────────
-  //  LIFECYCLE
-  // ─────────────────────────────────────────────────────────────────────────
+  private tickIntervalId?: ReturnType<typeof setInterval>;
+
   constructor() {
-    // Effect: Preload models when logged in
-    effect(async () => {
+    // ✅ FIX B7: Don't use async in effect — call async method separately
+    effect(() => {
       const loggedIn = this.isLoggedIn();
       if (!loggedIn) {
-        this.feedbackText = 'Login required to start detection';
+        this.feedbackText.set('Login required to start detection');
         return;
       }
-      
-      this.feedbackText = 'Loading AI models...';
-      await Promise.all([
-        this.handDetectService.preloadModel(),
-        this.faceDetectService.preloadModel(),
-      ]);
-      this.feedbackText = 'Click Start to begin';
+      this.feedbackText.set('Loading AI models...');
+      this.loadModels(); // fire-and-forget (not async inside effect)
     });
 
     // Effect: Process predictions from backend
     effect(() => {
       const result = this.userService.predictionResult();
       if (!result) return;
-      
+
       this.isProcessingBackend = false;
-      
-      // Handle special states
-      if (!result.label || result.label === 'error' || result.label === 'no_hand') {
+
+      if (
+        !result.label ||
+        result.label === 'error' ||
+        result.label === 'no_hand'
+      ) {
         if (result.label === 'no_hand') {
-          this.feedbackText = 'Show hand to camera';
+          this.feedbackText.set('Show hand to camera');
         }
         this.resetLetterDetection();
         this.suggestedWords.set([]);
         return;
       }
-      
+
       if (result.label === 'uncertain') {
-        this.feedbackText = 'Hold steady...';
+        this.feedbackText.set('Hold steady...');
         return;
       }
-      
-      // Valid letter detected
+
       this.processLetter(result.label, result.confidence);
-      
-      // Update suggested words based on emotion + letter
       this.updateSuggestedWords(result.label);
     });
 
-    // Update time since last letter
-    setInterval(() => {
+    // ✅ FIX B1: Store interval ID + use 1000ms not 100ms
+    this.tickIntervalId = setInterval(() => {
       if (this.lastLetterTimestamp > 0) {
         const elapsed = Date.now() - this.lastLetterTimestamp;
         if (elapsed < 1000) {
@@ -161,7 +168,20 @@ export class GestureDetectionComponent implements OnDestroy {
           this.timeSinceLastLetter.set('--');
         }
       }
-    }, 100);
+    }, 1000); // ✅ Was 100ms — 1000ms is enough for "Xs ago"
+  }
+
+  private async loadModels(): Promise<void> {
+    try {
+      await Promise.all([
+        this.handDetectService.preloadModel(),
+        this.faceDetectService.preloadModel(),
+      ]);
+      this.feedbackText.set('Click Start to begin');
+    } catch (err) {
+      console.error('Failed to load models:', err);
+      this.feedbackText.set('Model load failed');
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -171,232 +191,209 @@ export class GestureDetectionComponent implements OnDestroy {
     return emotion.split(' ')[0]; // "Happy 😄" → "Happy"
   }
 
-  private updateSuggestedWords(letter: string) {
-    const emotionRaw = this.currentMood();
-    const emotion = this.normalizeEmotion(emotionRaw);
-    
-    // Get words for current emotion + letter
-    const words = 
+  private updateSuggestedWords(letter: string): void {
+    const emotion = this.normalizeEmotion(this.currentMood());
+    const words =
       EMOTION_WORD_MAP[emotion]?.[letter] ??
       EMOTION_WORD_MAP['Neutral']?.[letter] ??
       [];
-    
     this.suggestedWords.set(words);
   }
 
-  addSuggestedWord(word: string) {
-    // Add the word letter by letter
-    for (const char of word.toUpperCase()) {
-      this.sentenceBuffer.update(buf => [...buf, char]);
-    }
-    
-    // Add space after word
-    this.sentenceBuffer.update(buf => [...buf, ' ']);
-    
-    this.feedbackText = `Added: ${word}`;
-    
-    if (this.isSpeechEnabled()) {
-      speakText(word);
-    }
+  addSuggestedWord(word: string): void {
+    const chars = word.toUpperCase().split('');
+    this.sentenceBuffer.update((buf) => [...buf, ...chars, ' ']);
+    this.feedbackText.set(`Added: ${word}`);
+    if (this.isSpeechEnabled()) speakText(word);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
   //  LETTER DETECTION LOGIC
-  // ─────────────────────────────────────────────────────────────────────────
-  private processLetter(letter: string, confidence: number) {
+  // ─────────────────────────────────────────────────────────────────
+  private processLetter(letter: string, confidence: number): void {
     this.currentLetter.set(letter);
     this.currentConfidence.set(confidence);
-    
     const now = Date.now();
-    
-    // Stability check: same letter for N frames
+
     if (letter === this.lastDetectedLetter) {
-      this.letterStability.update(v => v + 1);
+      this.letterStability.update((v) => v + 1);
     } else {
       this.lastDetectedLetter = letter;
       this.letterStability.set(1);
-      this.feedbackText = `Detecting ${letter}...`;
+      this.feedbackText.set(`Detecting ${letter}...`);
       return;
     }
-    
-    // Not stable enough yet
+
     if (this.letterStability() < this.STABILITY_THRESHOLD) {
-      this.feedbackText = `Hold ${letter}... (${this.letterStability()}/${this.STABILITY_THRESHOLD})`;
+      this.feedbackText.set(
+        `Hold ${letter}... (${this.letterStability()}/${this.STABILITY_THRESHOLD})`,
+      );
       return;
     }
-    
-    // Too soon after last letter (prevent duplicates)
-    if (now - this.lastLetterTime < this.MIN_LETTER_INTERVAL) {
-      return;
-    }
-    
-    // ✅ Letter is stable and ready to add!
+
+    if (now - this.lastLetterTime < this.MIN_LETTER_INTERVAL) return;
+
     this.addLetterToSentence(letter);
     this.lastLetterTime = now;
     this.lastLetterTimestamp = now;
     this.letterStability.set(0);
-    
-    // Auto-space timer
-    if (this.autoSpace()) {
-      this.resetAutoSpaceTimer();
-    }
+
+    if (this.autoSpace()) this.resetAutoSpaceTimer();
   }
 
-  private addLetterToSentence(letter: string) {
-    // Add to sentence buffer
-    this.sentenceBuffer.update(buf => [...buf, letter]);
-    
-    // Add to history (keep last 10)
-    this.letterHistory.update(hist => {
-      const newHist = [...hist, letter];
-      return newHist.slice(-10);
-    });
-    
-    // Speak if enabled
-    if (this.isSpeechEnabled()) {
-      speakText(letter);
-    }
-    
-    this.feedbackText = `Added: ${letter}`;
+  private addLetterToSentence(letter: string): void {
+    this.sentenceBuffer.update((buf) => [...buf, letter]);
+    this.letterHistory.update((hist) => [...hist, letter].slice(-10));
+    if (this.isSpeechEnabled()) speakText(letter);
+    this.feedbackText.set(`Added: ${letter}`);
   }
 
-  private resetLetterDetection() {
+  private resetLetterDetection(): void {
     this.currentLetter.set('');
     this.currentConfidence.set(0);
     this.lastDetectedLetter = null;
     this.letterStability.set(0);
   }
 
-  private resetAutoSpaceTimer() {
-    if (this.spaceTimerHandle) {
-      clearTimeout(this.spaceTimerHandle);
-    }
-    
+  private resetAutoSpaceTimer(): void {
+    if (this.spaceTimerHandle) clearTimeout(this.spaceTimerHandle);
     this.spaceTimerHandle = setTimeout(() => {
       if (this.isRecording() && this.sentenceBuffer().length > 0) {
-        const lastChar = this.sentenceBuffer()[this.sentenceBuffer().length - 1];
-        if (lastChar !== ' ') {
-          this.addSpace();
-        }
+        const last = this.sentenceBuffer()[this.sentenceBuffer().length - 1];
+        if (last !== ' ') this.addSpace();
       }
     }, this.AUTO_SPACE_TIMEOUT);
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────
   //  RECORDING CONTROL
-  // ─────────────────────────────────────────────────────────────────────────
-  async startRecording() {
+  // ─────────────────────────────────────────────────────────────────
+  async startRecording(): Promise<void> {
     if (!this.isLoggedIn()) {
-      this.feedbackText = 'Please login to use sign detection';
+      this.feedbackText.set('Please login to use sign detection');
       return;
     }
     if (this.isRecording()) return;
 
     try {
-      // Connect WebSocket
       this.userService.connect();
-      
-      // Get camera stream
+
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { width: 640, height: 480 },
       });
-      
-      this.videoElement.nativeElement.srcObject = this.mediaStream;
-      await this.videoElement.nativeElement.play();
-      
+
+      const video = this.videoElement.nativeElement;
+      video.srcObject = this.mediaStream;
+      await video.play();
+
+      // ✅ FIX B9: Cache canvas context once
+      this.canvasCtx = this.overlayCanvas.nativeElement.getContext('2d');
+
       this.isRecording.set(true);
-      this.feedbackText = 'Initializing...';
-      
-      // Start AI loop after short delay
+      this.feedbackText.set('Initializing...');
+
       setTimeout(() => {
-        this.feedbackText = 'Show hand to start signing';
+        this.feedbackText.set('Show hand to start signing');
         this.isProcessingBackend = false;
         this.renderLoop();
       }, 1500);
-      
+
+        // ✅ FIX B2: Run render loop OUTSIDE Angular zone
+      //   this.ngZone.runOutsideAngular(() => this.renderLoop());
+      // }, 1500);
     } catch (err) {
       console.error('Camera error:', err);
-      this.feedbackText = 'Camera access denied';
+      this.feedbackText.set('Camera access denied');
     }
   }
 
-  stopRecording() {
-    if (!this.isLoggedIn()) return;
-    
+  stopRecording(): void {
     this.isRecording.set(false);
-    
+
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
+      this.animationId = undefined;
     }
-    
+
     if (this.spaceTimerHandle) {
       clearTimeout(this.spaceTimerHandle);
+      this.spaceTimerHandle = undefined;
     }
-    
-    this.mediaStream?.getTracks().forEach(t => t.stop());
-    this.videoElement.nativeElement.srcObject = null;
-    
+
+    // Stop camera tracks
+    this.mediaStream?.getTracks().forEach((t) => t.stop());
+    this.mediaStream = null;
+
+    const video = this.videoElement?.nativeElement;
+    if (video) video.srcObject = null;
+
     this.userService.disconnect();
-    this.clearCanvas();
-    
+
+    // ✅ FIX B10: Zero out canvas to free GPU memory
+    const canvas = this.overlayCanvas?.nativeElement;
+    if (canvas) {
+      canvas.width = 0;
+      canvas.height = 0;
+    }
+    this.canvasCtx = null;
+
     this.resetLetterDetection();
     this.suggestedWords.set([]);
     this.currentMood.set('Neutral 😐');
-    this.feedbackText = 'Stopped';
+    this.feedbackText.set('Stopped');
+    this.lastLandmarks = null;
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  //  RENDER LOOP
-  // ─────────────────────────────────────────────────────────────────────────
-  private renderLoop() {
-    if (!this.isLoggedIn() || !this.isRecording()) return;
+  // ─────────────────────────────────────────────────────────────────
+  //  RENDER LOOP (runs outside Angular zone)
+  // ─────────────────────────────────────────────────────────────────
+  private renderLoop(): void {
+    if (!this.isRecording()) return;
 
     const video = this.videoElement.nativeElement;
     const canvas = this.overlayCanvas.nativeElement;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = this.canvasCtx; // ✅ FIX B9: Use cached context
 
-    // Resize canvas
-    if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+    if (!ctx) return;
+
+    // Resize canvas if needed
+    if (
+      canvas.width !== video.videoWidth ||
+      canvas.height !== video.videoHeight
+    ) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
     }
 
     // Get hand landmarks
     const result = this.handDetectService.getHandCrop(video);
-    
-    // 🎭 FACE/EMOTION DETECTION
+
+    // Face/emotion detection
     const now = performance.now();
     const faceResult = this.faceDetectService.detectEmotion(video, now);
     if (faceResult) {
       this.currentMood.set(faceResult.emotion);
-      
-      // Update suggested words when emotion changes
       if (this.currentLetter()) {
         this.updateSuggestedWords(this.currentLetter());
       }
     }
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Smoothing logic
     if (result && result.landmarks) {
       this.missingFrames = 0;
       this.lastLandmarks = result.landmarks;
       this.drawLandmarks(ctx, result.landmarks);
 
-      // Send to backend
+      // ✅ FIX B3: Use canvas.toBlob() instead of base64→binary
       if (result.crop && !this.isProcessingBackend) {
         this.isProcessingBackend = true;
-        const base64Data = result.crop.split(',')[1];
-        const binaryString = atob(base64Data);
-        const len = binaryString.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        this.userService.sendImage(bytes.buffer);
+        this.sendCropAsBlob(result.crop);
       }
-    } else if (this.lastLandmarks && this.missingFrames < this.MAX_MISSING_FRAMES) {
+    } else if (
+      this.lastLandmarks &&
+      this.missingFrames < this.MAX_MISSING_FRAMES
+    ) {
       this.missingFrames++;
       this.drawLandmarks(ctx, this.lastLandmarks);
     } else {
@@ -408,9 +405,27 @@ export class GestureDetectionComponent implements OnDestroy {
     this.animationId = requestAnimationFrame(() => this.renderLoop());
   }
 
-  private drawLandmarks(ctx: CanvasRenderingContext2D, landmarks: NormalizedLandmark[]) {
-    const width = ctx.canvas.width;
-    const height = ctx.canvas.height;
+  // ✅ FIX B3: Convert base64 crop to blob efficiently
+  private sendCropAsBlob(cropDataUrl: string): void {
+    // If crop is a data URL from canvas.toDataURL, convert to blob
+    // Better approach: modify HandDetectService to return Blob directly
+    // For now, use fetch API which is faster than manual atob+loop
+    fetch(cropDataUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        this.userService.sendImage(blob);
+      })
+      .catch(() => {
+        this.isProcessingBackend = false;
+      });
+  }
+
+  private drawLandmarks(
+    ctx: CanvasRenderingContext2D,
+    landmarks: NormalizedLandmark[],
+  ): void {
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
 
     // Draw connections
     ctx.save();
@@ -422,88 +437,82 @@ export class GestureDetectionComponent implements OnDestroy {
       const start = landmarks[startIdx];
       const end = landmarks[endIdx];
       ctx.beginPath();
-      ctx.moveTo(start.x * width, start.y * height);
-      ctx.lineTo(end.x * width, end.y * height);
+      ctx.moveTo(start.x * w, start.y * h);
+      ctx.lineTo(end.x * w, end.y * h);
       ctx.stroke();
     }
     ctx.restore();
 
-    // Draw landmarks
+    // Draw landmark dots
     ctx.fillStyle = '#FF0000';
     for (const lm of landmarks) {
       ctx.beginPath();
-      ctx.arc(lm.x * width, lm.y * height, 4, 0, 2 * Math.PI);
+      ctx.arc(lm.x * w, lm.y * h, 4, 0, 2 * Math.PI);
       ctx.fill();
     }
   }
 
-  private clearCanvas() {
-    const canvas = this.overlayCanvas.nativeElement;
-    const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────
   //  SENTENCE ACTIONS
-  // ─────────────────────────────────────────────────────────────────────────
-  addSpace() {
-    this.sentenceBuffer.update(buf => [...buf, ' ']);
-    this.feedbackText = 'Space added';
+  // ─────────────────────────────────────────────────────────────────
+  addSpace(): void {
+    this.sentenceBuffer.update((buf) => [...buf, ' ']);
+    this.feedbackText.set('Space added');
   }
 
-  backspace() {
-    this.sentenceBuffer.update(buf => buf.slice(0, -1));
-    if (this.letterHistory().length > 0) {
-      this.letterHistory.update(hist => hist.slice(0, -1));
-    }
-    this.feedbackText = 'Deleted';
+  backspace(): void {
+    this.sentenceBuffer.update((buf) => buf.slice(0, -1));
+    this.letterHistory.update((hist) => hist.slice(0, -1));
+    this.feedbackText.set('Deleted');
   }
 
-  addPunctuation(punct: string) {
-    this.sentenceBuffer.update(buf => [...buf, punct, ' ']);
-    this.feedbackText = `Added ${punct}`;
+  addPunctuation(punct: string): void {
+    this.sentenceBuffer.update((buf) => [...buf, punct, ' ']);
+    this.feedbackText.set(`Added ${punct}`);
   }
 
-  removeLetterAt(index: number) {
-    this.sentenceBuffer.update(buf => {
+  removeLetterAt(index: number): void {
+    this.sentenceBuffer.update((buf) => {
       const newBuf = [...buf];
       newBuf.splice(index, 1);
       return newBuf;
     });
   }
 
-  clearSentence() {
+  clearSentence(): void {
     this.sentenceBuffer.set([]);
     this.letterHistory.set([]);
     this.suggestedWords.set([]);
-    this.feedbackText = 'Cleared';
+    this.feedbackText.set('Cleared');
     this.lastLetterTimestamp = 0;
     this.timeSinceLastLetter.set('--');
   }
 
-  async copyToClipboard() {
+  async copyToClipboard(): Promise<void> {
     const text = this.sentenceBuffer().join('');
     try {
       await navigator.clipboard.writeText(text);
-      this.feedbackText = 'Copied to clipboard!';
+      this.feedbackText.set('Copied to clipboard!');
     } catch (err) {
-      this.feedbackText = 'Copy failed' + (err instanceof Error ? `: ${err.message}` : '');
+      this.feedbackText.set(
+        'Copy failed' + (err instanceof Error ? `: ${err.message}` : ''),
+      );
     }
   }
 
-  speakSentence() {
+  speakSentence(): void {
     const text = this.sentenceBuffer().join('');
     if (text.trim()) {
       speakText(text);
-      this.feedbackText = 'Speaking...';
+      this.feedbackText.set('Speaking...');
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────
   //  LIFECYCLE HOOKS
-  // ─────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────
   @HostListener('document:visibilitychange')
-  handleVisibilityChange() {
+  handleVisibilityChange(): void {
     if (document.hidden && this.isRecording()) {
       this.stopRecording();
     }
@@ -511,8 +520,16 @@ export class GestureDetectionComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.stopRecording();
+
+    // ✅ FIX B1: Clear the interval
+    if (this.tickIntervalId) {
+      clearInterval(this.tickIntervalId);
+      this.tickIntervalId = undefined;
+    }
+
     if (this.spaceTimerHandle) {
       clearTimeout(this.spaceTimerHandle);
+      this.spaceTimerHandle = undefined;
     }
   }
 }

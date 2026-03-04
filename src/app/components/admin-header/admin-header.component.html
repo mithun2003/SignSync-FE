@@ -1,101 +1,171 @@
-<header class="flex items-center justify-between h-16 px-6 border-b border-border-primary shadow-sm">
-  <!-- Left Section: Mobile Menu Toggle & Breadcrumbs -->
+<!-- admin-header.component.html -->
+<header class="flex items-center justify-between h-16 px-6
+               border-b border-border-primary bg-bg-secondary">
+
+  <!-- ═══ Left: Menu Toggle + Breadcrumbs ═══ -->
   <div class="flex items-center gap-4">
-    <!-- Mobile Menu Toggle -->
-    <button (click)="toggleMobileMenu()" class="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
-      aria-label="Toggle mobile menu">
-      <svg class="w-5 h-5 text-gray-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    <!-- Mobile menu toggle -->
+    <button (click)="toggleMobileMenu()"
+            class="md:hidden p-2 rounded-lg hover:bg-bg-hover transition-colors"
+            aria-label="Toggle mobile menu">
+      <svg class="w-5 h-5 text-font-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
     </button>
 
     <!-- Breadcrumbs -->
-    <nav class="hidden sm:flex items-center space-x-2 text-sm">
-      <a routerLink="/admin" class="text-neutral-d-grey hover:text-gray-400 transition-colors">Admin</a>
-      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    <nav class="hidden sm:flex items-center gap-2 body-3">
+      <a routerLink="/admin"
+         class="text-font-muted hover:text-font-secondary transition-colors">
+        Admin
+      </a>
+      <svg class="w-4 h-4 text-neutral-d-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
       </svg>
-      <span class="text-gray-600 font-medium">{{ currentPage() }}</span>
+      <span class="text-font-secondary font-medium">{{ currentPage() }}</span>
     </nav>
   </div>
 
-  <!-- Right Section: Search, Notifications, User Menu -->
-  <div class="flex items-center gap-4">
+  <!-- ═══ Right: Search + Notifications + User ═══ -->
+  <div class="flex items-center gap-3">
+
     <!-- Search -->
     <div class="hidden md:block relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <fa-icon [icon]="faMagnifyingGlass" class="text-font-muted text-sm"></fa-icon>
       </div>
-      <input type="text" placeholder="Search..."
-        class="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-        [(ngModel)]="searchQuery">
+      <input type="text"
+             placeholder="Search..."
+             class="pl-9 pr-4 py-2 w-56 body-3
+                    bg-bg-primary border border-border-primary rounded-lg
+                    text-white placeholder-neutral-d-grey
+                    focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10
+                    transition-all"
+             [ngModel]="searchQuery()"
+             (ngModelChange)="searchQuery.set($event)" />
+    </div>
+
+    <!-- Notifications -->
+    <div class="relative notification-area">
+      <button (click)="toggleNotifications()"
+              class="relative p-2.5 rounded-lg hover:bg-bg-hover transition-all"
+              aria-label="Notifications">
+        <fa-icon [icon]="faBell" class="text-font-muted text-base"></fa-icon>
+        @if (unreadCount() > 0) {
+          <span class="absolute top-1 right-1 w-4 h-4 rounded-full
+                       gradient-bg text-white body-4 font-bold
+                       flex items-center justify-center">
+            {{ unreadCount() }}
+          </span>
+        }
+      </button>
+
+      <!-- Notification Dropdown -->
+      @if (showNotifications()) {
+        <div class="absolute right-0 mt-2 w-80 bg-bg-card rounded-xl
+                    border border-border-primary z-50 animate-fade-in
+                    shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+          <div class="flex items-center justify-between p-4 border-b border-border-primary">
+            <span class="body-3 font-semibold text-white">Notifications</span>
+            <button (click)="markAllRead()"
+                    class="body-4 text-primary-light hover:text-white transition-colors">
+              Mark all read
+            </button>
+          </div>
+          <div class="max-h-64 overflow-y-auto">
+            @for (notif of notifications(); track notif.id) {
+              <div class="px-4 py-3 hover:bg-bg-hover transition-colors
+                          border-b border-border-muted last:border-0"
+                   [class.opacity-60]="notif.read">
+                <div class="flex items-start gap-3">
+                  <div class="w-2 h-2 mt-2 rounded-full shrink-0"
+                       [class.bg-info]="notif.type === 'info'"
+                       [class.bg-success]="notif.type === 'success'"
+                       [class.bg-warning]="notif.type === 'warning'"></div>
+                  <div class="flex-1 min-w-0">
+                    <p class="body-4 font-medium text-white">{{ notif.title }}</p>
+                    <p class="body-4 text-font-muted truncate">{{ notif.message }}</p>
+                    <p class="body-4 text-neutral-d-grey mt-1">{{ notif.time }}</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
 
     <!-- User Menu -->
-    <div class="relative">
+    <div class="relative user-menu-area">
       <button (click)="toggleUserMenu()"
-        class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors user-menu-button bg-white" aria-label="User menu">
-        <div class="w-8 h-8 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-          <span class="text-sm font-medium text-white">{{ getUserInitials() }}</span>
+              class="flex items-center gap-3 p-2 rounded-lg
+                     hover:bg-bg-hover transition-all"
+              aria-label="User menu">
+        <!-- Avatar -->
+        <div class="w-8 h-8 gradient-bg rounded-full
+                    flex items-center justify-center">
+          <span class="body-4 font-bold text-white">{{ getUserInitials() }}</span>
         </div>
+        <!-- Name (desktop only) -->
         <div class="hidden md:block text-left">
-          <p class="text-sm font-medium text-gray-900">{{ user().name || 'Admin User' }}</p>
-          <p class="text-xs text-gray-500">{{ user().email || 'admin@example.com' }}</p>
+          <p class="body-4 font-medium text-white">{{ userName }}</p>
+          <p class="body-4 text-font-muted" style="font-size: 11px;">{{ userEmail }}</p>
         </div>
-        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <svg class="w-4 h-4 text-neutral-l-grey hidden md:block"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
         </svg>
       </button>
 
       <!-- User Dropdown -->
       @if (showUserMenu()) {
-      <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 user-menu-dropdown">
-        <div class="p-4 border-b border-gray-200">
-          <p class="text-sm font-medium text-gray-900">{{ user().name || 'Admin User' }}</p>
-          <p class="text-sm text-gray-500">{{ user().email || 'admin@example.com' }}</p>
+        <div class="absolute right-0 mt-2 w-56 bg-bg-card rounded-xl
+                    border border-border-primary z-50 animate-fade-in
+                    shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+          <!-- User info -->
+          <div class="p-4 border-b border-border-primary">
+            <p class="body-3 font-medium text-white">{{ userName }}</p>
+            <p class="body-4 text-font-muted">{{ userEmail }}</p>
+            <span class="inline-block mt-2 px-2 py-0.5 rounded-full
+                         bg-primary/20 text-primary-light body-4 font-medium">
+              Admin
+            </span>
+          </div>
+          <!-- Menu Items -->
+          <div class="py-1">
+            <a routerLink="/profile"
+               class="flex items-center gap-3 px-4 py-2.5 body-3
+                      text-font-primary hover:bg-bg-hover hover:text-white
+                      transition-colors">
+              <fa-icon [icon]="faUser" class="w-4 text-font-muted"></fa-icon>
+              Profile
+            </a>
+            <a routerLink="/admin/settings"
+               class="flex items-center gap-3 px-4 py-2.5 body-3
+                      text-font-primary hover:bg-bg-hover hover:text-white
+                      transition-colors">
+              <fa-icon [icon]="faGear" class="w-4 text-font-muted"></fa-icon>
+              Settings
+            </a>
+            <a routerLink="/help"
+               class="flex items-center gap-3 px-4 py-2.5 body-3
+                      text-font-primary hover:bg-bg-hover hover:text-white
+                      transition-colors">
+              <fa-icon [icon]="faCircleQuestion" class="w-4 text-font-muted"></fa-icon>
+              Help & Support
+            </a>
+          </div>
+          <!-- Sign out -->
+          <div class="border-t border-border-primary py-1">
+            <button (click)="signOut()"
+                    class="flex items-center gap-3 px-4 py-2.5 body-3 w-full text-left
+                           text-danger hover:bg-danger/10 transition-colors">
+              <fa-icon [icon]="faRightFromBracket" class="w-4"></fa-icon>
+              Sign out
+            </button>
+          </div>
         </div>
-        <div class="py-2">
-          <a href="#"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Profile
-          </a>
-          <a href="#"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Settings
-          </a>
-          <a href="#"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Help & Support
-          </a>
-        </div>
-        <div class="border-t border-gray-200 py-2">
-          <button (click)="signOut()"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" />
-            </svg>
-            Sign out
-          </button>
-        </div>
-      </div>
       }
     </div>
   </div>

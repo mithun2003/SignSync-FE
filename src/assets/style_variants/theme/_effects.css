@@ -218,3 +218,120 @@
     100% { left: 100%; }
   }
 }
+
+
+
+
+/* theme/_effects.css - Tailwind v4 Compatible */
+/* ═══ ADD THESE to your existing _effects.css ═══ */
+
+/* ===== NEW KEYFRAMES ===== */
+
+/* Float animation (hero hand image) */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+/* Gradient text animation */
+@keyframes gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Stagger fade-in (hero elements) */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glow pulse (CTA banner border) */
+@keyframes glow-pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 20px rgb(139 92 246 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 10px rgb(139 92 246 / 0.5),
+                0 0 40px rgb(139 92 246 / 0.2);
+  }
+}
+
+/* Shimmer sweep (button/banner shine) */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ===== NEW UTILITIES ===== */
+@layer utilities {
+
+  /* Float animation */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Gradient text animation */
+  .animate-gradient {
+    background-size: 200% auto;
+    animation: gradient 3s linear infinite;
+  }
+
+  /* Stagger fade-in — uses CSS custom property --stagger-delay */
+  .animate-stagger-fade-in {
+    opacity: 0;
+    animation: stagger-fade-in 0.6s ease-out forwards;
+    animation-delay: calc(var(--stagger-delay, 0) * 0.15s);
+  }
+
+  /* Glow pulse border */
+  .animate-glow-border {
+    animation: glow-pulse-border 2s ease-in-out infinite;
+  }
+
+  /* Shimmer sweep overlay */
+  .shimmer-sweep {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.08),
+      transparent
+    );
+    animation: shimmer-sweep 3s ease-in-out infinite;
+  }
+
+  /* Card hover lift — combines translate + glow */
+  .card-hover-lift {
+    @apply transition-all duration-300;
+  }
+  .card-hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 30px rgb(139 92 246 / 0.15),
+                0 20px 40px rgb(0 0 0 / 0.2);
+    border-color: rgb(139 92 246 / 0.4);
+  }
+
+  /* Shadow glow (for icons on hover) */
+  .shadow-glow-sm {
+    box-shadow: 0 0 12px rgb(139 92 246 / 0.4);
+  }
+}

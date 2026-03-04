@@ -1,4 +1,4 @@
-/* base.css - Tailwind v4 Complete Theme */
+/* base.css - Tailwind v4 Complete Theme with Light & Dark Support */
 
 @import "tailwindcss";
 @import "./theme/_colors.css";
@@ -7,9 +7,9 @@
 @import "./theme/_effects.css";
 
 @theme {
-  /* =========================================================
+  /* ═══════════════════════════════════════════════════════════════
      COLOR TOKENS - Map CSS vars to Tailwind utilities
-  ========================================================= */
+  ═══════════════════════════════════════════════════════════════ */
   
   /* Neutrals */
   --color-white: var(--color-white);
@@ -40,6 +40,14 @@
   --color-bg-secondary: var(--color-bg-secondary);
   --color-bg-card: var(--color-bg-card);
   --color-bg-hover: var(--color-bg-hover);
+  --color-background: var(--color-background);
+
+  /* Sidebar */
+  --color-sidebar: var(--color-sidebar);
+  --color-sidebar-primary: var(--color-sidebar-primary);
+  --color-sidebar-foreground: var(--color-sidebar-foreground);
+  --color-sidebar-accent: var(--color-sidebar-accent);
+  --color-sidebar-accent-foreground: var(--color-sidebar-accent-foreground);
 
   /* Font Colors (enables text-font-primary, text-font-muted, etc.) */
   --color-font-primary: var(--color-font-primary);
@@ -51,6 +59,7 @@
   --color-success-light: var(--color-success-light);
   --color-success-dark: var(--color-success-dark);
   --color-warning: var(--color-warning);
+  --color-warning-light: var(--color-warning-light);
   --color-danger: var(--color-danger);
   --color-danger-dark: var(--color-danger-dark);
   --color-info: var(--color-info);
@@ -65,9 +74,12 @@
   --color-border-secondary: var(--color-border-secondary);
   --color-border-muted: var(--color-border-muted);
 
-  /* =========================================================
+  /* Muted */
+  --color-muted-foreground: var(--color-muted-foreground);
+
+  /* ═══════════════════════════════════════════════════════════════
      SPACING & RADIUS
-  ========================================================= */
+  ═══════════════════════════════════════════════════════════════ */
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
@@ -75,9 +87,9 @@
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* =========================================================
+  /* ═══════════════════════════════════════════════════════════════
      TYPOGRAPHY
-  ========================================================= */
+  ═══════════════════════════════════════════════════════════════ */
   --font-manrope: var(--font-manrope);
   --font-size-headline-1: var(--font-headline-1);
   --font-size-headline-2: var(--font-headline-2);
@@ -87,47 +99,204 @@
   --font-size-body-3: var(--font-body-3);
   --font-size-body-4: var(--font-body-4);
 
-  /* =========================================================
+  /* ═══════════════════════════════════════════════════════════════
      SHADOWS
-  ========================================================= */
+  ═══════════════════════════════════════════════════════════════ */
   --shadow-glow-sm: var(--shadow-glow-sm);
   --shadow-glow-md: var(--shadow-glow-md);
   --shadow-glow-lg: var(--shadow-glow-lg);
 }
 
-/* =========================================================
+/* ═══════════════════════════════════════════════════════════════
    GLOBAL STYLES
-========================================================= */
+═══════════════════════════════════════════════════════════════ */
 @layer base {
   * {
     @apply border-border-primary;
   }
 
   body {
-    @apply bg-bg-primary text-white font-[family-name:var(--font-manrope)];
+    @apply bg-bg-primary font-manrope;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Custom Scrollbar */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+  /* ───────────────────────────────────────────────────────────── */
+  /* TEXT COLOR - Theme-specific */
+  /* ───────────────────────────────────────────────────────────── */
+  
+  /* Dark theme - white text */
+  :root body,
+  [data-theme='dark'] body {
+    @apply text-white;
   }
 
-  *::-webkit-scrollbar {
+  /* Light theme - dark text */
+  [data-theme='light'] body {
+    @apply text-font-primary;
+  }
+
+  /* System theme - light by default */
+  [data-theme='system'] body {
+    @apply text-font-primary;
+  }
+
+  /* System theme - dark mode */
+  @media (prefers-color-scheme: dark) {
+    [data-theme='system'] body {
+      @apply text-white;
+    }
+  }
+
+  /* ───────────────────────────────────────────────────────────── */
+  /* CUSTOM SCROLLBAR - DARK THEME */
+  /* ───────────────────────────────────────────────────────────── */
+  
+  :root *,
+  [data-theme='dark'] * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(139 92 246 / 0.6) rgb(31 41 55);
+  }
+
+  :root *::-webkit-scrollbar,
+  [data-theme='dark'] *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  *::-webkit-scrollbar-track {
+  :root *::-webkit-scrollbar-track,
+  [data-theme='dark'] *::-webkit-scrollbar-track {
     @apply bg-neutral-d-grey/30 rounded-full;
   }
 
-  *::-webkit-scrollbar-thumb {
+  :root *::-webkit-scrollbar-thumb,
+  [data-theme='dark'] *::-webkit-scrollbar-thumb {
     @apply bg-primary/60 rounded-full;
   }
 
-  *::-webkit-scrollbar-thumb:hover {
+  :root *::-webkit-scrollbar-thumb:hover,
+  [data-theme='dark'] *::-webkit-scrollbar-thumb:hover {
     @apply bg-primary;
+  }
+
+  /* ───────────────────────────────────────────────────────────── */
+  /* CUSTOM SCROLLBAR - LIGHT THEME */
+  /* ───────────────────────────────────────────────────────────── */
+  
+  [data-theme='light'] * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(139 92 246 / 0.3) rgb(241 245 249);
+  }
+
+  [data-theme='light'] *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  [data-theme='light'] *::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 9999px;
+  }
+
+  [data-theme='light'] *::-webkit-scrollbar-thumb {
+    background: rgb(139 92 246 / 0.4);
+    border-radius: 9999px;
+  }
+
+  [data-theme='light'] *::-webkit-scrollbar-thumb:hover {
+    background: rgb(139 92 246 / 0.6);
+  }
+
+  /* ───────────────────────────────────────────────────────────── */
+  /* CUSTOM SCROLLBAR - SYSTEM THEME */
+  /* ───────────────────────────────────────────────────────────── */
+  
+  /* System theme - light by default */
+  [data-theme='system'] * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(139 92 246 / 0.3) rgb(241 245 249);
+  }
+
+  [data-theme='system'] *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  [data-theme='system'] *::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 9999px;
+  }
+
+  [data-theme='system'] *::-webkit-scrollbar-thumb {
+    background: rgb(139 92 246 / 0.4);
+    border-radius: 9999px;
+  }
+
+  [data-theme='system'] *::-webkit-scrollbar-thumb:hover {
+    background: rgb(139 92 246 / 0.6);
+  }
+
+  /* System theme - dark mode override */
+  @media (prefers-color-scheme: dark) {
+    [data-theme='system'] * {
+      scrollbar-color: rgb(139 92 246 / 0.6) rgb(31 41 55);
+    }
+
+    [data-theme='system'] *::-webkit-scrollbar-track {
+      @apply bg-neutral-d-grey/30 rounded-full;
+    }
+
+    [data-theme='system'] *::-webkit-scrollbar-thumb {
+      @apply bg-primary/60 rounded-full;
+    }
+
+    [data-theme='system'] *::-webkit-scrollbar-thumb:hover {
+      @apply bg-primary;
+    }
+  }
+
+  /* ───────────────────────────────────────────────────────────── */
+  /* SMOOTH THEME TRANSITIONS */
+  /* ───────────────────────────────────────────────────────────── */
+  
+  * {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  /* Faster transitions for interactive elements */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    transition-duration: 150ms;
+  }
+
+  /* Disable transitions when user prefers reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ───────────────────────────────────────────────────────────── */
+  /* SELECTION COLORS */
+  /* ───────────────────────────────────────────────────────────── */
+  
+  ::selection {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  /* Light theme - ensure good contrast */
+  [data-theme='light'] ::selection {
+    background-color: var(--color-primary);
+    color: white;
   }
 }

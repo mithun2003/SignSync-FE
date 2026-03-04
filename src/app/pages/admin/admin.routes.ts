@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
@@ -12,12 +12,12 @@ export const routes: Routes = [
   {
     path: 'todos',
     loadComponent: () =>
-      import('./todos/todos.component').then((m) => m.TodosComponent),
+      import('./components/todos/todos.component').then((m) => m.TodosComponent),
   },
   {
     path: 'settings',
     loadComponent: () =>
-      import('./settings/settings.component').then((m) => m.SettingsComponent),
+      import('./components/settings/settings.component').then((m) => m.SettingsComponent),
   },
   {
     path: '',

@@ -1,165 +1,133 @@
+// admin-header.component.ts
 import {
-  Component,
-  signal,
-  EventEmitter,
-  Output,
-  inject,
-  ElementRef,
-  Renderer2,
-  PLATFORM_ID,
-  AfterViewInit,
-  OnDestroy,
+  Component, signal, EventEmitter, Output,
+  inject, HostListener, DestroyRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
-
-import { isPlatformBrowser } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { AlertService } from 'app/shared/alert/service/alert.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router, NavigationEnd } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { filter, map } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faMagnifyingGlass, faBell, faUser,
+  faGear, faCircleQuestion, faRightFromBracket,
+} from '@fortawesome/free-solid-svg-icons';
 
 import { CommonService } from '@core/services/common/common.service';
-import { IUserData } from '@models/global.model';
-import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+  type: 'info' | 'warning' | 'success';
+}
+
 @Component({
   selector: 'app-admin-header',
-  imports: [FormsModule],
   standalone: true,
+  imports: [FormsModule, FontAwesomeModule],
   templateUrl: './admin-header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminHeaderComponent implements AfterViewInit, OnDestroy {
+export class AdminHeaderComponent {
   private commonService = inject(CommonService);
-  private alertService = inject(AlertService);
-  subscriptions: Subscription[] = [];
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
   @Output() mobileMenuToggle = new EventEmitter<void>();
 
-  // Signals for reactive state
+  // Icons
+  faMagnifyingGlass = faMagnifyingGlass;
+  faBell = faBell;
+  faUser = faUser;
+  faGear = faGear;
+  faCircleQuestion = faCircleQuestion;
+  faRightFromBracket = faRightFromBracket;
+
+  // State
   searchQuery = signal('');
   showUserMenu = signal(false);
-  private documentClickListener: (() => void) | null = null;
-  private router = inject(Router);
-  private elRef = inject(ElementRef);
-  private renderer = inject(Renderer2);
-  private platformId = inject(PLATFORM_ID);
+  showNotifications = signal(false);
+  currentPage = signal('Dashboard');
 
-  ngAfterViewInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.documentClickListener = this.renderer.listen(
-        'document',
-        'click',
-        (event: Event) => {
-          // The dropdown menu
-          const userMenuDropdown = this.elRef.nativeElement.querySelector(
-            '.user-menu-dropdown',
-          );
-          // The button that toggles the menu
-          const userMenuButton =
-            this.elRef.nativeElement.querySelector('.user-menu-button');
-          // If menu is open, and click is outside both the button and the dropdown, close it
-          if (
-            this.showUserMenu() &&
-            userMenuDropdown &&
-            userMenuButton &&
-            !userMenuDropdown.contains(event.target) &&
-            !userMenuButton.contains(event.target)
-          ) {
-            this.showUserMenu.set(false);
-          }
-        },
-      );
+  // Notifications
+  notifications = signal<Notification[]>([
+    { id: 1, title: 'New user registered', message: 'John Doe just signed up',
+      time: '5m ago', read: false, type: 'info' },
+    { id: 2, title: 'System update', message: 'v2.1 deployed successfully',
+      time: '1h ago', read: false, type: 'success' },
+    { id: 3, title: 'High memory usage', message: 'Server using 85% RAM',
+      time: '3h ago', read: true, type: 'warning' },
+  ]);
+
+  unreadCount = signal(2);
+
+  constructor() {
+    // Auto-update breadcrumb from Router
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => {
+        const segment = e.urlAfterRedirects.split('/').pop() || 'dashboard';
+        return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(page => this.currentPage.set(page));
+  }
+
+  // Click-outside handler
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-menu-area')) {
+      this.showUserMenu.set(false);
+    }
+    if (!target.closest('.notification-area')) {
+      this.showNotifications.set(false);
     }
   }
 
-  ngOnDestroy() {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-
-    if (this.documentClickListener) {
-      this.documentClickListener();
-      this.documentClickListener = null;
-    }
-  }
-
-  // Get current page name for breadcrumbs
-  currentPage(): string {
-    const path = this.router.url.split('/').pop();
-    switch (path) {
-      case 'dashboard':
-        return 'Dashboard';
-      case 'todos':
-        return 'Todos';
-      case 'users':
-        return 'Users';
-      case 'analytics':
-        return 'Analytics';
-      case 'reports':
-        return 'Reports';
-      case 'settings':
-        return 'Settings';
-      case 'logs':
-        return 'System Logs';
-      case 'backup':
-        return 'Backup & Restore';
-      default:
-        return 'Dashboard';
-    }
-  }
-
-  // Get user initials for avatar
   getUserInitials(): string {
-    // const name = 'Admin User'; // Replace with actual user name
-    const name = this.commonService.user()?.first_name || 'User';
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
+    const user = this.commonService.user();
+    const name = user?.first_name || 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  // Toggle mobile menu
+  get userName(): string {
+    const user = this.commonService.user();
+    return user?.first_name
+      ? `${user.first_name} ${user.last_name || ''}`.trim()
+      : 'Admin User';
+  }
+
+  get userEmail(): string {
+    return this.commonService.user()?.email || 'admin@example.com';
+  }
+
   toggleMobileMenu(): void {
     this.mobileMenuToggle.emit();
   }
 
-  // Toggle user menu dropdown
   toggleUserMenu(): void {
-    this.showUserMenu.update((show) => !show);
+    this.showUserMenu.update(v => !v);
+    this.showNotifications.set(false);
   }
 
-  // // Sign out functionality
-  // signOut(): void {
-  //   // TODO: Implement sign out logic
-  //   console.log('Sign out');
-  //   this.subscriptions.push(
-  //     this.alertService
-  //       .alertMessage('confirm', {
-  //         title: 'Confirm Logout',
-  //         content: 'Are you sure you want to logout?',
-  //         doneMsg: 'Logout',
-  //         cancelMsg: 'Cancel',
-  //         icon: faRightFromBracket,
-  //         iconBgColor: 'red',
-  //         iconClass: 'text-common-primary-red-color',
-  //       })
-  //       .afterClosed()
-  //       .subscribe((res) => {
-  //         if (res) this.commonService.signOut();
-  //       }),
-  //   );
-  // }
-  signOut(){
+  toggleNotifications(): void {
+    this.showNotifications.update(v => !v);
+    this.showUserMenu.set(false);
+  }
+
+  markAllRead(): void {
+    this.notifications.update(list =>
+      list.map(n => ({ ...n, read: true }))
+    );
+    this.unreadCount.set(0);
+  }
+
+  signOut(): void {
     this.commonService.signOut();
-  }
-
-  // Mock user data (replace with actual user service)
-  user(): IUserData {
-    const user = this.commonService.user();
-    return {
-      name: user?.first_name || 'Admin User',
-      email: user?.email || 'admin@example.com',
-      role: 'admin',
-      username: user?.username || 'admin',
-      phone: 0,
-      profile_photo: user?.profile_image_url || null,
-    };
   }
 }
