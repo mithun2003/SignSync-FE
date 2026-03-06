@@ -35,3 +35,35 @@ export interface IAdminDashboard {
   system_services: ISystemService[];
   top_users: ITopUser[];
 }
+
+
+
+
+export interface ASLSign {
+  id: number;
+  character: string;
+  image_filename: string;
+  image_path: string;
+  cdn_url: string;
+  file_size: number;
+  mime_type: string;
+  upload_method: string;
+  version: number;
+  updated_at: string;
+  created_at: string;
+  updated_by?: number;
+}
+
+export interface SignStats {
+  total_signs: number;
+  missing_signs: number;
+  completion_percentage: number;
+  total_size_mb: number;
+}
+
+export interface VersionHistory {
+  version: number;
+  cdn_url: string;
+  updated_at: string;
+  upload_method: string;
+}

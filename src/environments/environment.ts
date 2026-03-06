@@ -4,6 +4,8 @@ export const environment: IEnvironment = {
   isItDev: true,
   rootUrl: 'http://localhost:8000',
   websocketUrl: 'ws://localhost:8000/api/v1',
+  cloudinaryCloudName: 'deqxg8jcu',
+  cloudinaryUploadPreset: 'asl_sign_upload',
 
   version: '0.0.0',
   brandName: 'SignSync'

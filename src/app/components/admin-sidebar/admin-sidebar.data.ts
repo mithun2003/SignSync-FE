@@ -39,6 +39,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: 'Management',
     items: [
+      { label: 'Signs', route: '/admin/signs', icon: faClipboardList},
       { label: 'Todos', route: '/admin/todos', icon: faClipboardList, badge: '23', badgeColor: 'warning' },
       { label: 'Users', route: '/admin/users', icon: faUsers, badge: '1.2k', badgeColor: 'info' },
       { label: 'Analytics', route: '/admin/analytics', icon: faChartBar, dot: true },

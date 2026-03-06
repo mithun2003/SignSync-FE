@@ -4,4 +4,6 @@ export interface IEnvironment {
   websocketUrl: string;
   version: string;
   brandName: string;
+  cloudinaryCloudName: string;
+  cloudinaryUploadPreset: string;
 }

@@ -1,0 +1,317 @@
+<!-- admin/pages/sign-management/sign-management.component.html -->
+<!-- Frontend-focused with Cloudinary selection -->
+
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-font-primary">ASL Sign Management</h1>
+      <p class="text-font-muted mt-1">Manage sign language images with Cloudinary</p>
+    </div>
+    
+    <button
+      (click)="loadActiveSigns()"
+      class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark
+             transition-colors flex items-center gap-2">
+      <fa-icon [icon]="faSync"></fa-icon>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Statistics -->
+  @if (stats()) {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-bg-card border border-border-primary rounded-lg p-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+            <fa-icon [icon]="faImage" class="text-primary text-xl"></fa-icon>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-font-primary">{{ stats()!.total_signs }}</p>
+            <p class="text-sm text-font-muted">Total Signs</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-bg-card border border-border-primary rounded-lg p-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-lg bg-warning/20 flex items-center justify-center">
+            <fa-icon [icon]="faCloudUploadAlt" class="text-warning text-xl"></fa-icon>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-font-primary">{{ stats()!.missing_signs }}</p>
+            <p class="text-sm text-font-muted">Missing Signs</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-bg-card border border-border-primary rounded-lg p-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-lg bg-success/20 flex items-center justify-center">
+            <fa-icon [icon]="faCheck" class="text-success text-xl"></fa-icon>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-font-primary">{{ stats()!.completion_percentage }}%</p>
+            <p class="text-sm text-font-muted">Completion</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="bg-danger/10 border border-danger rounded-lg p-4 flex items-center gap-3">
+      <fa-icon [icon]="faTimes" class="text-danger"></fa-icon>
+      <p class="text-danger">{{ error() }}</p>
+    </div>
+  }
+
+  <!-- Alphabet Grid -->
+  <div class="bg-bg-card border border-border-primary rounded-lg p-6">
+    <h2 class="text-xl font-semibold text-font-primary mb-4">A-Z Signs</h2>
+    
+    @if (loading()) {
+      <div class="flex items-center justify-center py-12">
+        <div class="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    } @else {
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4">
+        @for (char of alphabet; track char) {
+          <button 
+            (click)="openCharacterModal(char)"
+            class="relative group cursor-pointer">
+            <div 
+              [class]="hasSign(char)
+                ? 'border-2 border-success bg-success/5'
+                : 'border-2 border-border-primary bg-bg-secondary hover:border-primary/50'"
+              class="aspect-square rounded-lg overflow-hidden transition-all duration-200">
+              
+              @if (hasSign(char)) {
+                <img 
+                  [src]="getActiveSign(char)!.cloudinary_url" 
+                  [alt]="'Sign for ' + char"
+                  class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full flex flex-col items-center justify-center">
+                  <fa-icon [icon]="faImage" class="text-4xl text-font-muted mb-2"></fa-icon>
+                  <p class="text-xs text-font-muted">Click to add</p>
+                </div>
+              }
+            </div>
+            
+            <div class="mt-2 text-center">
+              <span class="text-lg font-bold text-font-primary">{{ char }}</span>
+              @if (hasSign(char)) {
+                <span class="block text-xs text-success mt-1">
+                  v{{ getActiveSign(char)!.version }}
+                </span>
+              }
+            </div>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Special Characters -->
+  <div class="bg-bg-card border border-border-primary rounded-lg p-6">
+    <h2 class="text-xl font-semibold text-font-primary mb-4">Special Characters</h2>
+    
+    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+      @for (char of specialChars; track char) {
+        <button 
+          (click)="openCharacterModal(char)"
+          class="relative group cursor-pointer">
+          <div 
+            [class]="hasSign(char)
+              ? 'border-2 border-success bg-success/5'
+              : 'border-2 border-border-primary bg-bg-secondary hover:border-primary/50'"
+            class="aspect-square rounded-lg overflow-hidden transition-all duration-200">
+            
+            @if (hasSign(char)) {
+              <img 
+                [src]="getActiveSign(char)!.cloudinary_url" 
+                [alt]="'Sign for ' + char"
+                class="w-full h-full object-cover">
+            } @else {
+              <div class="w-full h-full flex flex-col items-center justify-center">
+                <fa-icon [icon]="faImage" class="text-4xl text-font-muted mb-2"></fa-icon>
+                <p class="text-xs text-font-muted">{{ char }}</p>
+              </div>
+            }
+          </div>
+          
+          <div class="mt-2 text-center">
+            <span class="text-sm font-semibold text-font-primary">{{ char }}</span>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <button class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+       (click)="closeModal()">
+    <button class="bg-bg-card border border-border-primary rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
+         (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-font-primary">
+            Sign Options for: {{ selectedCharacter() }}
+          </h2>
+          <p class="text-sm text-font-muted mt-1">
+            Select existing image or upload/capture new one
+          </p>
+        </div>
+        
+        <button
+          (click)="closeModal()"
+          class="w-8 h-8 rounded-lg hover:bg-bg-hover transition-colors flex items-center justify-center">
+          <fa-icon [icon]="faTimes" class="text-font-muted"></fa-icon>
+        </button>
+      </div>
+
+      <!-- Mode: Select from Cloudinary -->
+      @if (modalMode() === 'select') {
+        <div class="space-y-4">
+          <!-- Existing Images from Cloudinary -->
+          <div>
+            <h3 class="text-lg font-semibold text-font-primary mb-3 flex items-center gap-2">
+              <fa-icon [icon]="faImages"></fa-icon>
+              Existing Images in Cloudinary
+            </h3>
+            
+            @if (loadingImages()) {
+              <div class="flex items-center justify-center py-8">
+                <div class="animate-spin w-6 h-6 border-4 border-primary border-t-transparent rounded-full"></div>
+              </div>
+            } @else if (cloudinaryImages().length === 0) {
+              <div class="text-center py-8 text-font-muted">
+                <fa-icon [icon]="faImage" class="text-4xl mb-2"></fa-icon>
+                <p>No existing images found</p>
+              </div>
+            } @else {
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                @for (image of cloudinaryImages(); track image.public_id) {
+                  <button 
+                    (click)="selectCloudinaryImage(image)"
+                    class="relative group cursor-pointer">
+                    <div class="aspect-square rounded-lg overflow-hidden border-2 border-border-primary
+                                hover:border-primary transition-all">
+                      <img 
+                        [src]="image.secure_url" 
+                        [alt]="image.public_id"
+                        class="w-full h-full object-cover">
+                      
+                      <!-- Overlay -->
+                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100
+                                  transition-opacity flex items-center justify-center">
+                        <div class="text-white text-center">
+                          <fa-icon [icon]="faCheck" class="text-2xl mb-2"></fa-icon>
+                          <p class="text-xs">Select</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="mt-1 text-xs text-font-muted text-center">
+                      {{ image.width }}×{{ image.height }} • {{ formatBytes(image.bytes) }}
+                    </div>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3 pt-4 border-t border-border-primary">
+            <button
+              (click)="switchToUpload()"
+              class="flex-1 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg
+                     font-semibold transition-colors flex items-center justify-center gap-2">
+              <fa-icon [icon]="faUpload"></fa-icon>
+              Upload New
+            </button>
+            
+            <button
+              (click)="switchToCapture()"
+              class="flex-1 py-3 bg-info hover:bg-info/80 text-white rounded-lg
+                     font-semibold transition-colors flex items-center justify-center gap-2">
+              <fa-icon [icon]="faCamera"></fa-icon>
+              Capture New
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Mode: Upload -->
+      @if (modalMode() === 'upload') {
+        <div>
+          <input
+            #fileInput
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="hidden">
+          
+          @if (previewImage()) {
+            <img [src]="previewImage()!" alt="Preview" class="w-full rounded-lg mb-4">
+          } @else {
+            <button
+              (click)="fileInput.click()"
+              class="w-full border-2 border-dashed border-border-primary rounded-lg p-12 
+                     text-center cursor-pointer hover:border-primary transition-colors">
+              <fa-icon [icon]="faUpload" class="text-5xl text-font-muted mb-4"></fa-icon>
+              <p class="text-font-secondary font-semibold">Click to select image</p>
+              <p class="text-sm text-font-muted mt-2">JPG, PNG, or WEBP</p>
+            </button>
+          }
+          
+          <button
+            (click)="modalMode.set('select')"
+            class="mt-4 px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors">
+            ← Back to Selection
+          </button>
+        </div>
+      }
+
+      <!-- Mode: Capture -->
+      @if (modalMode() === 'capture') {
+        <div>
+          @if (isCapturing()) {
+            <div class="space-y-4">
+              <video
+                #video
+                autoplay
+                playsinline
+                class="w-full rounded-lg bg-black">
+              </video>
+              
+              <button
+                (click)="capturePhoto()"
+                class="w-full py-3 bg-primary hover:bg-primary-dark text-white rounded-lg
+                       font-semibold transition-colors flex items-center justify-center gap-2">
+                <fa-icon [icon]="faCamera"></fa-icon>
+                Capture Photo
+              </button>
+            </div>
+          } @else if (previewImage()) {
+            <img [src]="previewImage()!" alt="Preview" class="w-full rounded-lg mb-4">
+          }
+          
+          <button
+            (click)="modalMode.set('select'); stopCamera()"
+            class="mt-4 px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors">
+            ← Back to Selection
+          </button>
+        </div>
+      }
+      
+      <canvas #canvas class="hidden"></canvas>
+    </button>
+  </button>
+}
