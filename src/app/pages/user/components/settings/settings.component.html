@@ -45,7 +45,7 @@
             <div class="mb-6">
               <div class="block text-sm font-medium text-font-muted mb-3">Theme</div>
               <div class="flex gap-3">
-                @for (theme of themeOptions(); track theme) {
+                @for (theme of themeOptions; track theme) {
                   <button (click)="updateSetting('theme', theme)"
                     [class]="settings().theme === theme
                       ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-white font-semibold'
@@ -61,7 +61,7 @@
             <div class="mb-6">
               <div class="block text-sm font-medium text-font-muted mb-3">Font Size</div>
               <div class="flex gap-3">
-                @for (size of fontOptions(); track size) {
+                @for (size of fontOptions; track size) {
                   <button (click)="updateSetting('fontSize', size)"
                     [class]="settings().fontSize === size
                       ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-white font-semibold'
@@ -139,7 +139,7 @@
             <div class="mb-6">
               <div class="block text-sm font-medium text-font-muted mb-3">Detection Speed</div>
               <div class="flex gap-3">
-                @for (speed of speedOptions(); track speed) {
+                @for (speed of speedOptions; track speed) {
                   <button (click)="updateSetting('detectionSpeed', speed)"
                     [class]="settings().detectionSpeed === speed
                       ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-white font-semibold'

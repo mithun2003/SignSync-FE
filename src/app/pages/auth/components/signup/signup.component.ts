@@ -1,5 +1,4 @@
-// signup.component.ts - Updated with firstName/lastName and new design
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,8 +11,10 @@ import { AuthService } from '@pages/auth/service/auth.service';
 
 @Component({
   selector: 'app-signup',
+  standalone: true,
   imports: [ReactiveFormsModule, RouterLink, TitleCasePipe],
   templateUrl: './signup.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignupComponent {
   private authService = inject(AuthService);
@@ -98,49 +99,29 @@ export class SignupComponent {
   }
 
   /**
-   * Calculate password strength
+   * Shared password score calculation (0-6)
    */
-  getPasswordStrength(): string {
-    const password = this.form.get('password')?.value;
-    if (!password) return 'weak';
-
+  private calcPasswordScore(password: string): number {
+    if (!password) return 0;
     let score = 0;
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    return score;
+  }
 
-    // Length checks
-    if (password.length >= 8) score += 1;
-    if (password.length >= 12) score += 1;
-
-    // Character variety checks
-    if (/[a-z]/.test(password)) score += 1;  // Lowercase
-    if (/[A-Z]/.test(password)) score += 1;  // Uppercase
-    if (/[0-9]/.test(password)) score += 1;  // Numbers
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;  // Special chars
-
-    // Score interpretation
+  getPasswordStrength(): string {
+    const score = this.calcPasswordScore(this.form.get('password')?.value);
     if (score <= 2) return 'weak';
     if (score <= 4) return 'medium';
     return 'strong';
   }
 
-  /**
-   * Get password strength as percentage
-   */
   getPasswordStrengthPercentage(): number {
-    const password = this.form.get('password')?.value;
-    if (!password) return 0;
-
-    let score = 0;
-
-    // Same checks as getPasswordStrength
-    if (password.length >= 8) score += 1;
-    if (password.length >= 12) score += 1;
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-
-    // Convert to percentage (max score is 6)
-    return Math.min((score / 6) * 100, 100);
+    return Math.min((this.calcPasswordScore(this.form.get('password')?.value) / 6) * 100, 100);
   }
 
   /**

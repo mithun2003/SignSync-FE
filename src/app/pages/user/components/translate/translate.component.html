@@ -117,12 +117,9 @@
                       [disabled]="isPlaying()"
                       class="px-3 py-2 rounded-lg font-semibold text-sm transition-all
                              hover:scale-110 disabled:cursor-not-allowed"
-                      [ngClass]="{
-                        'bg-primary text-white scale-110 ring-2 ring-primary ring-offset-2 ring-offset-gray-800': 
-                          $index === currentLetterIndex(),
-                        'bg-gray-700 text-gray-300 hover:bg-gray-600': 
-                          $index !== currentLetterIndex()
-                      }"
+                      [class]="$index === currentLetterIndex()
+                        ? 'bg-primary text-white scale-110 ring-2 ring-primary ring-offset-2 ring-offset-gray-800'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
                       [title]="letter === 'SPACE' ? 'Space separator' : 'Letter ' + letter"
                     >
                       {{ letter === 'SPACE' ? '␣' : letter }}

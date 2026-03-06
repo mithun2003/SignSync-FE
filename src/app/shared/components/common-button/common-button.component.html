@@ -1,18 +1,15 @@
 <!-- common-button.component.html - Updated for Tailwind v4 -->
 
 <button
-  [class]="completeButtonClass"
+  [class]="completeButtonClass()"
   [disabled]="isLoading() || disabled()"
   [type]="isSubmitButton() ? 'submit' : 'button'"
-  [ngClass]="disabled() ? disabledButtonClass() : ''"
   [matTooltip]="toolTipMsg() ?? ''"
   (click)="buttonClick($event)">
 
   <!-- Hover Effect (Expanding Circle) -->
   @if (hover() && !disabled() && !isLoading()) {
-    <!-- <span class="hover-effect"></span> -->
-
-    <span [class]="hoverEffectClass"></span>
+    <span [class]="hoverEffectClass()"></span>
   }
 
   <!-- Button Content -->

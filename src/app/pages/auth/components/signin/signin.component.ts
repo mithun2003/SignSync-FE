@@ -1,6 +1,4 @@
-// signin.component.ts - Updated getErrorMessage with proper typing
-
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -16,9 +14,11 @@ import { FastAPIErrorResponse, ValidationError } from '@pages/auth/model/auth.mo
 
 @Component({
   selector: 'app-signin',
+  standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SigninComponent {
   private fb = inject(FormBuilder);

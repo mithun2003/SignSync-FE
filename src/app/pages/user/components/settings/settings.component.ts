@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TitleCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { CommonService } from '@core/services/common/common.service';
 import { UserService } from '@pages/user/service/user-service/user.service';
@@ -55,7 +55,7 @@ export interface AppSettings {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [TitleCasePipe, FormsModule],
   templateUrl: './settings.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -73,21 +73,10 @@ export class SettingsComponent implements OnInit {
     stats: false,
   });
 
-   protected readonly themeOptions = signal<readonly AppSettings['theme'][]>([
-    'dark',
-    'light',
-    'system',
-  ]);
-   protected readonly fontOptions = signal<readonly AppSettings['fontSize'][]>([
-    'small',
-    'medium',
-    'large',
-  ]);
-   protected readonly speedOptions = signal<readonly AppSettings['detectionSpeed'][]>([
-    'fast',
-    'normal',
-    'accurate',
-  ]);
+  // Static option lists — plain readonly arrays (no reactivity needed)
+  protected readonly themeOptions: readonly AppSettings['theme'][] = ['dark', 'light', 'system'];
+  protected readonly fontOptions: readonly AppSettings['fontSize'][] = ['small', 'medium', 'large'];
+  protected readonly speedOptions: readonly AppSettings['detectionSpeed'][] = ['fast', 'normal', 'accurate'];
 
   // ── Settings (loaded from localStorage + backend) ─────────
   settings = signal<AppSettings>({

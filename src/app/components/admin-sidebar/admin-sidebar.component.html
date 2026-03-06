@@ -1,12 +1,12 @@
 <!-- admin-sidebar.component.html -->
 <aside class="flex flex-col border-r border-border-primary h-full bg-bg-secondary"
-       [class.w-64]="!collapsed"
-       [class.w-[68px]]="collapsed">
+       [class.w-64]="!collapsed()"
+       [class.w-[68px]]="collapsed()">
 
   <!-- ═══ Sidebar Header ═══ -->
   <div class="h-16 flex items-center justify-between px-4 border-b border-border-primary
               sticky top-0 bg-bg-secondary z-10">
-    @if (!collapsed) {
+    @if (!collapsed()) {
       <div class="flex items-center gap-2.5">
         <img ngSrc="images/icon.png" width="36" height="36"
              alt="SignSync Logo" class="rounded-xl" />
@@ -21,8 +21,8 @@
     <button (click)="toggleCollapse()"
             class="hidden md:flex p-1.5 rounded-lg hover:bg-bg-hover
                    text-font-muted hover:text-white transition-all"
-            [attr.title]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
-      <svg class="w-4 h-4 transition-transform" [class.rotate-180]="collapsed"
+            [attr.title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+      <svg class="w-4 h-4 transition-transform" [class.rotate-180]="collapsed()"
            fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
@@ -44,7 +44,7 @@
   <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
     @for (section of navSections; track section.title) {
       <!-- Section Title -->
-      @if (!collapsed) {
+      @if (!collapsed()) {
         <div class="px-3 mb-2 mt-6 first:mt-0 body-4
                     text-font-muted uppercase tracking-wider font-semibold">
           {{ section.title }}
@@ -62,9 +62,9 @@
                   body-3 font-medium text-font-primary
                   hover:bg-bg-hover hover:text-white
                   transition-all duration-200 group border-l-[3px] border-l-transparent"
-           [class.justify-center]="collapsed"
-           [class.px-2]="collapsed"
-           [attr.title]="collapsed ? item.label : null">
+           [class.justify-center]="collapsed()"
+           [class.px-2]="collapsed()"
+           [attr.title]="collapsed() ? item.label : null">
 
           <!-- Icon -->
           <fa-icon [icon]="item.icon"
@@ -72,8 +72,8 @@
                           transition-all group-hover:scale-110">
           </fa-icon>
 
-          <!-- Label + Badge (hidden when collapsed) -->
-          @if (!collapsed) {
+          <!-- Label + Badge (hidden when collapsed()) -->
+          @if (!collapsed()) {
             <span>{{ item.label }}</span>
 
             @if (item.badge) {
@@ -97,7 +97,7 @@
     }
 
     <!-- ═══ Quick Actions ═══ -->
-    @if (!collapsed) {
+    @if (!collapsed()) {
       <div class="px-3 mb-2 mt-6 body-4
                   text-font-muted uppercase tracking-wider font-semibold">
         Quick Actions
@@ -112,14 +112,14 @@
                      body-3 font-medium text-font-primary
                      hover:bg-bg-hover hover:text-white
                      transition-all duration-200 group"
-              [class.justify-center]="collapsed"
-              [class.px-2]="collapsed"
-              [attr.title]="collapsed ? action.label : null">
+              [class.justify-center]="collapsed()"
+              [class.px-2]="collapsed()"
+              [attr.title]="collapsed() ? action.label : null">
         <fa-icon [icon]="action.icon"
                  class="w-5 h-5 text-font-muted group-hover:text-primary-light
                         transition-all group-hover:scale-110">
         </fa-icon>
-        @if (!collapsed) {
+        @if (!collapsed()) {
           <span>{{ action.label }}</span>
         }
       </button>
@@ -127,7 +127,7 @@
   </nav>
 
   <!-- ═══ Sidebar Footer — System Status ═══ -->
-  @if (!collapsed) {
+  @if (!collapsed()) {
     <div class="p-4 border-t border-border-primary space-y-3">
       <!-- System Health -->
       <div>

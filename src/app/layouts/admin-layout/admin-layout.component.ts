@@ -1,5 +1,4 @@
-// admin-layout.component.ts
-import { Component, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AdminHeaderComponent } from '@components/admin-header/admin-header.component';
 import { AdminSidebarComponent } from '@components/admin-sidebar/admin-sidebar.component';
@@ -9,17 +8,11 @@ import { AdminSidebarComponent } from '@components/admin-sidebar/admin-sidebar.c
   standalone: true,
   imports: [RouterOutlet, AdminHeaderComponent, AdminSidebarComponent],
   templateUrl: './admin-layout.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminLayoutComponent implements OnInit {
+export class AdminLayoutComponent {
   showMobileMenu = signal(false);
-  sidebarCollapsed = signal(false);
-
-  ngOnInit(): void {
-    const saved = localStorage.getItem('admin-sidebar-collapsed');
-    if (saved === 'true') {
-      this.sidebarCollapsed.set(true);
-    }
-  }
+  sidebarCollapsed = signal(localStorage.getItem('admin-sidebar-collapsed') === 'true');
 
   toggleMobileMenu(): void {
     this.showMobileMenu.update(v => !v);

@@ -60,9 +60,7 @@ export class CommonService {
             ...res.data,
             profile_image_url: this.buildImageUrl(res.data.profile_image_url),
           };
-          console.log(updatedUser);
           this.setUser(updatedUser);
-          console.log(this.user());
           this._loading.set(false);
         }),
         catchError(() => {
@@ -91,8 +89,6 @@ export class CommonService {
   }
 
   logout() {
-    console.log('Sign out');
-    // this.subscriptions.push(
     this.alertService
       .alertMessage('confirm', {
         title: 'Confirm Logout',
@@ -107,7 +103,6 @@ export class CommonService {
       .subscribe((res) => {
         if (res) this.signOut();
       });
-    // );
   }
 
   buildImageUrl(profileImageUrl: string | null): string {

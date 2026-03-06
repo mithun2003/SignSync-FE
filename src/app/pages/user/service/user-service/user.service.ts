@@ -9,16 +9,18 @@ import {
 } from '../../model/user.model';
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
+import { LocalStorageService } from '@core/services/local-storage/local-storage.service';
 
 // ✅ FIX B5: Backpressure constants
 const MAX_WS_BUFFER = 1024 * 512; // 512KB — skip if buffer exceeds this
-const MAX_PENDING = 2;             // Max frames in flight
+const MAX_PENDING = 2; // Max frames in flight
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
   private apiService = inject(ApiService);
+  private localStorageService = inject(LocalStorageService)
   predictionResult = signal<IPredictResponse | null>(null);
   private socket?: WebSocket;
   private pendingFrames = 0; // ✅ FIX B5: Track in-flight frames
@@ -26,11 +28,19 @@ export class UserService {
   connect(): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) return;
 
-    this.socket = new WebSocket(`${environment.websocketUrl}/predict/ws`);
+    const token = this.localStorageService.getItem('accessToken');
+
+    if (!token) {
+      console.error('[WS] No access token found');
+      return;
+    }
+
+    this.socket = new WebSocket(
+      `${environment.websocketUrl}/predict/ws?token=${token}`,
+    );
 
     this.socket.onopen = () => {
       this.pendingFrames = 0;
-      // ✅ FIX B4: Only log in dev
       if (environment.isItDev) console.log('[WS] Connected');
     };
 
@@ -45,10 +55,13 @@ export class UserService {
             confidence: response.data.confidence,
           });
         }
-      } catch {
-        // Silently ignore parse errors
+      } catch (error: unknown) {
+        if (environment.isItDev) {
+          console.warn('[WS] Failed to parse message', error);
+        }
+      } finally {
+        this.pendingFrames = Math.max(0, this.pendingFrames - 1);
       }
-      // ✅ FIX B4: Removed 3x console.log that ran every frame
     };
 
     this.socket.onerror = (err) => {
@@ -61,19 +74,18 @@ export class UserService {
     };
   }
 
-  sendImage(data: Blob | ArrayBuffer): void {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return;
+  sendImage(data: Blob | ArrayBuffer): boolean {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return false;
 
-    // ✅ FIX B5: Backpressure — skip if too many frames in flight
-    if (this.pendingFrames >= MAX_PENDING) return;
+    // Backpressure — skip if too many frames in flight
+    if (this.pendingFrames >= MAX_PENDING) return false;
 
-    // ✅ FIX B5: Skip if browser WS buffer is too full
-    if (this.socket.bufferedAmount > MAX_WS_BUFFER) return;
+    // Skip if browser WS buffer is too full
+    if (this.socket.bufferedAmount > MAX_WS_BUFFER) return false;
 
     this.socket.send(data);
     this.pendingFrames++;
-
-    // ✅ FIX B4: Removed 3x console.log that ran every frame
+    return true;
   }
 
   disconnect(): void {
@@ -113,7 +125,10 @@ export class UserService {
   uploadProfileImage(file: File): Observable<IUserResponse> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.apiService.post<IUserResponse>('user/me/profile-image', formData);
+    return this.apiService.post<IUserResponse>(
+      'user/me/profile-image',
+      formData,
+    );
   }
 
   getProfile(): Observable<IUserResponse> {

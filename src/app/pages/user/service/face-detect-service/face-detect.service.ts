@@ -12,6 +12,10 @@ export class FaceDetectService {
   private _isReady = signal(false);
   readonly isReady = this._isReady.asReadonly();
 
+  // Throttle face detection — 200ms is plenty for mood display
+  private lastDetectionTs = 0;
+  private readonly MIN_FACE_INTERVAL_MS = 200;
+
   // Load Model
   async preloadModel() {
     if (this._isReady()) return;
@@ -36,10 +40,13 @@ export class FaceDetectService {
 
   // Detect Face & Calculate Emotion
   detectEmotion(video: HTMLVideoElement, timestamp: number): { 
-    emotion: 
-    string; score: number; 
+    emotion: string; score: number; 
   } | null {
     if (!this.faceLandmarker || !this._isReady()) return null;
+
+    // Skip frame if not enough time has elapsed (avoids running heavy ML every rAF)
+    if (timestamp - this.lastDetectionTs < this.MIN_FACE_INTERVAL_MS) return null;
+    this.lastDetectionTs = timestamp;
 
     const result: FaceLandmarkerResult = this.faceLandmarker.detectForVideo(video, timestamp);
 

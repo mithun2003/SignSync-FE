@@ -27,9 +27,13 @@ export class HandDetectService {
   private _isReady = signal(false);
   readonly isReady = this._isReady.asReadonly();
 
-  // Optional FPS protection (prevents accidental over-calling)
+  // FPS protection (~12 FPS max)
   private lastProcessTs = 0;
-  private readonly MIN_INTERVAL_MS = 80; // ~12 FPS max
+  private readonly MIN_INTERVAL_MS = 80;
+
+  // Persistent 224×224 canvas reused every frame (avoids per-frame DOM allocation)
+  private cropCanvas: HTMLCanvasElement | null = null;
+  private cropCtx: CanvasRenderingContext2D | null = null;
 
   // ---------------- MODEL LOAD ----------------
   async preloadModel() {
@@ -87,76 +91,67 @@ export class HandDetectService {
 
 // ---------------- SKELETON DRAWING LOGIC ----------------
   private performCanvasCrop(
-    source: HTMLVideoElement,
+    _source: HTMLVideoElement,
     landmarks: NormalizedLandmark[],
   ): string | null {
-    // 1. Calculate Bounding Box (To center the skeleton)
-    const xs = landmarks.map((l) => l.x);
-    const ys = landmarks.map((l) => l.y);
-    
+    // 1. Calculate bounding box using a loop (avoids spread allocation)
+    let minX = 1, minY = 1, maxX = 0, maxY = 0;
+    for (const l of landmarks) {
+      if (l.x < minX) minX = l.x;
+      if (l.y < minY) minY = l.y;
+      if (l.x > maxX) maxX = l.x;
+      if (l.y > maxY) maxY = l.y;
+    }
+
     const pad = 0.1;
-    const minX = Math.max(0, Math.min(...xs) - pad);
-    const minY = Math.max(0, Math.min(...ys) - pad);
-    const maxX = Math.min(1, Math.max(...xs) + pad);
-    const maxY = Math.min(1, Math.max(...ys) + pad);
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(1, maxX + pad);
+    maxY = Math.min(1, maxY + pad);
 
     const widthNorm = maxX - minX;
     const heightNorm = maxY - minY;
-
     if (widthNorm < 0.05 || heightNorm < 0.05) return null;
 
-    // 2. Setup Black Canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = 224;
-    canvas.height = 224;
-    const ctx = canvas.getContext('2d')!;
+    // 2. Reuse persistent canvas (avoids per-frame DOM allocation)
+    if (!this.cropCanvas) {
+      this.cropCanvas = document.createElement('canvas');
+      this.cropCanvas.width = 224;
+      this.cropCanvas.height = 224;
+      this.cropCtx = this.cropCanvas.getContext('2d');
+    }
+    const ctx = this.cropCtx;
+    if (!ctx) return null;
 
-    // Fill Background with Black
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, 224, 224);
 
-    // 3. Helper to Map Normalized Coords (0-1) to Canvas Coords (0-224)
-    // We shift by minX/minY to center the hand in the box
+    // 3. Map normalized coords to canvas coords
     const toX = (val: number) => ((val - minX) / widthNorm) * 224;
     const toY = (val: number) => ((val - minY) / heightNorm) * 224;
 
-    // 4. Draw Connections (White Lines)
+    // 4. Draw connections (white lines)
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
-
     for (const [start, end] of HAND_CONNECTIONS) {
       const p1 = landmarks[start];
       const p2 = landmarks[end];
-
       ctx.beginPath();
       ctx.moveTo(toX(p1.x), toY(p1.y));
       ctx.lineTo(toX(p2.x), toY(p2.y));
       ctx.stroke();
     }
 
-    // 5. Draw Landmarks (White Dots)
+    // 5. Draw landmark dots (white)
     ctx.fillStyle = 'white';
     for (const lm of landmarks) {
       ctx.beginPath();
       ctx.arc(toX(lm.x), toY(lm.y), 4, 0, 2 * Math.PI);
       ctx.fill();
     }
-    // return canvas.toDataURL('image/png');
-    const dataUrl = canvas.toDataURL('image/png');
 
-    // ---------------- DEBUGGING START ----------------
-    // UNCOMMENT THIS to see the image in a new tab!
-
-    console.log('🔍 Generated Crop:', dataUrl);
-
-    // Or even better, open it directly (be careful, this opens many tabs if in a loop!)
-    // const win = window.open();
-    // win?.document.write('<img src="' + dataUrl + '"/>');
-    // ---------------- DEBUGGING END ------------------
-
-    return dataUrl;
+    // JPEG is 5-10× faster to encode than PNG and produces a much smaller payload
+    return this.cropCanvas.toDataURL('image/jpeg', 0.85);
   }
-
-
 }

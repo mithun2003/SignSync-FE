@@ -1,7 +1,7 @@
 // admin-sidebar.component.ts
 import { NgOptimizedImage } from '@angular/common';
 import {
-  Component, EventEmitter, Output, Input,
+  Component, input, output,
   signal, ChangeDetectionStrategy,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -19,9 +19,9 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminSidebarComponent {
-  @Input() collapsed = false;
-  @Output() mobileMenuClose = new EventEmitter<void>();
-  @Output() collapsedChange = new EventEmitter<boolean>();
+  collapsed = input<boolean>(false);
+  mobileMenuClose = output<void>();
+  collapsedChange = output<boolean>();
 
   // Data
   readonly navSections: NavSection[] = NAV_SECTIONS;
@@ -34,9 +34,9 @@ export class AdminSidebarComponent {
 
   // Actions
   toggleCollapse(): void {
-    this.collapsed = !this.collapsed;
-    this.collapsedChange.emit(this.collapsed);
-    localStorage.setItem('admin-sidebar-collapsed', String(this.collapsed));
+    const newValue = !this.collapsed();
+    this.collapsedChange.emit(newValue);
+    localStorage.setItem('admin-sidebar-collapsed', String(newValue));
   }
 
   closeMobileMenu(): void {
@@ -55,12 +55,10 @@ export class AdminSidebarComponent {
   }
 
   private createBackup(): void {
-    console.log('Creating backup...');
     // TODO: Call admin API
   }
 
   private clearCache(): void {
-    console.log('Clearing cache...');
     // TODO: Call admin API
   }
 }

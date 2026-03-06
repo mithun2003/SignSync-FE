@@ -1,5 +1,3 @@
-// profile.component.ts — FULLY TYPED (no 'any')
-import { CommonModule } from '@angular/common';
 import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,7 +10,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -62,7 +60,7 @@ export class ProfileComponent implements OnInit {
         this.populateFromUser(res.data);
         this.commonService.setUser(res.data);
       },
-      error: (err: Error) => console.error('Failed to load profile:', err)
+      error: (err: unknown) => console.error('Failed to load profile:', err)
     });
   }
 

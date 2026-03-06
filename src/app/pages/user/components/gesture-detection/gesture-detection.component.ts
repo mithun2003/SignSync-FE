@@ -1,9 +1,8 @@
-import { CommonModule } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  DestroyRef,
   effect,
   ElementRef,
   HostListener,
@@ -12,7 +11,7 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 
@@ -35,8 +34,8 @@ import { UserService } from '@pages/user/service/user-service/user.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
-    RouterModule,
+    DecimalPipe,
+    RouterLink,
     FontAwesomeModule,
     CommonButtonComponent,
   ],
@@ -44,8 +43,6 @@ import { UserService } from '@pages/user/service/user-service/user.service';
 export class GestureDetectionComponent implements OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('overlayCanvas') overlayCanvas!: ElementRef<HTMLCanvasElement>;
-
-  private destroyRef = inject(DestroyRef);
 
   // Services
   public handDetectService = inject(HandDetectService);
@@ -116,7 +113,6 @@ export class GestureDetectionComponent implements OnDestroy {
   private tickIntervalId?: ReturnType<typeof setInterval>;
 
   constructor() {
-    // ✅ FIX B7: Don't use async in effect — call async method separately
     effect(() => {
       const loggedIn = this.isLoggedIn();
       if (!loggedIn) {
@@ -124,10 +120,10 @@ export class GestureDetectionComponent implements OnDestroy {
         return;
       }
       this.feedbackText.set('Loading AI models...');
-      this.loadModels(); // fire-and-forget (not async inside effect)
+      this.loadModels();
     });
 
-    // Effect: Process predictions from backend
+    // Process predictions from backend
     effect(() => {
       const result = this.userService.predictionResult();
       if (!result) return;
@@ -156,7 +152,6 @@ export class GestureDetectionComponent implements OnDestroy {
       this.updateSuggestedWords(result.label);
     });
 
-    // ✅ FIX B1: Store interval ID + use 1000ms not 100ms
     this.tickIntervalId = setInterval(() => {
       if (this.lastLetterTimestamp > 0) {
         const elapsed = Date.now() - this.lastLetterTimestamp;
@@ -168,7 +163,7 @@ export class GestureDetectionComponent implements OnDestroy {
           this.timeSinceLastLetter.set('--');
         }
       }
-    }, 1000); // ✅ Was 100ms — 1000ms is enough for "Xs ago"
+    }, 1000);
   }
 
   private async loadModels(): Promise<void> {
@@ -286,7 +281,6 @@ export class GestureDetectionComponent implements OnDestroy {
       video.srcObject = this.mediaStream;
       await video.play();
 
-      // ✅ FIX B9: Cache canvas context once
       this.canvasCtx = this.overlayCanvas.nativeElement.getContext('2d');
 
       this.isRecording.set(true);
@@ -297,10 +291,6 @@ export class GestureDetectionComponent implements OnDestroy {
         this.isProcessingBackend = false;
         this.renderLoop();
       }, 1500);
-
-        // ✅ FIX B2: Run render loop OUTSIDE Angular zone
-      //   this.ngZone.runOutsideAngular(() => this.renderLoop());
-      // }, 1500);
     } catch (err) {
       console.error('Camera error:', err);
       this.feedbackText.set('Camera access denied');
@@ -320,7 +310,6 @@ export class GestureDetectionComponent implements OnDestroy {
       this.spaceTimerHandle = undefined;
     }
 
-    // Stop camera tracks
     this.mediaStream?.getTracks().forEach((t) => t.stop());
     this.mediaStream = null;
 
@@ -329,7 +318,7 @@ export class GestureDetectionComponent implements OnDestroy {
 
     this.userService.disconnect();
 
-    // ✅ FIX B10: Zero out canvas to free GPU memory
+    // Zero out canvas to free GPU memory
     const canvas = this.overlayCanvas?.nativeElement;
     if (canvas) {
       canvas.width = 0;
@@ -352,7 +341,7 @@ export class GestureDetectionComponent implements OnDestroy {
 
     const video = this.videoElement.nativeElement;
     const canvas = this.overlayCanvas.nativeElement;
-    const ctx = this.canvasCtx; // ✅ FIX B9: Use cached context
+    const ctx = this.canvasCtx;
 
     if (!ctx) return;
 
@@ -368,7 +357,7 @@ export class GestureDetectionComponent implements OnDestroy {
     // Get hand landmarks
     const result = this.handDetectService.getHandCrop(video);
 
-    // Face/emotion detection
+    // Face/emotion detection (throttled inside service to ~5fps)
     const now = performance.now();
     const faceResult = this.faceDetectService.detectEmotion(video, now);
     if (faceResult) {
@@ -385,10 +374,12 @@ export class GestureDetectionComponent implements OnDestroy {
       this.lastLandmarks = result.landmarks;
       this.drawLandmarks(ctx, result.landmarks);
 
-      // ✅ FIX B3: Use canvas.toBlob() instead of base64→binary
       if (result.crop && !this.isProcessingBackend) {
         this.isProcessingBackend = true;
-        this.sendCropAsBlob(result.crop);
+        const blob = this.dataURLtoBlob(result.crop);
+        const sent = this.userService.sendImage(blob);
+        // If socket was unavailable, unblock immediately
+        if (!sent) this.isProcessingBackend = false;
       }
     } else if (
       this.lastLandmarks &&
@@ -405,19 +396,17 @@ export class GestureDetectionComponent implements OnDestroy {
     this.animationId = requestAnimationFrame(() => this.renderLoop());
   }
 
-  // ✅ FIX B3: Convert base64 crop to blob efficiently
-  private sendCropAsBlob(cropDataUrl: string): void {
-    // If crop is a data URL from canvas.toDataURL, convert to blob
-    // Better approach: modify HandDetectService to return Blob directly
-    // For now, use fetch API which is faster than manual atob+loop
-    fetch(cropDataUrl)
-      .then((res) => res.blob())
-      .then((blob) => {
-        this.userService.sendImage(blob);
-      })
-      .catch(() => {
-        this.isProcessingBackend = false;
-      });
+  /** Convert a data URL to Blob synchronously — faster than fetch() for small images */
+  private dataURLtoBlob(dataUrl: string): Blob {
+    const commaIdx = dataUrl.indexOf(',');
+    const mimeMatch = dataUrl.substring(0, commaIdx).match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const binary = atob(dataUrl.substring(commaIdx + 1));
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: mime });
   }
 
   private drawLandmarks(
@@ -521,7 +510,6 @@ export class GestureDetectionComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.stopRecording();
 
-    // ✅ FIX B1: Clear the interval
     if (this.tickIntervalId) {
       clearInterval(this.tickIntervalId);
       this.tickIntervalId = undefined;

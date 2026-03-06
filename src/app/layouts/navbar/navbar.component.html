@@ -82,16 +82,16 @@
               <div class="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 
                           opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
-              <img [src]="user?.profile_image_url || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
+              <img [src]="user()?.profile_image_url || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
                    class="relative w-9 h-9 rounded-full border-2 border-primary/50 
                           group-hover:border-primary transition-colors"
                    alt="User Avatar" />
               
               <div class="relative hidden md:block text-left">
                 <p class="text-sm font-medium text-font-muted group-hover:text-primary transition-colors">
-                  {{ user?.username || 'Admin User' }}
+                  {{ user()?.username || 'Admin User' }}
                 </p>
-                <p class="text-xs text-font-muted/60">{{ user?.email || 'admin@example.com' }}</p>
+                <p class="text-xs text-font-muted/60">{{ user()?.email || 'admin@example.com' }}</p>
               </div>
               
               <svg class="relative w-4 h-4 text-gray-400 group-hover:text-primary 
@@ -113,14 +113,14 @@
                 <div class="p-4 border-b border-border-primary 
                             bg-linear-to-r from-primary/5 via-violet-500/5 to-primary/5">
                   <div class="flex items-center gap-3">
-                    <img [src]="user?.profile_image_url || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
+                    <img [src]="user()?.profile_image_url || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'"
                          class="w-12 h-12 rounded-full border-2 border-primary/50"
                          alt="User Avatar" />
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-semibold text-font-muted truncate">
-                        {{ user?.username }}
+                        {{ user()?.username }}
                       </p>
-                      <p class="text-xs text-font-muted truncate">{{ user?.email }}</p>
+                      <p class="text-xs text-font-muted truncate">{{ user()?.email }}</p>
                     </div>
                   </div>
                 </div>
