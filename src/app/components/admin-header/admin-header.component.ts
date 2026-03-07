@@ -5,8 +5,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, NavigationEnd } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -28,7 +27,7 @@ interface Notification {
 @Component({
   selector: 'app-admin-header',
   standalone: true,
-  imports: [FormsModule, FontAwesomeModule],
+  imports: [FontAwesomeModule, RouterModule],
   templateUrl: './admin-header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { SignManagementComponent } from './components/sign-management/sign-management.component';
+import { ProfileComponent } from '@pages/profile/profile.component';
+import { roleGuard } from '@core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -27,6 +29,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/settings/settings.component').then((m) => m.SettingsComponent),
   },
+    {
+      path: 'profile',
+      component: ProfileComponent,
+      canActivate: [roleGuard],
+      data: {
+        title: 'Profile',
+        isAdmin: true,
+      },
+    },
   {
     path: '',
     redirectTo: 'dashboard',

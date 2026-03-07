@@ -51,4 +51,13 @@ export class ApiService {
       withCredentials: true,
     });
   }
+
+  getBlob(endpoint: string, params?: HttpParams): Observable<Blob> {
+  return this.http.get(`${this.baseUrl}/${endpoint}`, {
+    headers: this.jsonHeaders,
+    params,
+    withCredentials: true,
+    responseType: 'blob',
+  });
+}
 }
