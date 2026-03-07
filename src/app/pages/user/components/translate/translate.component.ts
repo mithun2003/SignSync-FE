@@ -7,7 +7,6 @@ import {
   OnDestroy,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
@@ -23,7 +22,6 @@ import { CommonButtonComponent } from 'app/shared/components/common-button/commo
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DecimalPipe,
-    FormsModule,
     RouterLink,
     FontAwesomeModule,
     CommonButtonComponent,
@@ -36,8 +34,7 @@ export class TranslateComponent implements OnDestroy {
   faSpinner = faSpinner;
 
   // State
-  inputText = '';
-  animationSpeedValue = 1500; // milliseconds per sign
+  inputText = signal('');
   
   // Signals
   isPlaying = signal(false);
@@ -61,13 +58,18 @@ export class TranslateComponent implements OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────
   //  TEXT PROCESSING
   // ─────────────────────────────────────────────────────────────────────────
+  onInputTextChange(event: Event): void {
+    this.inputText.set((event.target as HTMLTextAreaElement).value);
+    this.onTextChange();
+  }
+
   onTextChange() {
     // Extract A-Z letters AND spaces
-    const cleaned = this.inputText
+    const cleaned = this.inputText()
       .toUpperCase()
       .split('')
-      .filter((char) => /[A-Z ]/.test(char))  // ← Added space to the regex
-      .map((char) => char === ' ' ? 'SPACE' : char);  // ← Convert space to 'SPACE'
+      .filter((char) => /[A-Z ]/.test(char))
+      .map((char) => char === ' ' ? 'SPACE' : char);
     
     this.letters.set(cleaned);
     
@@ -140,7 +142,7 @@ export class TranslateComponent implements OnDestroy {
 
   clear() {
     this.pause();
-    this.inputText = '';
+    this.inputText.set('');
     this.letters.set([]);
     this.currentLetter.set('');
     this.currentSignImage.set('');
@@ -153,8 +155,8 @@ export class TranslateComponent implements OnDestroy {
     this.updateCurrentSign();
   }
 
-  onSpeedChange() {
-    this.animationSpeed.set(this.animationSpeedValue);
+  onSpeedChange(event: Event): void {
+    this.animationSpeed.set(Number((event.target as HTMLInputElement).value));
     
     // If playing, restart timer with new speed
     if (this.isPlaying()) {

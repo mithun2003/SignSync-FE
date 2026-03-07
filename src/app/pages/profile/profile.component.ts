@@ -1,6 +1,6 @@
-import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonService } from '@core/services/common/common.service';
 import { IUserRead } from '@models/global.model';
 import { IUserUpdate } from '@pages/user/model/user.model';     // ✅ Import IUserRead
@@ -19,6 +19,7 @@ export class ProfileComponent implements OnInit {
   private commonService = inject(CommonService);
   private userService = inject(UserService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   // Signals — all properly typed
   profilePhoto = signal<string>('');
@@ -30,7 +31,14 @@ export class ProfileComponent implements OnInit {
   twoFactorEnabled = signal<boolean>(false);
   isSaving = signal<boolean>(false);
   isDeleting = signal<boolean>(false);
-  isUploading = signal<boolean>(false); 
+  isUploading = signal<boolean>(false);
+  isAdmin = signal<boolean>(false);
+
+  readonly containerClass = computed(() =>
+    `min-h-screen bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary text-white ${
+      this.isAdmin() ? 'p-6' : 'pt-24 pb-12 px-6'
+    }`
+  );
 
   // Form includes ALL editable fields
   profileForm: FormGroup = this.fb.group({
@@ -44,6 +52,7 @@ export class ProfileComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.isAdmin.set(this.route.snapshot.data['isAdmin'] === true);
     this.loadProfile();
   }
 

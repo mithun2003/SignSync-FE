@@ -36,8 +36,8 @@
 
             <textarea
               #textInput
-              [(ngModel)]="inputText"
-              (input)="onTextChange()"
+              [value]="inputText()"
+              (input)="onInputTextChange($event)"
               placeholder="Type your message here... (e.g., 'Hello World')"
               class="w-full h-40 p-4 bg-gray-700 text-white rounded-xl border-2 border-gray-600 
                      focus:border-primary focus:outline-none resize-none transition-colors
@@ -48,7 +48,7 @@
             <!-- Character counter -->
             <div class="flex justify-between items-center mt-2 text-sm text-gray-400">
               <span>{{ currentLetterIndex() + 1 }} / {{ letters().length }}</span>
-              <span>{{ inputText.length }} characters</span>
+              <span>{{ inputText().length }} characters</span>
             </div>
 
             <!-- Control Buttons -->
@@ -57,28 +57,25 @@
                 [text]="isPlaying() ? '⏸ Pause' : '▶ Play'"
                 textClass="body-3-medium"
                 [color]="isPlaying() ? 'yellow' : 'green'"
-                [disabled]="!inputText.trim() || letters().length === 0"
+                [disabled]="!inputText().trim() || letters().length === 0"
                 (click)="togglePlay()"
-              >
-              </app-common-button>
+              ></app-common-button>
 
               <app-common-button
                 text="🔄 Reset"
                 textClass="body-3-medium"
                 color="gray"
-                [disabled]="!inputText.trim()"
+                [disabled]="!inputText().trim()"
                 (click)="reset()"
-              >
-              </app-common-button>
+              ></app-common-button>
 
               <app-common-button
                 text="🗑️ Clear"
                 textClass="body-3-medium"
                 buttonType="outline"
-                [disabled]="!inputText.trim()"
+                [disabled]="!inputText().trim()"
                 (click)="clear()"
-              >
-              </app-common-button>
+              ></app-common-button>
             </div>
 
             <!-- Speed Control -->
@@ -91,8 +88,8 @@
                 min="500"
                 max="3000"
                 step="100"
-                [(ngModel)]="animationSpeedValue"
-                (input)="onSpeedChange()"
+                [value]="animationSpeed()"
+                (input)="onSpeedChange($event)"
                 class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer
                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
                        [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
@@ -241,11 +238,11 @@
             }
 
             <!-- Full Sentence Display -->
-            @if (inputText.trim()) {
+            @if (inputText().trim()) {
               <div class="bg-gray-700 rounded-xl p-4">
                 <h3 class="text-sm text-gray-300 mb-2 font-semibold">Your Message:</h3>
                 <p class="text-white text-lg wrap-break-word">
-                  {{ inputText }}
+                  {{ inputText() }}
                 </p>
               </div>
             }

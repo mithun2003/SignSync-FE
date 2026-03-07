@@ -1,27 +1,50 @@
 <!-- admin-header.component.html -->
-<header class="flex items-center justify-between h-16 px-6
-               border-b border-border-primary bg-bg-secondary">
-
+<header
+  class="flex items-center justify-between h-16 px-6 border-b border-border-primary bg-bg-secondary"
+>
   <!-- ═══ Left: Menu Toggle + Breadcrumbs ═══ -->
   <div class="flex items-center gap-4">
     <!-- Mobile menu toggle -->
-    <button (click)="toggleMobileMenu()"
-            class="md:hidden p-2 rounded-lg hover:bg-bg-hover transition-colors"
-            aria-label="Toggle mobile menu">
-      <svg class="w-5 h-5 text-font-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"/>
+    <button
+      (click)="toggleMobileMenu()"
+      class="md:hidden p-2 rounded-lg hover:bg-bg-hover transition-colors"
+      aria-label="Toggle mobile menu"
+    >
+      <svg
+        class="w-5 h-5 text-font-muted"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
       </svg>
     </button>
 
     <!-- Breadcrumbs -->
     <nav class="hidden sm:flex items-center gap-2 body-3">
-      <a routerLink="/admin"
-         class="text-font-muted hover:text-font-secondary transition-colors">
+      <a
+        routerLink="/admin"
+        class="text-font-muted hover:text-font-secondary transition-colors"
+      >
         Admin
       </a>
-      <svg class="w-4 h-4 text-neutral-d-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      <svg
+        class="w-4 h-4 text-neutral-d-grey"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 5l7 7-7 7"
+        />
       </svg>
       <span class="text-font-secondary font-medium">{{ currentPage() }}</span>
     </nav>
@@ -29,33 +52,37 @@
 
   <!-- ═══ Right: Search + Notifications + User ═══ -->
   <div class="flex items-center gap-3">
-
     <!-- Search -->
     <div class="hidden md:block relative">
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <fa-icon [icon]="faMagnifyingGlass" class="text-font-muted text-sm"></fa-icon>
+      <div
+        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+      >
+        <fa-icon
+          [icon]="faMagnifyingGlass"
+          class="text-font-muted text-sm"
+        ></fa-icon>
       </div>
-      <input type="text"
-             placeholder="Search..."
-             class="pl-9 pr-4 py-2 w-56 body-3
-                    bg-bg-primary border border-border-primary rounded-lg
-                    text-white placeholder-neutral-d-grey
-                    focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10
-                    transition-all"
-             [ngModel]="searchQuery()"
-             (ngModelChange)="searchQuery.set($event)" />
+      <input
+        type="text"
+        placeholder="Search..."
+        class="pl-9 pr-4 py-2 w-56 body-3 bg-bg-primary border border-border-primary rounded-lg text-white placeholder-neutral-d-grey focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+      />
     </div>
 
     <!-- Notifications -->
     <div class="relative notification-area">
-      <button (click)="toggleNotifications()"
-              class="relative p-2.5 rounded-lg hover:bg-bg-hover transition-all"
-              aria-label="Notifications">
+      <button
+        (click)="toggleNotifications()"
+        class="relative p-2.5 rounded-lg hover:bg-bg-hover transition-all"
+        aria-label="Notifications"
+      >
         <fa-icon [icon]="faBell" class="text-font-muted text-base"></fa-icon>
         @if (unreadCount() > 0) {
-          <span class="absolute top-1 right-1 w-4 h-4 rounded-full
-                       gradient-bg text-white body-4 font-bold
-                       flex items-center justify-center">
+          <span
+            class="absolute top-1 right-1 w-4 h-4 rounded-full gradient-bg text-white body-4 font-bold flex items-center justify-center"
+          >
             {{ unreadCount() }}
           </span>
         }
@@ -63,30 +90,43 @@
 
       <!-- Notification Dropdown -->
       @if (showNotifications()) {
-        <div class="absolute right-0 mt-2 w-80 bg-bg-card rounded-xl
-                    border border-border-primary z-50 animate-fade-in
-                    shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-          <div class="flex items-center justify-between p-4 border-b border-border-primary">
+        <div
+          class="absolute right-0 mt-2 w-80 bg-bg-card rounded-xl border border-border-primary z-50 animate-fade-in shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+        >
+          <div
+            class="flex items-center justify-between p-4 border-b border-border-primary"
+          >
             <span class="body-3 font-semibold text-white">Notifications</span>
-            <button (click)="markAllRead()"
-                    class="body-4 text-primary-light hover:text-white transition-colors">
+            <button
+              (click)="markAllRead()"
+              class="body-4 text-primary-light hover:text-white transition-colors"
+            >
               Mark all read
             </button>
           </div>
           <div class="max-h-64 overflow-y-auto">
             @for (notif of notifications(); track notif.id) {
-              <div class="px-4 py-3 hover:bg-bg-hover transition-colors
-                          border-b border-border-muted last:border-0"
-                   [class.opacity-60]="notif.read">
+              <div
+                class="px-4 py-3 hover:bg-bg-hover transition-colors border-b border-border-muted last:border-0"
+                [class.opacity-60]="notif.read"
+              >
                 <div class="flex items-start gap-3">
-                  <div class="w-2 h-2 mt-2 rounded-full shrink-0"
-                       [class.bg-info]="notif.type === 'info'"
-                       [class.bg-success]="notif.type === 'success'"
-                       [class.bg-warning]="notif.type === 'warning'"></div>
+                  <div
+                    class="w-2 h-2 mt-2 rounded-full shrink-0"
+                    [class.bg-info]="notif.type === 'info'"
+                    [class.bg-success]="notif.type === 'success'"
+                    [class.bg-warning]="notif.type === 'warning'"
+                  ></div>
                   <div class="flex-1 min-w-0">
-                    <p class="body-4 font-medium text-white">{{ notif.title }}</p>
-                    <p class="body-4 text-font-muted truncate">{{ notif.message }}</p>
-                    <p class="body-4 text-neutral-d-grey mt-1">{{ notif.time }}</p>
+                    <p class="body-4 font-medium text-white">
+                      {{ notif.title }}
+                    </p>
+                    <p class="body-4 text-font-muted truncate">
+                      {{ notif.message }}
+                    </p>
+                    <p class="body-4 text-neutral-d-grey mt-1">
+                      {{ notif.time }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -98,69 +138,89 @@
 
     <!-- User Menu -->
     <div class="relative user-menu-area">
-      <button (click)="toggleUserMenu()"
-              class="flex items-center gap-3 p-2 rounded-lg
-                     hover:bg-bg-hover transition-all"
-              aria-label="User menu">
+      <button
+        (click)="toggleUserMenu()"
+        class="flex items-center gap-3 p-2 rounded-lg hover:bg-bg-hover transition-all"
+        aria-label="User menu"
+      >
         <!-- Avatar -->
-        <div class="w-8 h-8 gradient-bg rounded-full
-                    flex items-center justify-center">
-          <span class="body-4 font-bold text-white">{{ getUserInitials() }}</span>
+        <div
+          class="w-8 h-8 gradient-bg rounded-full flex items-center justify-center"
+        >
+          <span class="body-4 font-bold text-white">{{
+            getUserInitials()
+          }}</span>
         </div>
         <!-- Name (desktop only) -->
         <div class="hidden md:block text-left">
           <p class="body-4 font-medium text-white">{{ userName }}</p>
-          <p class="body-4 text-font-muted" style="font-size: 11px;">{{ userEmail }}</p>
+          <p class="body-4 text-font-muted" style="font-size: 11px">
+            {{ userEmail }}
+          </p>
         </div>
-        <svg class="w-4 h-4 text-neutral-l-grey hidden md:block"
-             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        <svg
+          class="w-4 h-4 text-neutral-l-grey hidden md:block"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
       <!-- User Dropdown -->
       @if (showUserMenu()) {
-        <div class="absolute right-0 mt-2 w-56 bg-bg-card rounded-xl
-                    border border-border-primary z-50 animate-fade-in
-                    shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+        <div
+          class="absolute right-0 mt-2 w-56 bg-bg-card rounded-xl border border-border-primary z-50 animate-fade-in shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+        >
           <!-- User info -->
           <div class="p-4 border-b border-border-primary">
             <p class="body-3 font-medium text-white">{{ userName }}</p>
             <p class="body-4 text-font-muted">{{ userEmail }}</p>
-            <span class="inline-block mt-2 px-2 py-0.5 rounded-full
-                         bg-primary/20 text-primary-light body-4 font-medium">
+            <span
+              class="inline-block mt-2 px-2 py-0.5 rounded-full bg-primary/20 text-primary-light body-4 font-medium"
+            >
               Admin
             </span>
           </div>
           <!-- Menu Items -->
           <div class="py-1">
-            <a routerLink="/profile"
-               class="flex items-center gap-3 px-4 py-2.5 body-3
-                      text-font-primary hover:bg-bg-hover hover:text-white
-                      transition-colors">
+            <a
+              routerLink="/admin/profile"
+              class="flex items-center gap-3 px-4 py-2.5 body-3 text-font-primary hover:bg-bg-hover hover:text-white transition-colors hover:cursor-pointer"
+            >
               <fa-icon [icon]="faUser" class="w-4 text-font-muted"></fa-icon>
               Profile
             </a>
-            <a routerLink="/admin/settings"
-               class="flex items-center gap-3 px-4 py-2.5 body-3
-                      text-font-primary hover:bg-bg-hover hover:text-white
-                      transition-colors">
+            <a
+              routerLink="/admin/settings"
+              class="flex items-center gap-3 px-4 py-2.5 body-3 text-font-primary hover:bg-bg-hover hover:text-white transition-colors"
+            >
               <fa-icon [icon]="faGear" class="w-4 text-font-muted"></fa-icon>
               Settings
             </a>
-            <a routerLink="/help"
-               class="flex items-center gap-3 px-4 py-2.5 body-3
-                      text-font-primary hover:bg-bg-hover hover:text-white
-                      transition-colors">
-              <fa-icon [icon]="faCircleQuestion" class="w-4 text-font-muted"></fa-icon>
+            <a
+              routerLink="/help"
+              class="flex items-center gap-3 px-4 py-2.5 body-3 text-font-primary hover:bg-bg-hover hover:text-white transition-colors"
+            >
+              <fa-icon
+                [icon]="faCircleQuestion"
+                class="w-4 text-font-muted"
+              ></fa-icon>
               Help & Support
             </a>
           </div>
           <!-- Sign out -->
           <div class="border-t border-border-primary py-1">
-            <button (click)="signOut()"
-                    class="flex items-center gap-3 px-4 py-2.5 body-3 w-full text-left
-                           text-danger hover:bg-danger/10 transition-colors">
+            <button
+              (click)="signOut()"
+              class="flex items-center gap-3 px-4 py-2.5 body-3 w-full text-left text-danger hover:bg-danger/10 transition-colors"
+            >
               <fa-icon [icon]="faRightFromBracket" class="w-4"></fa-icon>
               Sign out
             </button>

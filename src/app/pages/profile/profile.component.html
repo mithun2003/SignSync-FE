@@ -1,5 +1,5 @@
 <!-- profile.component.html — FULLY UPDATED -->
-<div class="min-h-screen bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary text-white pt-24 pb-12 px-6">
+<div [class]="containerClass()">
   <div class="max-w-5xl mx-auto">
     
     <!-- Header -->
@@ -254,6 +254,7 @@
       </div>
     </div>
 
+    @if (!isAdmin()) {
     <!-- Danger Zone -->
     <div class="bg-bg-card rounded-2xl border border-danger/50 p-6">
       <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 text-danger">
@@ -278,6 +279,7 @@
       </button>
     </div>
     </div>
+    }
 
   </div>
 </div>

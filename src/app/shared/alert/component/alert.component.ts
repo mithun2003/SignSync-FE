@@ -10,7 +10,6 @@ import {
   MatDialogModule,
   MatDialogRef
 } from '@angular/material/dialog';
-import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   IAlertData,
@@ -26,7 +25,6 @@ import { CommonButtonComponent } from '../../components/common-button/common-but
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     CommonButtonComponent,
     MatDialogModule,
     FontAwesomeModule

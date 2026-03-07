@@ -14,15 +14,7 @@ export class AdminService {
   }
 
   exportReport(): Observable<Blob> {
-    // For CSV export — need raw HttpClient since ApiService returns JSON
-    return new Observable(observer => {
-      fetch(`${this.apiService['baseUrl']}/admin/dashboard/export`, {
-        credentials: 'include',
-      })
-        .then(res => res.blob())
-        .then(blob => { observer.next(blob); observer.complete(); })
-        .catch(err => observer.error(err));
-    });
+    return this.apiService.getBlob('admin/dashboard/export');
   }
 
   getUsers(page = 1, limit = 20): Observable<IApiRes> {

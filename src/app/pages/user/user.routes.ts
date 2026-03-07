@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { TranslateComponent } from './components/translate/translate.component';
 import { roleGuard } from '@core/guards/role.guard';
-import { ProfileComponent } from './components/profile/profile.component';
+import { ProfileComponent } from '../profile/profile.component';
 import { GestureDetectionComponent } from './components/gesture-detection/gesture-detection.component';
 import { HelpComponent } from './components/help/help.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
