@@ -12,12 +12,27 @@ export interface HandCropResult {
 }
 
 export const HAND_CONNECTIONS = [
-  [0, 1], [1, 2], [2, 3], [3, 4],         // Thumb
-  [0, 5], [5, 6], [6, 7], [7, 8],         // Index
-  [5, 9], [9, 10], [10, 11], [11, 12],    // Middle
-  [9, 13], [13, 14], [14, 15], [15, 16],  // Ring
-  [13, 17], [17, 18], [18, 19], [19, 20], // Pinky
-  [0, 17]                                 // Palm Base
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 4], // Thumb
+  [0, 5],
+  [5, 6],
+  [6, 7],
+  [7, 8], // Index
+  [5, 9],
+  [9, 10],
+  [10, 11],
+  [11, 12], // Middle
+  [9, 13],
+  [13, 14],
+  [14, 15],
+  [15, 16], // Ring
+  [13, 17],
+  [17, 18],
+  [18, 19],
+  [19, 20], // Pinky
+  [0, 17], // Palm Base
 ];
 
 @Injectable({ providedIn: 'root' })
@@ -27,9 +42,12 @@ export class HandDetectService {
   private _isReady = signal(false);
   readonly isReady = this._isReady.asReadonly();
 
-  // FPS protection (~12 FPS max)
+  private _loadFailed = signal(false);
+  readonly loadFailed = this._loadFailed.asReadonly();
+
+  // FPS protection (~16 FPS max)
   private lastProcessTs = 0;
-  private readonly MIN_INTERVAL_MS = 80;
+  private readonly MIN_INTERVAL_MS = 60;
 
   // Persistent 224×224 canvas reused every frame (avoids per-frame DOM allocation)
   private cropCanvas: HTMLCanvasElement | null = null;
@@ -38,25 +56,28 @@ export class HandDetectService {
   // ---------------- MODEL LOAD ----------------
   async preloadModel() {
     if (this._isReady()) return;
+    this._loadFailed.set(false);
 
-    const vision = await FilesetResolver.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm',
-    );
+    try {
+      const vision = await FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm',
+      );
 
-    const modelPath =
-      'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task';
+      const modelPath =
+        'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task';
 
-    this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
-      baseOptions: {
-        modelAssetPath: modelPath,
-        delegate: 'CPU',
-      },
-      runningMode: 'VIDEO', // ✅ REQUIRED for live video
-      numHands: 1,
-    });
+      this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
+        baseOptions: { modelAssetPath: modelPath, delegate: 'CPU' },
+        runningMode: 'VIDEO',
+        numHands: 1,
+      });
 
-    this._isReady.set(true);
-    console.log('[HandDetectService] Model ready');
+      this._isReady.set(true);
+      console.log('[HandDetectService] Model ready');
+    } catch (err) {
+      console.error('[HandDetectService] Model load failed', err);
+      this._loadFailed.set(true);
+    }
   }
 
   // ---------------- MAIN API ----------------
@@ -78,8 +99,16 @@ export class HandDetectService {
       return null;
     }
 
-    // Correct VIDEO-mode call
-    const result = this.handLandmarker.detectForVideo(video, now);
+    let result;
+    try {
+      result = this.handLandmarker.detectForVideo(video, now);
+    } catch (err) {
+      // Transient WebGL errors can occur on the first call after initialization.
+      // Just log and skip this frame — MediaPipe will recover on the next call.
+      console.warn('[HandDetectService] detectForVideo skipped frame:', err);
+      return null;
+    }
+
     if (!result.landmarks || result.landmarks.length === 0) return null;
 
     const landmarks = result.landmarks[0];
@@ -89,13 +118,16 @@ export class HandDetectService {
     };
   }
 
-// ---------------- SKELETON DRAWING LOGIC ----------------
+  // ---------------- SKELETON DRAWING LOGIC ----------------
   private performCanvasCrop(
     _source: HTMLVideoElement,
     landmarks: NormalizedLandmark[],
   ): string | null {
     // 1. Calculate bounding box using a loop (avoids spread allocation)
-    let minX = 1, minY = 1, maxX = 0, maxY = 0;
+    let minX = 1,
+      minY = 1,
+      maxX = 0,
+      maxY = 0;
     for (const l of landmarks) {
       if (l.x < minX) minX = l.x;
       if (l.y < minY) minY = l.y;

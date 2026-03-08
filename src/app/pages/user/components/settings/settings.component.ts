@@ -1,10 +1,18 @@
-import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TitleCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { CommonService } from '@core/services/common/common.service';
 import { UserService } from '@pages/user/service/user-service/user.service';
+import { ThemeService } from '@core/services/theme/theme.service';
 import { finalize } from 'rxjs';
+import { AlertService } from 'app/shared/alert/service/alert.service';
 
 // ── Interfaces ──────────────────────────────────────────────
 export interface AppSettings {
@@ -63,6 +71,8 @@ export class SettingsComponent implements OnInit {
   private router = inject(Router);
   private commonService = inject(CommonService);
   private userService = inject(UserService);
+  private themeService = inject(ThemeService);
+  private alertService = inject(AlertService);
 
   // ── State ─────────────────────────────────────────────────
   activeSection = signal<string>('appearance');
@@ -74,9 +84,25 @@ export class SettingsComponent implements OnInit {
   });
 
   // Static option lists — plain readonly arrays (no reactivity needed)
-  protected readonly themeOptions: readonly AppSettings['theme'][] = ['dark', 'light', 'system'];
-  protected readonly fontOptions: readonly AppSettings['fontSize'][] = ['small', 'medium', 'large'];
-  protected readonly speedOptions: readonly AppSettings['detectionSpeed'][] = ['fast', 'normal', 'accurate'];
+  protected readonly themeOptions: readonly AppSettings['theme'][] = [
+    'dark',
+    'light',
+    'system',
+  ];
+  protected readonly fontOptions: readonly AppSettings['fontSize'][] = [
+    'small',
+    'medium',
+    'large',
+  ];
+  protected readonly speedOptions: readonly AppSettings['detectionSpeed'][] = [
+    'fast',
+    'normal',
+    'accurate',
+  ];
+  protected readonly timeFormatOptions: readonly AppSettings['timeFormat'][] = [
+    '12h',
+    '24h',
+  ];
 
   // ── Settings (loaded from localStorage + backend) ─────────
   settings = signal<AppSettings>({
@@ -124,6 +150,11 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadSettings();
+    // Sync theme with ThemeService on init
+    this.settings.update((s) => ({
+      ...s,
+      theme: this.themeService.currentTheme(),
+    }));
   }
 
   // ── Load settings from localStorage + backend ─────────────
@@ -143,13 +174,17 @@ export class SettingsComponent implements OnInit {
     if (user) {
       this.settings.update((s) => ({
         ...s,
-        signLanguageDialect: (user.language?.toUpperCase() as 'ASL' | 'BSL' | 'ISL') || 'ASL',
+        signLanguageDialect:
+          (user.language?.toUpperCase() as 'ASL' | 'BSL' | 'ISL') || 'ASL',
       }));
     }
   }
 
   // ── Update a single setting ───────────────────────────────
-  updateSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]): void {
+  updateSetting<K extends keyof AppSettings>(
+    key: K,
+    value: AppSettings[K],
+  ): void {
     this.settings.update((s) => ({ ...s, [key]: value }));
     this.hasUnsavedChanges.set(true);
 
@@ -173,7 +208,8 @@ export class SettingsComponent implements OnInit {
       language: s.signLanguageDialect.toLowerCase(),
     };
 
-    this.userService.updateProfile(backendUpdate)
+    this.userService
+      .updateProfile(backendUpdate)
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: () => {
@@ -188,7 +224,9 @@ export class SettingsComponent implements OnInit {
 
   // ── Reset to defaults ─────────────────────────────────────
   resetToDefaults(): void {
-    const confirmed = confirm('Reset all settings to defaults? This cannot be undone.');
+    const confirmed = confirm(
+      'Reset all settings to defaults? This cannot be undone.',
+    );
     if (!confirmed) return;
 
     localStorage.removeItem('signsync_settings');
@@ -198,12 +236,13 @@ export class SettingsComponent implements OnInit {
 
   // ── Theme helpers ─────────────────────────────────────────
   private applyTheme(theme: string): void {
-    document.documentElement.setAttribute('data-theme', theme);
+    this.themeService.setTheme(theme as 'dark' | 'light' | 'system');
   }
 
   private applyFontSize(size: string): void {
     const map = { small: '14px', medium: '16px', large: '18px' };
-    document.documentElement.style.fontSize = map[size as keyof typeof map] || '16px';
+    document.documentElement.style.fontSize =
+      map[size as keyof typeof map] || '16px';
   }
 
   private applyHighContrast(enabled: boolean): void {
@@ -233,7 +272,9 @@ export class SettingsComponent implements OnInit {
   }
 
   clearDetectionHistory(): void {
-    const confirmed = confirm('Delete all detection history? This cannot be undone.');
+    const confirmed = confirm(
+      'Delete all detection history? This cannot be undone.',
+    );
     if (!confirmed) return;
 
     this.isClearing.update((c) => ({ ...c, history: true }));
@@ -242,19 +283,29 @@ export class SettingsComponent implements OnInit {
     // For now simulate:
     setTimeout(() => {
       this.isClearing.update((c) => ({ ...c, history: false }));
-      alert('Detection history cleared.');
+      this.alertService.alertMessage('success', {
+        content: 'Detection history cleared.',
+        close: true,
+        timeout: 3000,
+      });
     }, 1500);
   }
 
   clearStatistics(): void {
-    const confirmed = confirm('Reset all practice statistics? This cannot be undone.');
+    const confirmed = confirm(
+      'Reset all practice statistics? This cannot be undone.',
+    );
     if (!confirmed) return;
 
     this.isClearing.update((c) => ({ ...c, stats: true }));
 
     setTimeout(() => {
       this.isClearing.update((c) => ({ ...c, stats: false }));
-      alert('Statistics reset.');
+      this.alertService.alertMessage('success', {
+        content: 'Statistics reset.',
+        close: true,
+        timeout: 3000,
+      });
     }, 1500);
   }
 

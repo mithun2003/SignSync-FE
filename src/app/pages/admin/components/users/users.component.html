@@ -1,0 +1,284 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="headline-3 text-font-primary">Users</h1>
+      <p class="body-3 text-font-muted mt-1">
+        Manage all registered users of the platform.
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div
+      class="bg-bg-card rounded-2xl border border-border-primary p-12 text-center"
+    >
+      <div
+        class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"
+      ></div>
+      <p class="text-font-muted body-3">Loading users...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (errorMessage() && !isLoading()) {
+    <div
+      class="bg-danger/10 border border-danger/30 rounded-xl p-4 flex items-center gap-3"
+    >
+      <span class="text-2xl">⚠️</span>
+      <p class="text-danger body-3">{{ errorMessage() }}</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div
+        class="bg-bg-card rounded-xl border border-border-primary p-4 text-center"
+      >
+        <p class="text-2xl font-bold text-font-primary">{{ stats().total }}</p>
+        <p class="body-4 text-font-muted mt-1">Total Users</p>
+      </div>
+      <div
+        class="bg-bg-card rounded-xl border border-border-primary p-4 text-center"
+      >
+        <p class="text-2xl font-bold text-success">{{ stats().active }}</p>
+        <p class="body-4 text-font-muted mt-1">Active</p>
+      </div>
+      <div
+        class="bg-bg-card rounded-xl border border-border-primary p-4 text-center"
+      >
+        <p class="text-2xl font-bold text-warning">{{ stats().inactive }}</p>
+        <p class="body-4 text-font-muted mt-1">Inactive</p>
+      </div>
+      <div
+        class="bg-bg-card rounded-xl border border-border-primary p-4 text-center"
+      >
+        <p class="text-2xl font-bold text-danger">{{ stats().suspended }}</p>
+        <p class="body-4 text-font-muted mt-1">Suspended</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-4">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <!-- Search -->
+        <div class="relative flex-1">
+          <fa-icon
+            [icon]="faMagnifyingGlass"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-font-muted text-sm"
+          ></fa-icon>
+          <input
+            type="text"
+            (input)="onSearch($event)"
+            placeholder="Search by username or email..."
+            class="w-full pl-10 pr-4 py-2.5 bg-bg-secondary rounded-lg border border-border-primary body-3 text-font-primary placeholder:text-font-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+          />
+        </div>
+        <!-- Status Filter -->
+        <div class="flex gap-2 flex-wrap">
+          @for (s of statusOptions; track s.key) {
+            <button
+              (click)="setStatus(s.key)"
+              [class]="
+                statusFilter() === s.key
+                  ? 'px-3 py-1.5 rounded-lg body-4 font-medium capitalize border border-primary bg-primary text-white'
+                  : 'px-3 py-1.5 rounded-lg body-4 font-medium capitalize border border-border-primary bg-bg-secondary text-font-muted hover:border-primary transition-all duration-200'
+              "
+            >
+              {{ s.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div
+      class="bg-bg-card rounded-2xl border border-border-primary overflow-hidden"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-border-primary bg-bg-secondary">
+              <th
+                class="text-left px-6 py-4 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                User
+              </th>
+              <th
+                class="text-left px-6 py-4 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                Role
+              </th>
+              <th
+                class="text-left px-6 py-4 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                Status
+              </th>
+              <th
+                class="text-left px-6 py-4 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                Signs
+              </th>
+              <th
+                class="text-left px-6 py-4 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                Last Seen
+              </th>
+              <th
+                class="text-left px-6 py-4 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                Joined
+              </th>
+              <th
+                class="text-left px-6 py-4 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of paginated(); track user.id) {
+              <tr
+                class="border-b border-border-primary/50 hover:bg-bg-hover/50 transition-colors"
+              >
+                <!-- User info -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0"
+                    >
+                      <span class="text-sm font-bold text-primary">{{
+                        user.username[0].toUpperCase()
+                      }}</span>
+                    </div>
+                    <div>
+                      <p class="body-3 font-medium text-font-primary">
+                        {{ user.username }}
+                      </p>
+                      <p class="body-4 text-font-muted">{{ user.email }}</p>
+                    </div>
+                  </div>
+                </td>
+                <!-- Role -->
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2.5 py-1 rounded-full body-4 font-medium"
+                    [class]="
+                      user.role === 'admin'
+                        ? 'bg-primary/20 text-primary'
+                        : 'bg-bg-secondary text-font-secondary'
+                    "
+                  >
+                    {{ user.role }}
+                  </span>
+                </td>
+                <!-- Status -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="w-2 h-2 rounded-full"
+                      [class.bg-success]="user.status === 'active'"
+                      [class.bg-font-muted]="user.status === 'inactive'"
+                      [class.bg-danger]="user.status === 'suspended'"
+                    ></div>
+                    <span
+                      class="body-4 capitalize"
+                      [class.text-success]="user.status === 'active'"
+                      [class.text-font-muted]="user.status === 'inactive'"
+                      [class.text-danger]="user.status === 'suspended'"
+                    >
+                      {{ user.status }}
+                    </span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 body-3 text-font-secondary">
+                  {{ user.total_signs | number }}
+                </td>
+                <td class="px-6 py-4 body-3 text-font-muted">
+                  {{ user.last_seen }}
+                </td>
+                <td class="px-6 py-4 body-3 text-font-muted">
+                  {{ user.joined_at }}
+                </td>
+                <!-- Actions -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    @if (user.status !== "active") {
+                      <button
+                        (click)="updateStatus(user, 'active')"
+                        title="Activate"
+                        class="p-1.5 rounded-lg bg-success/10 text-success hover:bg-success/20 transition-colors text-xs font-medium px-2"
+                      >
+                        Activate
+                      </button>
+                    }
+                    @if (user.status !== "suspended") {
+                      <button
+                        (click)="updateStatus(user, 'suspended')"
+                        title="Suspend"
+                        class="p-1.5 rounded-lg bg-warning/10 text-warning hover:bg-warning/20 transition-colors text-xs font-medium px-2"
+                      >
+                        Suspend
+                      </button>
+                    }
+                    <button
+                      (click)="deleteUser(user.id)"
+                      title="Delete"
+                      class="p-1.5 rounded-lg bg-danger/10 text-danger hover:bg-danger/20 transition-colors text-xs font-medium px-2"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td
+                  colspan="7"
+                  class="px-6 py-16 text-center body-3 text-font-muted"
+                >
+                  @if (searchQuery() || statusFilter() !== "all") {
+                    No users found matching your filters.
+                  } @else {
+                    No users registered yet.
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <div
+          class="flex items-center justify-between px-6 py-4 border-t border-border-primary"
+        >
+          <p class="body-4 text-font-muted">
+            Page {{ currentPage() }} of {{ totalPages() }} ·
+            {{ totalCount() }} users
+          </p>
+          <div class="flex gap-2">
+            <button
+              (click)="prevPage()"
+              [disabled]="currentPage() === 1"
+              class="px-3 py-1.5 rounded-lg body-4 border border-border-primary text-font-secondary hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
+              ← Prev
+            </button>
+            <button
+              (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()"
+              class="px-3 py-1.5 rounded-lg body-4 border border-border-primary text-font-secondary hover:bg-bg-hover disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

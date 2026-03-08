@@ -10,14 +10,14 @@
   /* ═══════════════════════════════════════════════════════════════
      COLOR TOKENS - Map CSS vars to Tailwind utilities
   ═══════════════════════════════════════════════════════════════ */
-  
+
   /* Neutrals */
   --color-white: var(--color-white);
   --color-neutral-black: var(--color-neutral-black);
   --color-neutral-d-grey: var(--color-neutral-d-grey);
   --color-neutral-grey: var(--color-neutral-grey);
   --color-neutral-l-grey: var(--color-neutral-l-grey);
-  
+
   /* Primary Scale (enables bg-primary-500, text-primary-600, etc.) */
   --color-primary-50: var(--color-primary-50);
   --color-primary-100: var(--color-primary-100);
@@ -29,7 +29,7 @@
   --color-primary-700: var(--color-primary-700);
   --color-primary-800: var(--color-primary-800);
   --color-primary-900: var(--color-primary-900);
-  
+
   /* Primary Shortcuts */
   --color-primary: var(--color-primary-600);
   --color-primary-light: var(--color-primary-500);
@@ -117,32 +117,34 @@
 
   body {
     @apply bg-bg-primary font-manrope;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 
   /* ───────────────────────────────────────────────────────────── */
   /* TEXT COLOR - Theme-specific */
   /* ───────────────────────────────────────────────────────────── */
-  
+
   /* Dark theme - white text */
   :root body,
-  [data-theme='dark'] body {
+  [data-theme="dark"] body {
     @apply text-white;
   }
 
   /* Light theme - dark text */
-  [data-theme='light'] body {
+  [data-theme="light"] body {
     @apply text-font-primary;
   }
 
   /* System theme - light by default */
-  [data-theme='system'] body {
+  [data-theme="system"] body {
     @apply text-font-primary;
   }
 
   /* System theme - dark mode */
   @media (prefers-color-scheme: dark) {
-    [data-theme='system'] body {
+    [data-theme="system"] body {
       @apply text-white;
     }
   }
@@ -150,106 +152,106 @@
   /* ───────────────────────────────────────────────────────────── */
   /* CUSTOM SCROLLBAR - DARK THEME */
   /* ───────────────────────────────────────────────────────────── */
-  
+
   :root *,
-  [data-theme='dark'] * {
+  [data-theme="dark"] * {
     scrollbar-width: thin;
     scrollbar-color: rgb(139 92 246 / 0.6) rgb(31 41 55);
   }
 
   :root *::-webkit-scrollbar,
-  [data-theme='dark'] *::-webkit-scrollbar {
+  [data-theme="dark"] *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
   :root *::-webkit-scrollbar-track,
-  [data-theme='dark'] *::-webkit-scrollbar-track {
+  [data-theme="dark"] *::-webkit-scrollbar-track {
     @apply bg-neutral-d-grey/30 rounded-full;
   }
 
   :root *::-webkit-scrollbar-thumb,
-  [data-theme='dark'] *::-webkit-scrollbar-thumb {
+  [data-theme="dark"] *::-webkit-scrollbar-thumb {
     @apply bg-primary/60 rounded-full;
   }
 
   :root *::-webkit-scrollbar-thumb:hover,
-  [data-theme='dark'] *::-webkit-scrollbar-thumb:hover {
+  [data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
     @apply bg-primary;
   }
 
   /* ───────────────────────────────────────────────────────────── */
   /* CUSTOM SCROLLBAR - LIGHT THEME */
   /* ───────────────────────────────────────────────────────────── */
-  
-  [data-theme='light'] * {
+
+  [data-theme="light"] * {
     scrollbar-width: thin;
     scrollbar-color: rgb(139 92 246 / 0.3) rgb(241 245 249);
   }
 
-  [data-theme='light'] *::-webkit-scrollbar {
+  [data-theme="light"] *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  [data-theme='light'] *::-webkit-scrollbar-track {
+  [data-theme="light"] *::-webkit-scrollbar-track {
     background: #f1f5f9;
     border-radius: 9999px;
   }
 
-  [data-theme='light'] *::-webkit-scrollbar-thumb {
+  [data-theme="light"] *::-webkit-scrollbar-thumb {
     background: rgb(139 92 246 / 0.4);
     border-radius: 9999px;
   }
 
-  [data-theme='light'] *::-webkit-scrollbar-thumb:hover {
+  [data-theme="light"] *::-webkit-scrollbar-thumb:hover {
     background: rgb(139 92 246 / 0.6);
   }
 
   /* ───────────────────────────────────────────────────────────── */
   /* CUSTOM SCROLLBAR - SYSTEM THEME */
   /* ───────────────────────────────────────────────────────────── */
-  
+
   /* System theme - light by default */
-  [data-theme='system'] * {
+  [data-theme="system"] * {
     scrollbar-width: thin;
     scrollbar-color: rgb(139 92 246 / 0.3) rgb(241 245 249);
   }
 
-  [data-theme='system'] *::-webkit-scrollbar {
+  [data-theme="system"] *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  [data-theme='system'] *::-webkit-scrollbar-track {
+  [data-theme="system"] *::-webkit-scrollbar-track {
     background: #f1f5f9;
     border-radius: 9999px;
   }
 
-  [data-theme='system'] *::-webkit-scrollbar-thumb {
+  [data-theme="system"] *::-webkit-scrollbar-thumb {
     background: rgb(139 92 246 / 0.4);
     border-radius: 9999px;
   }
 
-  [data-theme='system'] *::-webkit-scrollbar-thumb:hover {
+  [data-theme="system"] *::-webkit-scrollbar-thumb:hover {
     background: rgb(139 92 246 / 0.6);
   }
 
   /* System theme - dark mode override */
   @media (prefers-color-scheme: dark) {
-    [data-theme='system'] * {
+    [data-theme="system"] * {
       scrollbar-color: rgb(139 92 246 / 0.6) rgb(31 41 55);
     }
 
-    [data-theme='system'] *::-webkit-scrollbar-track {
+    [data-theme="system"] *::-webkit-scrollbar-track {
       @apply bg-neutral-d-grey/30 rounded-full;
     }
 
-    [data-theme='system'] *::-webkit-scrollbar-thumb {
+    [data-theme="system"] *::-webkit-scrollbar-thumb {
       @apply bg-primary/60 rounded-full;
     }
 
-    [data-theme='system'] *::-webkit-scrollbar-thumb:hover {
+    [data-theme="system"] *::-webkit-scrollbar-thumb:hover {
       @apply bg-primary;
     }
   }
@@ -257,9 +259,10 @@
   /* ───────────────────────────────────────────────────────────── */
   /* SMOOTH THEME TRANSITIONS */
   /* ───────────────────────────────────────────────────────────── */
-  
+
   * {
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-property:
+      background-color, border-color, color, fill, stroke, box-shadow;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
   }
@@ -288,15 +291,137 @@
   /* ───────────────────────────────────────────────────────────── */
   /* SELECTION COLORS */
   /* ───────────────────────────────────────────────────────────── */
-  
+
   ::selection {
     background-color: var(--color-primary);
     color: white;
   }
 
   /* Light theme - ensure good contrast */
-  [data-theme='light'] ::selection {
+  [data-theme="light"] ::selection {
     background-color: var(--color-primary);
     color: white;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME — COMPONENT OVERRIDES
+   Fixes hardcoded text-white / dark-theme-only styles so every
+   component looks great in light mode without touching each file.
+═══════════════════════════════════════════════════════════════ */
+@layer utilities {
+  /* ── 1. text-white → font-primary when on light card/page surfaces ── */
+  [data-theme="light"] .bg-bg-card .text-white,
+  [data-theme="light"] .bg-bg-primary .text-white,
+  [data-theme="light"] .bg-bg-secondary .text-white {
+    color: var(--color-font-primary) !important;
+  }
+
+  /* ── 2. Standalone text-white (headings, paragraphs on page bg) ── */
+  [data-theme="light"] h1.text-white,
+  [data-theme="light"] h2.text-white,
+  [data-theme="light"] h3.text-white,
+  [data-theme="light"] h4.text-white,
+  [data-theme="light"] h5.text-white,
+  [data-theme="light"] h6.text-white,
+  [data-theme="light"] p.text-white,
+  [data-theme="light"] span.text-white,
+  [data-theme="light"] div.text-white,
+  [data-theme="light"] li.text-white,
+  [data-theme="light"] td.text-white,
+  [data-theme="light"] th.text-white,
+  [data-theme="light"] label.text-white {
+    color: var(--color-font-primary) !important;
+  }
+
+  /* ── 3. Preserve text-white on coloured button & badge backgrounds ── */
+  [data-theme="light"] button.text-white,
+  [data-theme="light"] a.text-white,
+  [data-theme="light"] .common-login-button,
+  [data-theme="light"] .common-gradient-button,
+  [data-theme="light"] [class*="bg-primary"] .text-white,
+  [data-theme="light"] [class*="bg-success"] .text-white,
+  [data-theme="light"] [class*="bg-danger"] .text-white,
+  [data-theme="light"] [class*="bg-warning"] .text-white,
+  [data-theme="light"] [class*="bg-info"] .text-white {
+    color: #ffffff !important;
+  }
+
+  /* ── 4. Page-level gradient backgrounds — light lavender in light mode ── */
+  [data-theme="light"] .min-h-screen.bg-linear-to-b,
+  [data-theme="light"] .min-h-dvh.bg-linear-to-b {
+    background: linear-gradient(
+      to bottom,
+      var(--color-bg-primary),
+      var(--color-bg-secondary),
+      var(--color-bg-primary)
+    ) !important;
+  }
+
+  /* ── 5. Cards — add subtle elevation shadow in light mode ── */
+  [data-theme="light"] .bg-bg-card {
+    box-shadow:
+      0 1px 4px rgb(139 92 246 / 0.08),
+      0 0 1px rgb(139 92 246 / 0.12);
+  }
+
+  /* ── 6. Inputs, selects, textareas — light theme styling ── */
+  [data-theme="light"]
+    input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(
+      [type="file"]
+    ),
+  [data-theme="light"] select,
+  [data-theme="light"] textarea {
+    background-color: #ffffff !important;
+    color: var(--color-font-primary) !important;
+    border-color: var(--color-border-primary) !important;
+  }
+
+  [data-theme="light"] input::placeholder,
+  [data-theme="light"] textarea::placeholder {
+    color: var(--color-font-muted) !important;
+  }
+
+  /* ── 7. bg-bg-primary/50 helper — light version ── */
+  [data-theme="light"] .bg-bg-primary\/50 {
+    background-color: rgb(246 243 255 / 0.7) !important;
+  }
+
+  /* ── 8. Sidebar — light mode ── */
+  [data-theme="light"] aside.bg-bg-secondary {
+    background-color: var(--color-sidebar) !important;
+    border-color: var(--color-border-primary) !important;
+  }
+
+  /* ── 9. Range input (slider) — light mode ── */
+  [data-theme="light"] input[type="range"] {
+    accent-color: var(--color-primary);
+  }
+  [data-theme="light"] input[type="range"]::-webkit-slider-runnable-track {
+    background: var(--color-border-secondary);
+  }
+  [data-theme="light"] input[type="range"]::-webkit-slider-thumb {
+    background: var(--color-primary);
+  }
+
+  /* ── 10. nav active link — light mode ── */
+  [data-theme="light"] .routerLinkActive,
+  [data-theme="light"] [routerLinkActive] {
+    background-color: rgb(139 92 246 / 0.1) !important;
+    color: var(--color-primary-dark) !important;
+    border-left-color: var(--color-primary-dark) !important;
+  }
+
+  /* ── 11. gradient-text stays violet on any theme ── */
+  [data-theme="light"] .gradient-text {
+    background: linear-gradient(
+      90deg,
+      var(--color-primary-dark),
+      var(--color-primary),
+      var(--color-primary-dark)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
   }
 }

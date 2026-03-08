@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,12 +12,25 @@ import {
 } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faUserPlus,
+  faUser,
+  faAt,
+  faEnvelope,
+  faLock,
+  faEye,
+  faEyeSlash,
+  faCircleExclamation,
+  faXmark,
+  faSpinner,
+} from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '@pages/auth/service/auth.service';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TitleCasePipe],
+  imports: [ReactiveFormsModule, RouterLink, TitleCasePipe, FontAwesomeModule],
   templateUrl: './signup.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,6 +38,17 @@ export class SignupComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+
+  faUserPlus = faUserPlus;
+  faUser = faUser;
+  faAt = faAt;
+  faEnvelope = faEnvelope;
+  faLock = faLock;
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+  faCircleExclamation = faCircleExclamation;
+  faXmark = faXmark;
+  faSpinner = faSpinner;
 
   form: FormGroup;
   loading = signal<boolean>(false);
@@ -59,7 +88,7 @@ export class SignupComponent {
 
     // Prepare data for API
     const formData = this.form.getRawValue();
-    
+
     // Combine firstName and lastName into name for API (if your API expects 'name')
     const signupData = {
       name: `${formData.firstName} ${formData.lastName}`,
@@ -73,7 +102,7 @@ export class SignupComponent {
         this.loading.set(false);
         // Redirect to signin or auto-login
         this.router.navigate(['/auth/signin'], {
-          queryParams: { registered: 'true' }
+          queryParams: { registered: 'true' },
         });
       },
       error: (err: unknown) => {
@@ -121,13 +150,16 @@ export class SignupComponent {
   }
 
   getPasswordStrengthPercentage(): number {
-    return Math.min((this.calcPasswordScore(this.form.get('password')?.value) / 6) * 100, 100);
+    return Math.min(
+      (this.calcPasswordScore(this.form.get('password')?.value) / 6) * 100,
+      100,
+    );
   }
 
   /**
    * Toggle password visibility
    */
   togglePassword(): void {
-    this.showPassword.update(v => !v);
+    this.showPassword.update((v) => !v);
   }
 }

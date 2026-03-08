@@ -1,17 +1,38 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faCheck,
+  faArrowLeft,
+  faLock,
+  faCircleExclamation,
+  faSpinner,
+  faEnvelope,
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-reset-password',
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './reset-password.component.html'
+  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
+  templateUrl: './reset-password.component.html',
 })
 export class ResetPasswordComponent {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+
+  readonly faCheck = faCheck;
+  readonly faArrowLeft = faArrowLeft;
+  readonly faLock = faLock;
+  readonly faCircleExclamation = faCircleExclamation;
+  readonly faSpinner = faSpinner;
+  readonly faEnvelope = faEnvelope;
 
   form: FormGroup;
   loading = signal<boolean>(false);
@@ -21,12 +42,15 @@ export class ResetPasswordComponent {
   token: string | null = null;
 
   constructor() {
-    this.form = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordsMatchValidator });
+    this.form = this.fb.group(
+      {
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validators: this.passwordsMatchValidator },
+    );
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.token = params['token'] || null;
     });
   }
@@ -49,8 +73,10 @@ export class ResetPasswordComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(err?.error?.message || 'An error occurred. Please try again.');
-      }
+        this.error.set(
+          err?.error?.message || 'An error occurred. Please try again.',
+        );
+      },
     });
   }
 

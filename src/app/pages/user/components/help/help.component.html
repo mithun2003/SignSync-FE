@@ -1,1 +1,238 @@
-<p>help works!</p>
+<div class="space-y-12 p-12 pt-24">
+  <!-- ── Hero Header ────────────────────────────────────────────── -->
+  <div
+    class="relative overflow-hidden rounded-3xl bg-bg-card border border-border-primary p-10 animate-fade-in"
+  >
+    <!-- Decorative blobs -->
+    <div
+      class="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none"
+    ></div>
+    <div
+      class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-accent-pink/10 blur-3xl pointer-events-none"
+    ></div>
+
+    <div
+      class="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+    >
+      <div>
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/30 mb-4"
+        >
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-primary animate-glow inline-block"
+          ></span>
+          <span class="body-4 text-primary font-medium">Documentation</span>
+        </div>
+        <h1 class="headline-2 text-white mb-3">
+          Help &amp; <span class="gradient-text">Support</span>
+        </h1>
+        <p class="body-1 text-font-secondary max-w-xl">
+          Everything you need to get the most out of SignSync — from your first
+          sign to building full sentences hands-free.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+        <a
+          href="mailto:support@signsync.app"
+          class="common-login-button inline-flex items-center gap-2 no-underline"
+        >
+          <span>✉️</span> Contact Support
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Getting Started ────────────────────────────────────────── -->
+  <section class="animate-fade-in">
+    <h2 class="headline-3 text-white mb-6 flex items-center gap-3">
+      <span
+        class="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center text-lg"
+        >🚀</span
+      >
+      Getting Started
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      @for (
+        step of [
+          {
+            num: "1",
+            icon: "📷",
+            title: "Allow Camera Access",
+            desc: "Grant camera permission when prompted, then tap Start Recording. SignSync processes everything locally — your video never leaves your device.",
+          },
+          {
+            num: "2",
+            icon: "🤚",
+            title: "Sign ASL Letters",
+            desc: "Hold each hand sign steady in front of the camera. Wait for the purple ring to fill, then move on to the next letter.",
+          },
+          {
+            num: "3",
+            icon: "📋",
+            title: "Build & Share",
+            desc: "Your sentence builds automatically. Use the Quick Actions to add spaces, speak the sentence aloud, or copy it to your clipboard.",
+          },
+        ];
+        track step.num
+      ) {
+        <div
+          class="group relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary p-6 card-hover-lift"
+        >
+          <div
+            class="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-bl-full"
+          ></div>
+          <div class="relative">
+            <div class="flex items-center gap-3 mb-4">
+              <span
+                class="w-8 h-8 rounded-full bg-primary flex items-center justify-center body-4 font-bold text-white shrink-0"
+                >{{ step.num }}</span
+              >
+              <span class="text-2xl">{{ step.icon }}</span>
+            </div>
+            <h3 class="body-1-semibold text-white mb-2">{{ step.title }}</h3>
+            <p class="body-3 text-font-muted">{{ step.desc }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── Features Overview ──────────────────────────────────────── -->
+  <section class="animate-fade-in">
+    <h2 class="headline-3 text-white mb-6 flex items-center gap-3">
+      <span
+        class="w-9 h-9 rounded-xl bg-info/15 flex items-center justify-center text-lg"
+        >✨</span
+      >
+      Key Features
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      @for (feature of features; track feature.title) {
+        <div
+          class="group rounded-2xl bg-bg-card border border-border-primary p-6 hover:border-primary/40 transition-all duration-300 hover:shadow-[0_0_24px_rgba(139,92,246,0.12)]"
+        >
+          <div
+            class="w-11 h-11 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform duration-300"
+            [class]="feature.color"
+          >
+            {{ feature.icon }}
+          </div>
+          <h3 class="body-1-semibold text-white mb-2">{{ feature.title }}</h3>
+          <p class="body-3 text-font-muted leading-relaxed">
+            {{ feature.description }}
+          </p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── Tips for Better Detection ─────────────────────────────── -->
+  <section class="animate-fade-in">
+    <h2 class="headline-3 text-white mb-6 flex items-center gap-3">
+      <span
+        class="w-9 h-9 rounded-xl bg-warning/15 flex items-center justify-center text-lg"
+        >🎯</span
+      >
+      Tips for Better Detection
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      @for (tip of tips; track tip.title) {
+        <div
+          class="flex gap-4 rounded-2xl bg-bg-card border border-border-muted p-5 hover:border-primary/30 transition-colors duration-300"
+        >
+          <div
+            class="w-10 h-10 rounded-xl bg-bg-primary flex items-center justify-center text-xl shrink-0 mt-0.5"
+          >
+            {{ tip.icon }}
+          </div>
+          <div>
+            <h3 class="body-2-medium text-white mb-1">{{ tip.title }}</h3>
+            <p class="body-3 text-font-muted">{{ tip.description }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── FAQ ────────────────────────────────────────────────────── -->
+  <section class="animate-fade-in">
+    <h2 class="headline-3 text-white mb-6 flex items-center gap-3">
+      <span
+        class="w-9 h-9 rounded-xl bg-accent-purple/15 flex items-center justify-center text-lg"
+        >❓</span
+      >
+      Frequently Asked Questions
+    </h2>
+
+    <div class="space-y-3">
+      @for (faq of faqs; track faq.question; let i = $index) {
+        <div
+          class="rounded-2xl bg-bg-card border transition-all duration-300"
+          [class.border-primary/40]="openFaqIndex() === i"
+          [class.border-border-primary]="openFaqIndex() !== i"
+        >
+          <button
+            type="button"
+            class="w-full flex items-center justify-between gap-4 p-5 text-left group"
+            (click)="toggleFaq(i)"
+          >
+            <span
+              class="body-2-medium text-white group-hover:text-primary transition-colors duration-200"
+            >
+              {{ faq.question }}
+            </span>
+            <span
+              class="shrink-0 w-7 h-7 rounded-full bg-bg-primary border border-border-primary flex items-center justify-center transition-transform duration-300"
+              [class.rotate-180]="openFaqIndex() === i"
+              [class.border-primary/40]="openFaqIndex() === i"
+            >
+              <fa-icon [icon]="faChevronDown" class="text-font-muted"></fa-icon>
+            </span>
+          </button>
+
+          @if (openFaqIndex() === i) {
+            <div class="px-5 pb-5 animate-fade-in">
+              <div class="h-px w-full bg-border-muted mb-4"></div>
+              <p class="body-2 text-font-secondary leading-relaxed">
+                {{ faq.answer }}
+              </p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── Contact Card ───────────────────────────────────────────── -->
+  <section class="animate-fade-in">
+    <div
+      class="relative overflow-hidden rounded-3xl border border-border-secondary p-8 text-center glass"
+    >
+      <div
+        class="absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-accent-pink/10 pointer-events-none"
+      ></div>
+      <div class="relative">
+        <div
+          class="w-14 h-14 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-2xl mx-auto mb-5 animate-glow"
+        >
+          🛟
+        </div>
+        <h2 class="headline-3 text-white mb-3">Still need help?</h2>
+        <p class="body-2 text-font-secondary mb-7 max-w-md mx-auto">
+          Can't find what you're looking for? Our support team is happy to help
+          you get started or troubleshoot any issues.
+        </p>
+        <a
+          href="mailto:support@signsync.app"
+          class="common-login-button inline-flex items-center gap-2 no-underline"
+        >
+          <span>✉️</span> Send us a message
+        </a>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,23 +1,34 @@
 <!-- sign-to-text.component.html -->
-<div class="flex flex-col lg:flex-row justify-center items-center p-6 pt-24 gap-6 bg-linear-to-b from-[#0b022b] to-[#121232] text-gray-100 min-h-screen">
-  
+<div
+  class="flex flex-col lg:flex-row justify-center items-center p-6 pt-24 gap-6 bg-bg-primary text-font-primary min-h-screen"
+>
   @if (commonService.loading()) {
-    <div class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors">
-      <fa-icon size="xl" [icon]="faSpinner" class="text-base text-white animate-spin [animation-duration:1.8s]"></fa-icon>
+    <div
+      class="relative group overflow-hidden flex items-center justify-center gap-3 p-2 rounded-lg border border-border-primary transition-colors"
+    >
+      <fa-icon
+        size="xl"
+        [icon]="faSpinner"
+        class="text-base text-white animate-spin [animation-duration:1.8s]"
+      ></fa-icon>
     </div>
   } @else if (isLoggedIn()) {
-    
     <!-- Left: Webcam + Controls -->
     <div class="w-full lg:w-2/5 flex flex-col gap-4">
-      
       <!-- Webcam Preview -->
-      <div class="bg-gray-800 rounded-2xl p-4 shadow-lg">
-        <h2 class="text-lg font-semibold mb-3 text-gray-300 flex items-center gap-2">
+      <div class="bg-bg-card rounded-2xl p-4 border border-border-primary">
+        <h2
+          class="body-1-semibold mb-3 text-font-secondary flex items-center gap-2"
+        >
           <span class="text-2xl">📹</span>
           Live Camera Feed
           @if (isRecording()) {
-            <span class="ml-auto flex items-center gap-2 text-sm text-green-400">
-              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span
+              class="ml-auto flex items-center gap-2 text-sm text-green-400"
+            >
+              <span
+                class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+              ></span>
               Recording
             </span>
           }
@@ -29,7 +40,7 @@
             autoplay
             muted
             playsinline
-            class="rounded-xl shadow-lg border-2 border-gray-700 w-full h-full object-cover scale-x-[-1]"
+            class="rounded-xl shadow-lg border-2 border-border-primary w-full h-full object-cover scale-x-[-1]"
           ></video>
 
           <canvas
@@ -40,13 +51,24 @@
 
         <!-- Controls -->
         <div class="mt-4 flex gap-3">
-          <app-common-button
-            [text]="handDetectService.isReady() ? '▶ Start' : '⌛ Loading Model...'"
-            textClass="body-3-medium"
-            color="green"
-            [disabled]="isRecording() || !handDetectService.isReady()"
-            (click)="startRecording()"
-          />
+          @if (handDetectService.loadFailed()) {
+            <button
+              (click)="retryModelLoad()"
+              class="flex-1 py-2.5 px-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              🔄 Retry Loading Model
+            </button>
+          } @else {
+            <app-common-button
+              [text]="
+                handDetectService.isReady() ? '▶ Start' : '⌛ Loading Model...'
+              "
+              textClass="body-3-medium"
+              color="green"
+              [disabled]="isRecording() || !handDetectService.isReady()"
+              (click)="startRecording()"
+            />
+          }
 
           <app-common-button
             text="⏹ Stop"
@@ -67,86 +89,192 @@
 
         <!-- Settings -->
         <div class="mt-4 flex flex-col gap-3">
-          <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label
+            class="flex items-center gap-2 body-3 text-font-secondary cursor-pointer"
+          >
             <input
               type="checkbox"
               [checked]="autoSpace()"
               (change)="autoSpace.set(!autoSpace())"
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-primary focus:ring-primary"
+              class="w-4 h-4 rounded border-border-secondary bg-bg-secondary text-primary focus:ring-primary"
             />
             Auto-add spaces (pause = space)
           </label>
 
-          <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label
+            class="flex items-center gap-2 body-3 text-font-secondary cursor-pointer"
+          >
             <input
               type="checkbox"
               [checked]="isSpeechEnabled()"
               (change)="isSpeechEnabled.set(!isSpeechEnabled())"
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-primary focus:ring-primary"
+              class="w-4 h-4 rounded border-border-secondary bg-bg-secondary text-primary focus:ring-primary"
             />
             Enable voice feedback
           </label>
+
+          @if (isSpeechEnabled()) {
+            <div class="flex flex-col gap-1">
+              <div
+                class="flex items-center justify-between body-3 text-font-secondary"
+              >
+                <span>Reading speed</span>
+                <span class="text-primary font-medium">
+                  @if (speechRate() <= 0.6) {
+                    Slow
+                  } @else if (speechRate() <= 0.9) {
+                    Normal
+                  } @else if (speechRate() <= 1.2) {
+                    Fast
+                  } @else {
+                    Very Fast
+                  }
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="body-4 text-font-muted">🐢</span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="1.5"
+                  step="0.1"
+                  [value]="speechRate()"
+                  (input)="speechRate.set(+$any($event.target).value)"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-bg-secondary accent-primary"
+                />
+                <span class="body-4 text-font-muted">🐇</span>
+              </div>
+            </div>
+          }
         </div>
       </div>
 
       <!-- Current Detection -->
-      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <h3 class="text-sm font-semibold text-gray-300 mb-3">Current Detection</h3>
-        
+      <div class="bg-bg-card rounded-2xl p-6 border border-border-primary">
+        <h3 class="body-3-semibold text-font-secondary mb-3">
+          Current Detection
+        </h3>
+
         <div class="text-center">
-          <div class="text-9xl font-bold text-primary mb-3">
-            {{ currentLetter() || '-' }}
+          <!-- Letter with stability ring -->
+          <div class="relative inline-flex items-center justify-center mb-3">
+            <!-- SVG progress ring -->
+            <svg class="absolute w-36 h-36 -rotate-90" viewBox="0 0 120 120">
+              <circle
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                stroke="#374151"
+                stroke-width="6"
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                stroke="#7c3aed"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-dasharray="339.3"
+                [style.stroke-dashoffset]="
+                  339.3 * (1 - letterStability() / STABILITY_THRESHOLD)
+                "
+                [style.transition]="'stroke-dashoffset 0.1s ease'"
+                [class.stroke-green-400]="
+                  letterStability() >= STABILITY_THRESHOLD
+                "
+              />
+            </svg>
+            <div
+              class="text-8xl font-bold text-primary z-10 w-28 h-28 flex items-center justify-center transition-all duration-200"
+              [class.scale-110]="letterStability() >= STABILITY_THRESHOLD"
+              [class.text-green-400]="letterStability() >= STABILITY_THRESHOLD"
+            >
+              {{ currentLetter() || "–" }}
+            </div>
           </div>
-          
+
           <div class="flex items-center justify-center gap-2 mb-3">
-            <span class="text-sm text-gray-400">Confidence:</span>
-            <span class="text-lg font-bold text-white">
-              {{ currentConfidence() | number: '1.0-0' }}%
+            <span class="body-3 text-font-muted">Confidence:</span>
+            <span
+              class="text-lg font-bold"
+              [class.text-green-400]="currentConfidence() >= 80"
+              [class.text-yellow-400]="
+                currentConfidence() >= 50 && currentConfidence() < 80
+              "
+              [class.text-red-400]="
+                currentConfidence() > 0 && currentConfidence() < 50
+              "
+              [class.text-white]="currentConfidence() === 0"
+            >
+              {{ currentConfidence() | number: "1.0-0" }}%
             </span>
           </div>
 
           <!-- Confidence Bar -->
-          <div class="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
+          <div
+            class="w-full h-3 bg-bg-secondary rounded-full overflow-hidden mb-3"
+          >
             <div
-              class="h-full bg-linear-to-r from-primary to-violet-primary transition-all duration-300"
+              class="h-full transition-all duration-300 rounded-full"
+              [class.bg-green-500]="currentConfidence() >= 80"
+              [class.bg-yellow-500]="
+                currentConfidence() >= 50 && currentConfidence() < 80
+              "
+              [class.bg-red-500]="
+                currentConfidence() > 0 && currentConfidence() < 50
+              "
+              [class.bg-bg-hover]="currentConfidence() === 0"
               [style.width.%]="currentConfidence()"
             ></div>
           </div>
 
-          <p class="text-xs text-gray-500 mt-3 italic">
+          <!-- Stability dots -->
+          @if (isRecording() && currentLetter()) {
+            <div class="flex justify-center gap-1.5 mb-2">
+              @for (i of [1, 2, 3]; track i) {
+                <div
+                  class="w-2.5 h-2.5 rounded-full transition-all duration-150"
+                  [class.bg-violet-500]="letterStability() >= i"
+                  [class.bg-bg-hover]="letterStability() < i"
+                ></div>
+              }
+            </div>
+          }
+
+          <p class="body-4 text-font-muted italic">
             {{ feedbackText() }}
           </p>
         </div>
       </div>
-
     </div>
 
     <!-- Right: Sentence Builder -->
     <div class="w-full lg:w-3/5 flex flex-col gap-4">
-      
       <!-- Sentence Display -->
-      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg grow">
+      <div class="bg-bg-card rounded-2xl p-6 border border-border-primary grow">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-gray-300 flex items-center gap-2">
+          <h2
+            class="body-1-semibold text-font-secondary flex items-center gap-2"
+          >
             <span class="text-2xl">📝</span>
             Your Message
           </h2>
-          
+
           <div class="flex gap-2">
             <button
               (click)="copyToClipboard()"
               [disabled]="sentenceBuffer().length === 0"
-              class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
-                     rounded-lg text-sm text-gray-300 transition-colors flex items-center gap-2"
+              class="px-3 py-1.5 bg-bg-secondary hover:b g-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 text-font-secondary transition-colors flex items-center gap-2"
             >
               📋 Copy
             </button>
-            
+
             <button
               (click)="speakSentence()"
               [disabled]="sentenceBuffer().length === 0"
-              class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
-                     rounded-lg text-sm text-gray-300 transition-colors flex items-center gap-2"
+              class="px-3 py-1.5 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 text-font-secondary transition-colors flex items-center gap-2"
             >
               🔊 Speak
             </button>
@@ -154,26 +282,25 @@
         </div>
 
         <!-- Sentence Text Area -->
-        <div class="bg-linear-to-b from-[#0b022b] to-[#121232] rounded-xl p-6 min-h-50 max-h-100 overflow-y-auto border-2 border-gray-700
-                    focus-within:border-primary transition-colors
-                    [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-800 
-                    [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full
-                    [&::-webkit-scrollbar-thumb:hover]:bg-gray-500">
+        <div
+          class="bg-bg-primary rounded-xl p-6 min-h-50 max-h-100 overflow-y-auto border-2 border-border-primary focus-within:border-primary transition-colors [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-bg-card [&::-webkit-scrollbar-thumb]:bg-border-secondary [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-border-secondary"
+        >
           @if (sentenceBuffer().length === 0) {
-            <p class="text-gray-500 italic text-center py-8">
+            <p class="body-2 text-font-muted italic text-center py-8">
               Start signing to build your message...
             </p>
           } @else {
             <div class="flex flex-wrap gap-2 text-2xl leading-relaxed">
               @for (item of sentenceBuffer(); track $index) {
-                @if (item === ' ') {
+                @if (item === " ") {
                   <span class="inline-block w-3"></span>
                 } @else {
                   <button
                     type="button"
-                    class="inline-block px-1 py-0.5 rounded hover:bg-gray-800 transition-all duration-300 
-                           cursor-pointer animate-[fadeIn_0.3s_ease-out] bg-transparent border-none text-inherit"
-                    [class.text-primary]="$index === sentenceBuffer().length - 1"
+                    class="inline-block px-1 py-0.5 rounded hover:bg-bg-card transition-all duration-300 cursor-pointer animate-[fadeIn_0.3s_ease-out] bg-transparent border-none text-inherit"
+                    [class.text-primary]="
+                      $index === sentenceBuffer().length - 1
+                    "
                     [class.scale-105]="$index === sentenceBuffer().length - 1"
                     (click)="removeLetterAt($index)"
                     [title]="'Click to remove ' + item"
@@ -182,118 +309,54 @@
                   </button>
                 }
               }
-              <span class="inline-block w-0.5 h-8 bg-primary animate-pulse ml-1"></span>
+              <span
+                class="inline-block w-0.5 h-8 bg-primary animate-pulse ml-1"
+              ></span>
             </div>
           }
         </div>
 
         <!-- Stats -->
-        <div class="mt-4 flex items-center justify-between text-sm text-gray-400">
+        <div
+          class="mt-4 flex items-center justify-between body-3 text-font-muted"
+        >
           <span>{{ letterCount() }} letters</span>
           <span>{{ wordCount() }} words</span>
           <span>Last: {{ timeSinceLastLetter() }}</span>
         </div>
       </div>
 
-      <!-- Letter History -->
-      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <h3 class="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
-          <span>📜</span>
-          Recent Letters
-        </h3>
-        
-        <div class="flex gap-2 overflow-x-auto pb-2
-                    [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-700 
-                    [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full">
-          @if (letterHistory().length === 0) {
-            <p class="text-gray-500 text-sm italic">No letters detected yet</p>
-          } @else {
-            @for (letter of letterHistory(); track $index) {
-              <div 
-                class="shrink-0 w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center
-                       text-2xl font-bold border-2 transition-all duration-300 hover:scale-110
-                       animate-[fadeIn_0.3s_ease-out]"
-                [class.border-primary]="$index === letterHistory().length - 1"
-                [class.border-gray-600]="$index !== letterHistory().length - 1"
-                [class.shadow-lg]="$index === letterHistory().length - 1"
-                [class.shadow-primary/50]="$index === letterHistory().length - 1"
-              >
-                {{ letter }}
-              </div>
-            }
-          }
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <h3 class="text-sm font-semibold text-gray-300 mb-3">Quick Actions</h3>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <button
-            (click)="addSpace()"
-            [disabled]="!isRecording()"
-            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
-                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Add Space
-          </button>
-          
-          <button
-            (click)="backspace()"
-            [disabled]="sentenceBuffer().length === 0"
-            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
-                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            ⌫ Backspace
-          </button>
-          
-          <button
-            (click)="addPunctuation('.')"
-            [disabled]="!isRecording()"
-            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
-                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Add Period
-          </button>
-          
-          <button
-            (click)="addPunctuation('?')"
-            [disabled]="!isRecording()"
-            class="px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed
-                   rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Add ?
-          </button>
-        </div>
-      </div>
-      
       <!-- Emotion & Suggested Words -->
-      <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <h3 class="text-sm font-semibold text-gray-300 mb-3">Emotion & Suggestions</h3>
-        
+      <div
+        class="bg-bg-card rounded-2xl p-6 border border-border-primary animate-fade-in"
+      >
+        <h3 class="body-3-semibold text-font-secondary mb-3">
+          Emotion & Suggestions
+        </h3>
+
         <!-- Emotion Display -->
-        <div class="text-center mb-4 pb-4 border-b border-gray-700">
+        <div class="text-center mb-4 pb-4 border-b border-border-primary">
           <div class="text-6xl mb-2">
-            {{ currentMood().split(' ')[1] }}
+            {{ currentMood().split(" ")[1] }}
           </div>
           <div class="text-xl font-bold text-white tracking-wide">
-            {{ currentMood().split(' ')[0] }}
+            {{ currentMood().split(" ")[0] }}
           </div>
         </div>
 
         <!-- Suggested Words -->
         @if (suggestedWords().length > 0) {
           <div class="text-center">
-            <h4 class="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">
+            <h4
+              class="body-4 font-semibold text-font-muted mb-2 uppercase tracking-wider"
+            >
               Suggested Words
             </h4>
             <div class="flex flex-wrap justify-center gap-2">
               @for (word of suggestedWords(); track word) {
                 <button
                   type="button"
-                  class="px-3 py-1.5 bg-primary/20 border border-primary rounded-full text-white text-sm
-                         hover:bg-primary/30 transition-colors cursor-pointer animate-[fadeIn_0.3s_ease-out]"
+                  class="px-3 py-1.5 bg-primary/20 border border-primary rounded-full text-white text-sm hover:bg-primary/30 transition-colors cursor-pointer animate-[fadeIn_0.3s_ease-out]"
                   (click)="addSuggestedWord(word)"
                   [title]="'Click to add: ' + word"
                 >
@@ -303,26 +366,115 @@
             </div>
           </div>
         } @else {
-          <p class="text-gray-500 text-sm italic text-center">
-            {{ currentLetter() ? 'No suggestions for ' + currentLetter() : 'Sign a letter to see suggestions' }}
+          <p class="body-3 text-font-muted italic text-center">
+            {{
+              currentLetter()
+                ? "No suggestions for " + currentLetter()
+                : "Sign a letter to see suggestions"
+            }}
           </p>
         }
       </div>
-    </div>
 
+      <!-- Letter History -->
+      <div
+        class="bg-bg-card rounded-2xl p-6 border border-border-primary animate-fade-in"
+      >
+        <h3
+          class="body-3-semibold text-font-secondary mb-3 flex items-center gap-2"
+        >
+          <span>📜</span>
+          Recent Letters
+        </h3>
+
+        <div
+          class="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-bg-secondary [&::-webkit-scrollbar-thumb]:bg-border-secondary [&::-webkit-scrollbar-thumb]:rounded-full"
+        >
+          @if (letterHistory().length === 0) {
+            <p class="body-3 text-font-muted italic">No letters detected yet</p>
+          } @else {
+            @for (letter of letterHistory(); track $index) {
+              <div
+                class="shrink-0 w-16 h-16 rounded-lg flex items-center justify-center text-2xl font-bold border-2 transition-all duration-300 hover:bg-bg-hover animate-fade-in"
+                [class.bg-bg-secondary]="letter !== '⌫'"
+                [class.bg-red-900]="letter === '⌫'"
+                [class.border-primary]="$index === letterHistory().length - 1"
+                [class.border-border-secondary]="
+                  $index !== letterHistory().length - 1 && letter !== '⌫'
+                "
+                [class.border-red-600]="letter === '⌫'"
+                [class.shadow-lg]="$index === letterHistory().length - 1"
+                [class.shadow-primary/50]="
+                  $index === letterHistory().length - 1
+                "
+              >
+                @if (letter === " ") {
+                  <span class="text-font-muted text-lg">·</span>
+                } @else if (letter === "⌫") {
+                  <span class="text-red-400 text-lg">⌫</span>
+                } @else {
+                  {{ letter }}
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div
+        class="bg-bg-card rounded-2xl p-6 border border-border-primary animate-fade-in"
+      >
+        <h3 class="body-3-semibold text-font-secondary mb-3">Quick Actions</h3>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <button
+            (click)="addSpace()"
+            [disabled]="!isRecording()"
+            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            Add Space
+          </button>
+
+          <button
+            (click)="backspace()"
+            [disabled]="sentenceBuffer().length === 0"
+            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            ⌫ Backspace
+          </button>
+
+          <button
+            (click)="addPunctuation('.')"
+            [disabled]="!isRecording()"
+            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            Add Period
+          </button>
+
+          <button
+            (click)="addPunctuation('?')"
+            [disabled]="!isRecording()"
+            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            Add ?
+          </button>
+        </div>
+      </div>
+    </div>
   } @else {
     <!-- Not Logged In -->
     <div class="flex flex-col items-center justify-center text-center px-6">
       <div class="text-6xl mb-4">🔒</div>
-      
-      <h2 class="text-2xl font-bold text-white mb-2">
-        Sign to Text Locked
-      </h2>
-      
-      <p class="text-gray-400 max-w-md mb-6">
-        Convert your sign language gestures into text in real-time. Login to activate AI-powered sign recognition and build sentences with your hands.
+
+      <h2 class="text-2xl font-bold text-white mb-2">Sign to Text Locked</h2>
+
+      <p class="body-2 text-font-muted max-w-md mb-6">
+        Convert your sign language gestures into text in real-time. Login to
+        activate AI-powered sign recognition and build sentences with your
+        hands.
       </p>
-      
+
       <div class="flex gap-4">
         <app-common-button
           text="Login"
@@ -330,7 +482,7 @@
           textClass="body-3-medium"
           routerLink="/auth/signin"
         />
-        
+
         <app-common-button
           text="Create Account"
           buttonType="outline"
@@ -338,8 +490,8 @@
           routerLink="/auth/signup"
         />
       </div>
-      
-      <p class="mt-6 text-sm text-gray-500 italic">
+
+      <p class="mt-6 body-3 text-font-muted italic">
         Start building sentences with sign language 🤟
       </p>
     </div>

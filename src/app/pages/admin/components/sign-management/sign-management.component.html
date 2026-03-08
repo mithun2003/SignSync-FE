@@ -1,21 +1,34 @@
 <!-- admin/pages/sign-management/sign-management.component.html -->
-<!-- Frontend-focused with Cloudinary selection -->
 
 <div class="space-y-6 animate-fade-in">
   <!-- Header -->
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-3xl font-bold text-font-primary">ASL Sign Management</h1>
-      <p class="text-font-muted mt-1">Manage sign language images with Cloudinary</p>
+      <h1 class="headline-3 font-bold text-font-primary">
+        ASL Sign Management
+      </h1>
+      <p class="text-font-muted mt-1 body-3">
+        Manage sign language images with Cloudinary
+      </p>
     </div>
-    
-    <button
-      (click)="loadActiveSigns()"
-      class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark
-             transition-colors flex items-center gap-2">
-      <fa-icon [icon]="faSync"></fa-icon>
-      Refresh
-    </button>
+
+    <div class="flex items-center gap-3">
+      <button
+        (click)="openBulkUpload()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 gradient-bg rounded-lg body-4 text-white font-semibold hover:scale-105 hover:shadow-glow-sm transition-all duration-200 cursor-pointer"
+      >
+        <fa-icon [icon]="faLayerGroup"></fa-icon>
+        Bulk Upload
+      </button>
+
+      <button
+        (click)="loadActiveSigns()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-bg-card border border-border-primary rounded-lg body-4 text-font-primary hover:border-primary/40 hover:bg-bg-hover disabled:opacity-50 transition-all duration-200 cursor-pointer"
+      >
+        <fa-icon [icon]="faSync"></fa-icon>
+        Refresh
+      </button>
+    </div>
   </div>
 
   <!-- Statistics -->
@@ -23,11 +36,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-bg-card border border-border-primary rounded-lg p-6">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+          <div
+            class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center"
+          >
             <fa-icon [icon]="faImage" class="text-primary text-xl"></fa-icon>
           </div>
           <div>
-            <p class="text-2xl font-bold text-font-primary">{{ stats()!.total_signs }}</p>
+            <p class="text-2xl font-bold text-font-primary">
+              {{ stats()!.total_signs }}
+            </p>
             <p class="text-sm text-font-muted">Total Signs</p>
           </div>
         </div>
@@ -35,11 +52,18 @@
 
       <div class="bg-bg-card border border-border-primary rounded-lg p-6">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-lg bg-warning/20 flex items-center justify-center">
-            <fa-icon [icon]="faCloudUploadAlt" class="text-warning text-xl"></fa-icon>
+          <div
+            class="w-12 h-12 rounded-lg bg-warning/20 flex items-center justify-center"
+          >
+            <fa-icon
+              [icon]="faCloudUploadAlt"
+              class="text-warning text-xl"
+            ></fa-icon>
           </div>
           <div>
-            <p class="text-2xl font-bold text-font-primary">{{ stats()!.missing_signs }}</p>
+            <p class="text-2xl font-bold text-font-primary">
+              {{ stats()!.missing_signs }}
+            </p>
             <p class="text-sm text-font-muted">Missing Signs</p>
           </div>
         </div>
@@ -47,11 +71,15 @@
 
       <div class="bg-bg-card border border-border-primary rounded-lg p-6">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-lg bg-success/20 flex items-center justify-center">
+          <div
+            class="w-12 h-12 rounded-lg bg-success/20 flex items-center justify-center"
+          >
             <fa-icon [icon]="faCheck" class="text-success text-xl"></fa-icon>
           </div>
           <div>
-            <p class="text-2xl font-bold text-font-primary">{{ stats()!.completion_percentage }}%</p>
+            <p class="text-2xl font-bold text-font-primary">
+              {{ stats()!.completion_percentage }}%
+            </p>
             <p class="text-sm text-font-muted">Completion</p>
           </div>
         </div>
@@ -61,7 +89,9 @@
 
   <!-- Error Message -->
   @if (error()) {
-    <div class="bg-danger/10 border border-danger rounded-lg p-4 flex items-center gap-3">
+    <div
+      class="bg-danger/10 border border-danger rounded-lg p-4 flex items-center gap-3"
+    >
       <fa-icon [icon]="faTimes" class="text-danger"></fa-icon>
       <p class="text-danger">{{ error() }}</p>
     </div>
@@ -70,38 +100,53 @@
   <!-- Alphabet Grid -->
   <div class="bg-bg-card border border-border-primary rounded-lg p-6">
     <h2 class="text-xl font-semibold text-font-primary mb-4">A-Z Signs</h2>
-    
+
     @if (loading()) {
       <div class="flex items-center justify-center py-12">
-        <div class="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+        <div
+          class="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
+        ></div>
       </div>
     } @else {
-      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4">
+      <div
+        class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4"
+      >
         @for (char of alphabet; track char) {
-          <button 
+          <button
             (click)="openCharacterModal(char)"
-            class="relative group cursor-pointer">
-            <div 
-              [class]="hasSign(char)
-                ? 'border-2 border-success bg-success/5'
-                : 'border-2 border-border-primary bg-bg-secondary hover:border-primary/50'"
-              class="aspect-square rounded-lg overflow-hidden transition-all duration-200">
-              
+            class="relative group cursor-pointer"
+          >
+            <div
+              [class]="
+                hasSign(char)
+                  ? 'border-2 border-success bg-success/5'
+                  : 'border-2 border-border-primary bg-bg-secondary hover:border-primary/50'
+              "
+              class="aspect-square rounded-lg overflow-hidden transition-all duration-200"
+            >
               @if (hasSign(char)) {
-                <img 
-                  [src]="getActiveSign(char)!.cloudinary_url" 
+                <img
+                  [src]="getActiveSign(char)!.cloudinary_url"
                   [alt]="'Sign for ' + char"
-                  class="w-full h-full object-cover">
+                  class="w-full h-full object-fill"
+                />
               } @else {
-                <div class="w-full h-full flex flex-col items-center justify-center">
-                  <fa-icon [icon]="faImage" class="text-4xl text-font-muted mb-2"></fa-icon>
+                <div
+                  class="w-full h-full flex flex-col items-center justify-center"
+                >
+                  <fa-icon
+                    [icon]="faImage"
+                    class="text-4xl text-font-muted mb-2"
+                  ></fa-icon>
                   <p class="text-xs text-font-muted">Click to add</p>
                 </div>
               }
             </div>
-            
+
             <div class="mt-2 text-center">
-              <span class="text-lg font-bold text-font-primary">{{ char }}</span>
+              <span class="text-lg font-bold text-font-primary">{{
+                char
+              }}</span>
               @if (hasSign(char)) {
                 <span class="block text-xs text-success mt-1">
                   v{{ getActiveSign(char)!.version }}
@@ -116,34 +161,47 @@
 
   <!-- Special Characters -->
   <div class="bg-bg-card border border-border-primary rounded-lg p-6">
-    <h2 class="text-xl font-semibold text-font-primary mb-4">Special Characters</h2>
-    
+    <h2 class="text-xl font-semibold text-font-primary mb-4">
+      Special Characters
+    </h2>
+
     <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
       @for (char of specialChars; track char) {
-        <button 
+        <button
           (click)="openCharacterModal(char)"
-          class="relative group cursor-pointer">
-          <div 
-            [class]="hasSign(char)
-              ? 'border-2 border-success bg-success/5'
-              : 'border-2 border-border-primary bg-bg-secondary hover:border-primary/50'"
-            class="aspect-square rounded-lg overflow-hidden transition-all duration-200">
-            
+          class="relative group cursor-pointer"
+        >
+          <div
+            [class]="
+              hasSign(char)
+                ? 'border-2 border-success bg-success/5'
+                : 'border-2 border-border-primary bg-bg-secondary hover:border-primary/50'
+            "
+            class="aspect-square rounded-lg overflow-hidden transition-all duration-200"
+          >
             @if (hasSign(char)) {
-              <img 
-                [src]="getActiveSign(char)!.cloudinary_url" 
+              <img
+                [src]="getActiveSign(char)!.cloudinary_url"
                 [alt]="'Sign for ' + char"
-                class="w-full h-full object-cover">
+                class="w-full h-full object-fill"
+              />
             } @else {
-              <div class="w-full h-full flex flex-col items-center justify-center">
-                <fa-icon [icon]="faImage" class="text-4xl text-font-muted mb-2"></fa-icon>
+              <div
+                class="w-full h-full flex flex-col items-center justify-center"
+              >
+                <fa-icon
+                  [icon]="faImage"
+                  class="text-4xl text-font-muted mb-2"
+                ></fa-icon>
                 <p class="text-xs text-font-muted">{{ char }}</p>
               </div>
             }
           </div>
-          
+
           <div class="mt-2 text-center">
-            <span class="text-sm font-semibold text-font-primary">{{ char }}</span>
+            <span class="text-sm font-semibold text-font-primary">{{
+              char
+            }}</span>
           </div>
         </button>
       }
@@ -151,13 +209,16 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- ─── Single-character Modal ─────────────────────────────────────────────── -->
 @if (showModal()) {
-  <button class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-       (click)="closeModal()">
-    <button class="bg-bg-card border border-border-primary rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
-         (click)="$event.stopPropagation()">
-      
+  <button
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    (click)="closeModal()"
+  >
+    <button
+      class="bg-bg-card border border-border-primary rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
+      (click)="$event.stopPropagation()"
+    >
       <!-- Modal Header -->
       <div class="flex items-center justify-between mb-6">
         <div>
@@ -165,30 +226,62 @@
             Sign Options for: {{ selectedCharacter() }}
           </h2>
           <p class="text-sm text-font-muted mt-1">
-            Select existing image or upload/capture new one
+            Select existing image or upload / capture a new one
           </p>
         </div>
-        
-        <button
-          (click)="closeModal()"
-          class="w-8 h-8 rounded-lg hover:bg-bg-hover transition-colors flex items-center justify-center">
-          <fa-icon [icon]="faTimes" class="text-font-muted"></fa-icon>
-        </button>
+
+        <div class="flex items-center gap-2">
+          @if (hasSign(selectedCharacter()!)) {
+            <button
+              (click)="removeSign()"
+              [disabled]="isDeleting() || loading()"
+              class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg body-4 font-semibold bg-danger/10 text-danger border border-danger/30 hover:bg-danger hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              @if (isDeleting()) {
+                <div
+                  class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"
+                ></div>
+              } @else {
+                <fa-icon [icon]="faTrash" class="text-xs"></fa-icon>
+              }
+              Remove Sign
+            </button>
+          }
+
+          <button
+            (click)="closeModal()"
+            class="w-8 h-8 rounded-lg hover:bg-bg-hover transition-colors flex items-center justify-center"
+          >
+            <fa-icon [icon]="faTimes" class="text-font-muted"></fa-icon>
+          </button>
+        </div>
       </div>
 
+      @if (error()) {
+        <div
+          class="bg-danger/10 border border-danger rounded-lg p-3 flex items-center gap-2 mb-4"
+        >
+          <fa-icon [icon]="faTimes" class="text-danger text-sm"></fa-icon>
+          <p class="text-danger text-sm">{{ error() }}</p>
+        </div>
+      }
+
       <!-- Mode: Select from Cloudinary -->
-      @if (modalMode() === 'select') {
+      @if (modalMode() === "select") {
         <div class="space-y-4">
-          <!-- Existing Images from Cloudinary -->
           <div>
-            <h3 class="text-lg font-semibold text-font-primary mb-3 flex items-center gap-2">
+            <h3
+              class="text-lg font-semibold text-font-primary mb-3 flex items-center gap-2"
+            >
               <fa-icon [icon]="faImages"></fa-icon>
               Existing Images in Cloudinary
             </h3>
-            
+
             @if (loadingImages()) {
               <div class="flex items-center justify-center py-8">
-                <div class="animate-spin w-6 h-6 border-4 border-primary border-t-transparent rounded-full"></div>
+                <div
+                  class="animate-spin w-6 h-6 border-4 border-primary border-t-transparent rounded-full"
+                ></div>
               </div>
             } @else if (cloudinaryImages().length === 0) {
               <div class="text-center py-8 text-font-muted">
@@ -198,28 +291,35 @@
             } @else {
               <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 @for (image of cloudinaryImages(); track image.public_id) {
-                  <button 
+                  <button
                     (click)="selectCloudinaryImage(image)"
-                    class="relative group cursor-pointer">
-                    <div class="aspect-square rounded-lg overflow-hidden border-2 border-border-primary
-                                hover:border-primary transition-all">
-                      <img 
-                        [src]="image.secure_url" 
+                    class="relative group cursor-pointer"
+                  >
+                    <div
+                      class="aspect-square rounded-lg overflow-hidden border-2 border-border-primary hover:border-primary transition-all"
+                    >
+                      <img
+                        [src]="image.url"
                         [alt]="image.public_id"
-                        class="w-full h-full object-cover">
-                      
-                      <!-- Overlay -->
-                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100
-                                  transition-opacity flex items-center justify-center">
+                        class="w-full h-full object-fill"
+                      />
+
+                      <div
+                        class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
                         <div class="text-white text-center">
-                          <fa-icon [icon]="faCheck" class="text-2xl mb-2"></fa-icon>
+                          <fa-icon
+                            [icon]="faCheck"
+                            class="text-2xl mb-2"
+                          ></fa-icon>
                           <p class="text-xs">Select</p>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="mt-1 text-xs text-font-muted text-center">
-                      {{ image.width }}×{{ image.height }} • {{ formatBytes(image.bytes) }}
+                      {{ image.width }}×{{ image.height }} •
+                      {{ formatBytes(image.file_size) }}
                     </div>
                   </button>
                 }
@@ -231,16 +331,16 @@
           <div class="flex gap-3 pt-4 border-t border-border-primary">
             <button
               (click)="switchToUpload()"
-              class="flex-1 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg
-                     font-semibold transition-colors flex items-center justify-center gap-2">
+              class="flex-1 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+            >
               <fa-icon [icon]="faUpload"></fa-icon>
               Upload New
             </button>
-            
+
             <button
               (click)="switchToCapture()"
-              class="flex-1 py-3 bg-info hover:bg-info/80 text-white rounded-lg
-                     font-semibold transition-colors flex items-center justify-center gap-2">
+              class="flex-1 py-3 bg-info hover:bg-info/80 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+            >
               <fa-icon [icon]="faCamera"></fa-icon>
               Capture New
             </button>
@@ -249,38 +349,56 @@
       }
 
       <!-- Mode: Upload -->
-      @if (modalMode() === 'upload') {
+      @if (modalMode() === "upload") {
         <div>
           <input
             #fileInput
             type="file"
             accept="image/*"
             (change)="onFileSelected($event)"
-            class="hidden">
-          
-          @if (previewImage()) {
-            <img [src]="previewImage()!" alt="Preview" class="w-full rounded-lg mb-4">
+            class="hidden"
+          />
+
+          @if (loading()) {
+            <div class="flex flex-col items-center justify-center py-12 gap-3">
+              <div
+                class="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full"
+              ></div>
+              <p class="text-font-muted text-sm">Uploading…</p>
+            </div>
+          } @else if (previewImage()) {
+            <img
+              [src]="previewImage()!"
+              alt="Preview"
+              class="w-full rounded-lg mb-4"
+            />
           } @else {
             <button
               (click)="fileInput.click()"
-              class="w-full border-2 border-dashed border-border-primary rounded-lg p-12 
-                     text-center cursor-pointer hover:border-primary transition-colors">
-              <fa-icon [icon]="faUpload" class="text-5xl text-font-muted mb-4"></fa-icon>
-              <p class="text-font-secondary font-semibold">Click to select image</p>
+              class="w-full border-2 border-dashed border-border-primary rounded-lg p-12 text-center cursor-pointer hover:border-primary transition-colors"
+            >
+              <fa-icon
+                [icon]="faUpload"
+                class="text-5xl text-font-muted mb-4"
+              ></fa-icon>
+              <p class="text-font-secondary font-semibold">
+                Click to select image
+              </p>
               <p class="text-sm text-font-muted mt-2">JPG, PNG, or WEBP</p>
             </button>
           }
-          
+
           <button
             (click)="modalMode.set('select')"
-            class="mt-4 px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors">
+            class="mt-4 px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors"
+          >
             ← Back to Selection
           </button>
         </div>
       }
 
       <!-- Mode: Capture -->
-      @if (modalMode() === 'capture') {
+      @if (modalMode() === "capture") {
         <div>
           @if (isCapturing()) {
             <div class="space-y-4">
@@ -288,30 +406,282 @@
                 #video
                 autoplay
                 playsinline
-                class="w-full rounded-lg bg-black">
-              </video>
-              
+                class="w-full rounded-lg bg-black"
+              ></video>
+
               <button
                 (click)="capturePhoto()"
-                class="w-full py-3 bg-primary hover:bg-primary-dark text-white rounded-lg
-                       font-semibold transition-colors flex items-center justify-center gap-2">
+                class="w-full py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+              >
                 <fa-icon [icon]="faCamera"></fa-icon>
                 Capture Photo
               </button>
             </div>
+          } @else if (loading()) {
+            <div class="flex flex-col items-center justify-center py-12 gap-3">
+              <div
+                class="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full"
+              ></div>
+              <p class="text-font-muted text-sm">Uploading…</p>
+            </div>
           } @else if (previewImage()) {
-            <img [src]="previewImage()!" alt="Preview" class="w-full rounded-lg mb-4">
+            <img
+              [src]="previewImage()!"
+              alt="Preview"
+              class="w-full rounded-lg mb-4"
+            />
           }
-          
+
           <button
             (click)="modalMode.set('select'); stopCamera()"
-            class="mt-4 px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors">
+            class="mt-4 px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors"
+          >
             ← Back to Selection
           </button>
         </div>
       }
-      
+
       <canvas #canvas class="hidden"></canvas>
+    </button>
+  </button>
+}
+
+<!-- ─── Bulk Upload Modal ──────────────────────────────────────────────────── -->
+@if (showBulkModal()) {
+  <button
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    (click)="closeBulkModal()"
+  >
+    <button
+      class="bg-bg-card border border-border-primary rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2
+            class="text-2xl font-bold text-font-primary flex items-center gap-2"
+          >
+            <fa-icon [icon]="faLayerGroup" class="text-secondary"></fa-icon>
+            Bulk Upload Signs
+          </h2>
+          <p class="text-sm text-font-muted mt-1">
+            Name files after their character —
+            <code class="bg-bg-secondary px-1 rounded">A.jpg</code>,
+            <code class="bg-bg-secondary px-1 rounded">B.png</code>,
+            <code class="bg-bg-secondary px-1 rounded">SPACE.webp</code>
+          </p>
+        </div>
+
+        <button
+          (click)="closeBulkModal()"
+          class="w-8 h-8 rounded-lg hover:bg-bg-hover transition-colors flex items-center justify-center"
+        >
+          <fa-icon [icon]="faTimes" class="text-font-muted"></fa-icon>
+        </button>
+      </div>
+
+      <!-- Drop zone -->
+      @if (!bulkResult()) {
+        <button
+          (drop)="onBulkDrop($event)"
+          (dragover)="onBulkDragOver($event)"
+          class="border-2 border-dashed border-border-primary rounded-lg p-8 text-center hover:border-secondary transition-colors cursor-pointer mb-4"
+          (click)="bulkFileInput.click()"
+        >
+          <fa-icon
+            [icon]="faCloudUploadAlt"
+            class="text-5xl text-font-muted mb-3"
+          ></fa-icon>
+          <p class="text-font-secondary font-semibold">
+            Drag & drop images or click to browse
+          </p>
+          <p class="text-sm text-font-muted mt-1">
+            Select multiple files (A.jpg, B.png…)
+          </p>
+        </button>
+
+        <input
+          #bulkFileInput
+          type="file"
+          accept="image/*"
+          multiple
+          (change)="onBulkFilesSelected($event)"
+          class="hidden"
+        />
+
+        <!-- File list -->
+        @if (bulkFiles().length > 0) {
+          <div class="mb-4 space-y-2 max-h-56 overflow-y-auto">
+            @for (
+              item of bulkFilesMapped();
+              track item.file.name;
+              let i = $index
+            ) {
+              <div
+                class="flex items-center justify-between bg-bg-secondary rounded-lg px-3 py-2 text-sm"
+              >
+                <div class="flex items-center gap-2 min-w-0">
+                  @if (item.character) {
+                    <span
+                      class="w-8 h-8 rounded bg-success/20 text-success font-bold flex items-center justify-center shrink-0 text-xs"
+                    >
+                      {{ item.character }}
+                    </span>
+                  } @else {
+                    <span
+                      class="w-8 h-8 rounded bg-warning/20 text-warning flex items-center justify-center shrink-0"
+                    >
+                      <fa-icon
+                        [icon]="faExclamationTriangle"
+                        class="text-xs"
+                      ></fa-icon>
+                    </span>
+                  }
+                  <span class="truncate text-font-primary">{{
+                    item.file.name
+                  }}</span>
+                </div>
+
+                <div class="flex items-center gap-3 shrink-0 ml-2">
+                  <span class="text-font-muted">{{
+                    formatBytes(item.file.size)
+                  }}</span>
+                  @if (!item.character) {
+                    <span class="text-warning text-xs">Unknown char</span>
+                  }
+                  <button
+                    (click)="removeBulkFile(i)"
+                    class="text-font-muted hover:text-danger transition-colors"
+                  >
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (bulkError()) {
+            <div
+              class="bg-danger/10 border border-danger rounded-lg p-3 flex items-center gap-2 mb-4"
+            >
+              <fa-icon [icon]="faTimes" class="text-danger text-sm"></fa-icon>
+              <p class="text-danger text-sm">{{ bulkError() }}</p>
+            </div>
+          }
+
+          <div class="flex gap-3">
+            <button
+              (click)="bulkFiles.set([])"
+              class="px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors text-sm"
+            >
+              Clear All
+            </button>
+
+            <button
+              (click)="executeBulkUpload()"
+              [disabled]="bulkUploading()"
+              class="flex-1 py-2 bg-secondary hover:bg-secondary-dark text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              @if (bulkUploading()) {
+                <div
+                  class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+                ></div>
+                Uploading {{ bulkFiles().length }} file(s)…
+              } @else {
+                <fa-icon [icon]="faCloudUploadAlt"></fa-icon>
+                Upload {{ bulkFiles().length }} file(s)
+              }
+            </button>
+          </div>
+        }
+      }
+
+      <!-- Results -->
+      @if (bulkResult()) {
+        <div class="space-y-4">
+          <!-- Summary -->
+          <div class="grid grid-cols-2 gap-4">
+            <div
+              class="bg-success/10 border border-success rounded-lg p-4 text-center"
+            >
+              <p class="text-3xl font-bold text-success">
+                {{ bulkResult()!.uploaded.length }}
+              </p>
+              <p class="text-sm text-font-muted mt-1">Uploaded</p>
+            </div>
+            <div
+              class="bg-warning/10 border border-warning rounded-lg p-4 text-center"
+            >
+              <p class="text-3xl font-bold text-warning">
+                {{ bulkResult()!.skipped.length }}
+              </p>
+              <p class="text-sm text-font-muted mt-1">Skipped</p>
+            </div>
+          </div>
+
+          <!-- Uploaded list -->
+          @if (bulkResult()!.uploaded.length > 0) {
+            <div>
+              <h3
+                class="text-sm font-semibold text-success mb-2 flex items-center gap-2"
+              >
+                <fa-icon [icon]="faCheck"></fa-icon>
+                Successfully uploaded
+              </h3>
+              <div class="space-y-1 max-h-48 overflow-y-auto">
+                @for (item of bulkResult()!.uploaded; track item.filename) {
+                  <div
+                    class="flex items-center justify-between bg-success/5 rounded px-3 py-2 text-sm"
+                  >
+                    <span class="text-font-primary">{{ item.filename }}</span>
+                    <span class="text-success font-semibold"
+                      >→ {{ item.character }}</span
+                    >
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Skipped list -->
+          @if (bulkResult()!.skipped.length > 0) {
+            <div>
+              <h3
+                class="text-sm font-semibold text-warning mb-2 flex items-center gap-2"
+              >
+                <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+                Skipped
+              </h3>
+              <div class="space-y-1 max-h-36 overflow-y-auto">
+                @for (item of bulkResult()!.skipped; track item.filename) {
+                  <div class="bg-warning/5 rounded px-3 py-2 text-sm">
+                    <span class="text-font-primary">{{ item.filename }}</span>
+                    <span class="block text-warning text-xs mt-0.5">{{
+                      item.reason
+                    }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="flex gap-3 pt-2 border-t border-border-primary">
+            <button
+              (click)="bulkResult.set(null); bulkFiles.set([])"
+              class="px-4 py-2 bg-bg-secondary hover:bg-bg-hover rounded-lg transition-colors text-sm"
+            >
+              Upload More
+            </button>
+            <button
+              (click)="closeBulkModal()"
+              class="flex-1 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors text-sm"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      }
     </button>
   </button>
 }

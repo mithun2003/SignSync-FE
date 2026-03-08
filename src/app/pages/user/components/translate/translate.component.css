@@ -1,51 +1,4 @@
-/* text-to-sign.component.css */
-
-/* Bounce animation for current letter */
-@keyframes bounce-short {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-bounce-short {
-  animation: bounce-short 1s ease-in-out infinite;
-}
-
-/* Fade in animation for sign images */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Pulse animation for playing indicator */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Smooth image transitions */
-img {
-  transition: opacity 0.3s ease-in-out;
-}
+/* Animations are provided by the global theme — see src/assets/style_variants/theme/_effects.css */
 
 /* Custom scrollbar for textarea */
 textarea::-webkit-scrollbar {
@@ -53,15 +6,16 @@ textarea::-webkit-scrollbar {
 }
 
 textarea::-webkit-scrollbar-track {
-  background: rgb(55, 65, 81); /* gray-700 */
+  background: var(--color-bg-secondary);
   border-radius: 4px;
 }
 
 textarea::-webkit-scrollbar-thumb {
-  background: rgb(107, 114, 128); /* gray-500 */
+  background: var(--color-border-secondary);
   border-radius: 4px;
 }
 
 textarea::-webkit-scrollbar-thumb:hover {
-  background: rgb(156, 163, 175); /* gray-400 */
+  background: var(--color-primary);
+  border-radius: 4px;
 }

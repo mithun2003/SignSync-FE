@@ -18,11 +18,22 @@ import {
 import { IApiRes } from '@models/global.model';
 
 import { AdminService } from '@pages/admin/services/admin.service';
+import { AlertService } from 'app/shared/alert/service/alert.service';
+import { faSync } from '@fortawesome/pro-regular-svg-icons';
+import {
+  faFileArrowDown,
+  faUsers,
+  faBolt,
+  faCircleCheck,
+  faFileLines,
+  faArrowsRotate,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FontAwesomeModule],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +41,7 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private adminService = inject(AdminService);
   private destroyRef = inject(DestroyRef);
+  private alertService = inject(AlertService);
 
   // ─────────────────────────────────
   // Loading / Error
@@ -49,6 +61,14 @@ export class DashboardComponent implements OnInit {
   systemHealth = signal(0);
   userGrowth = signal(0);
   detectionGrowth = signal(0);
+
+  faSync = faSync;
+  faFileArrowDown = faFileArrowDown;
+  faUsers = faUsers;
+  faBolt = faBolt;
+  faCircleCheck = faCircleCheck;
+  faFileLines = faFileLines;
+  faArrowsRotate = faArrowsRotate;
 
   // ─────────────────────────────────
   // Lists
@@ -161,7 +181,9 @@ export class DashboardComponent implements OnInit {
           window.URL.revokeObjectURL(url);
         },
         error: () => {
-          alert('Failed to export report');
+          this.alertService.alertMessage('fail', {
+            content: 'Failed to export report',
+          });
         },
       });
   }

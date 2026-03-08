@@ -1,49 +1,69 @@
 <!-- hero.component.html -->
 <div class="relative pb-10">
-
   <!-- ═══ Particle System ═══ -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-[10%] left-[20%] w-1.5 h-1.5 bg-primary/40 rounded-full animate-ping"></div>
-    <div class="absolute top-[30%] left-[80%] w-1 h-1 bg-violet-500/30 rounded-full animate-ping"
-         style="animation-delay: 1.2s"></div>
-    <div class="absolute top-[60%] left-[15%] w-1 h-1 bg-primary/30 rounded-full animate-ping"
-         style="animation-delay: 0.7s"></div>
-    <div class="absolute top-[80%] left-[70%] w-0.5 h-0.5 bg-accent-pink/40 rounded-full animate-ping"
-         style="animation-delay: 2s"></div>
-    <div class="absolute top-[45%] left-[50%] w-1 h-1 bg-violet-500/20 rounded-full animate-ping"
-         style="animation-delay: 1.5s"></div>
+    <div
+      class="absolute top-[10%] left-[20%] w-1.5 h-1.5 bg-primary/40 rounded-full animate-ping"
+    ></div>
+    <div
+      class="absolute top-[30%] left-[80%] w-1 h-1 bg-violet-500/30 rounded-full animate-ping"
+      style="animation-delay: 1.2s"
+    ></div>
+    <div
+      class="absolute top-[60%] left-[15%] w-1 h-1 bg-primary/30 rounded-full animate-ping"
+      style="animation-delay: 0.7s"
+    ></div>
+    <div
+      class="absolute top-[80%] left-[70%] w-0.5 h-0.5 bg-accent-pink/40 rounded-full animate-ping"
+      style="animation-delay: 2s"
+    ></div>
+    <div
+      class="absolute top-[45%] left-[50%] w-1 h-1 bg-violet-500/20 rounded-full animate-ping"
+      style="animation-delay: 1.5s"
+    ></div>
   </div>
 
   <!-- ═══ Hero Grid ═══ -->
   <div class="grid md:grid-cols-[1.2fr_0.8fr] gap-12 items-center py-20">
     <div class="space-y-6">
-
       <!-- Badge — stagger delay: 0s -->
-      <div class="inline-block px-4 py-2 bg-primary/10 border border-primary/30 rounded-full
-                  animate-stagger-fade-in" style="--stagger-delay: 0">
-        <span class="text-primary text-sm font-medium">AI-Powered Sign Language Recognition</span>
+      <div
+        class="inline-block px-4 py-2 bg-primary/10 border border-primary/30 rounded-full animate-stagger-fade-in"
+        style="--stagger-delay: 0"
+      >
+        <span class="text-primary text-sm font-medium"
+          >AI-Powered Sign Language Recognition</span
+        >
       </div>
 
       <!-- Title — stagger delay: 1 -->
-      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight
-                 animate-stagger-fade-in" style="--stagger-delay: 1">
+      <h1
+        class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight animate-stagger-fade-in"
+        style="--stagger-delay: 1"
+      >
         Bridge the Gap with
-        <span class="block mt-2 bg-linear-to-r from-bg-primary via-violet-500 to-bg-primary
-                     bg-clip-text text-transparent animate-gradient">
+        <span
+          class="block mt-2 bg-linear-to-r from-bg-primary via-violet-500 to-bg-primary bg-clip-text text-transparent animate-gradient"
+        >
           Sign Language AI
         </span>
       </h1>
 
       <!-- Description — stagger delay: 2 -->
-      <p class="text-xl text-gray-300 leading-relaxed max-w-2xl
-                animate-stagger-fade-in" style="--stagger-delay: 2">
-        Real-time sign language detection and translation powered by cutting-edge AI.
-        Learn, practice, and communicate seamlessly with 72 million sign language users worldwide.
+      <p
+        class="body-1 text-font-secondary leading-relaxed max-w-2xl animate-stagger-fade-in"
+        style="--stagger-delay: 2"
+      >
+        Real-time sign language detection and translation powered by
+        cutting-edge AI. Learn, practice, and communicate seamlessly with 72
+        million sign language users worldwide.
       </p>
 
       <!-- CTA Buttons — stagger delay: 3 -->
-      <div class="flex flex-wrap gap-4 pt-4
-                  animate-stagger-fade-in" style="--stagger-delay: 3">
+      <div
+        class="flex flex-wrap gap-4 pt-4 animate-stagger-fade-in"
+        style="--stagger-delay: 3"
+      >
         <app-common-button
           text="🤟 Start Detecting"
           routerLink="/detect"
@@ -57,19 +77,21 @@
       </div>
 
       <!-- Stats — stagger delay: 4 -->
-      <div class="flex flex-wrap gap-8 pt-8 border-t border-gray-700/50
-                  animate-stagger-fade-in" style="--stagger-delay: 4">
+      <div
+        class="flex flex-wrap gap-8 pt-8 border-t border-border-primary/50 animate-stagger-fade-in"
+        style="--stagger-delay: 4"
+      >
         <div>
           <div class="text-3xl font-bold gradient-text">96.6%</div>
-          <div class="text-sm text-gray-400">Accuracy Rate</div>
+          <div class="body-3 text-font-muted">Accuracy Rate</div>
         </div>
         <div>
           <div class="text-3xl font-bold gradient-text">29</div>
-          <div class="text-sm text-gray-400">ASL Letters</div>
+          <div class="body-3 text-font-muted">ASL Letters</div>
         </div>
         <div>
           <div class="text-3xl font-bold gradient-text">Real-time</div>
-          <div class="text-sm text-gray-400">Detection</div>
+          <div class="body-3 text-font-muted">Detection</div>
         </div>
       </div>
     </div>
@@ -85,40 +107,65 @@
       </div>
 
       <!-- Decorative Blurs -->
-      <div class="absolute -top-10 -right-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
-      <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl animate-pulse"
-           style="animation-delay: 1s"></div>
+      <div
+        class="absolute -top-10 -right-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse"
+      ></div>
+      <div
+        class="absolute -bottom-10 -left-10 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl animate-pulse"
+        style="animation-delay: 1s"
+      ></div>
     </div>
   </div>
 
   <!-- ═══ Floating Feature Cards ═══ -->
   <div class="grid md:grid-cols-3 gap-6 -mt-8">
-    <div class="group bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6
-                card-hover-lift cursor-pointer
-                animate-stagger-fade-in" style="--stagger-delay: 2">
-      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">👁️</div>
-      <h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Real-time Detection</h3>
-      <p class="text-sm text-gray-400">
+    <div
+      class="group bg-bg-card/60 backdrop-blur-sm border border-border-primary rounded-2xl p-6 card-hover-lift cursor-pointer animate-stagger-fade-in"
+      style="--stagger-delay: 2"
+    >
+      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">
+        👁️
+      </div>
+      <h3
+        class="body-1-semibold mb-2 group-hover:text-primary transition-colors"
+      >
+        Real-time Detection
+      </h3>
+      <p class="body-3 text-font-muted">
         Instant recognition of ASL gestures using advanced computer vision
       </p>
     </div>
 
-    <div class="group bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6
-                card-hover-lift cursor-pointer
-                animate-stagger-fade-in" style="--stagger-delay: 3">
-      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">💬</div>
-      <h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Two-Way Translation</h3>
-      <p class="text-sm text-gray-400">
+    <div
+      class="group bg-bg-card/60 backdrop-blur-sm border border-border-primary rounded-2xl p-6 card-hover-lift cursor-pointer animate-stagger-fade-in"
+      style="--stagger-delay: 3"
+    >
+      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">
+        💬
+      </div>
+      <h3
+        class="body-1-semibold mb-2 group-hover:text-primary transition-colors"
+      >
+        Two-Way Translation
+      </h3>
+      <p class="body-3 text-font-muted">
         Sign-to-text and text-to-sign conversion for seamless communication
       </p>
     </div>
 
-    <div class="group bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6
-                card-hover-lift cursor-pointer
-                animate-stagger-fade-in" style="--stagger-delay: 4">
-      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">😊</div>
-      <h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">Emotion-Aware</h3>
-      <p class="text-sm text-gray-400">
+    <div
+      class="group bg-bg-card/60 backdrop-blur-sm border border-border-primary rounded-2xl p-6 card-hover-lift cursor-pointer animate-stagger-fade-in"
+      style="--stagger-delay: 4"
+    >
+      <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">
+        😊
+      </div>
+      <h3
+        class="body-1-semibold mb-2 group-hover:text-primary transition-colors"
+      >
+        Emotion-Aware
+      </h3>
+      <p class="body-3 text-font-muted">
         Context-aware suggestions based on facial expressions and mood
       </p>
     </div>

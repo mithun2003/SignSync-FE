@@ -1,104 +1,145 @@
-<div class="min-h-screen flex flex-col items-center justify-center text-center px-4 bg-gradient-to-br from-gray-50 to-gray-100">
-  <!-- Background Pattern -->
-  <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-    <div class="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+<div
+  class="relative min-h-screen flex flex-col items-center justify-center px-4 bg-bg-primary overflow-hidden"
+>
+  <!-- ── Ambient background blobs ─────────────────────────────── -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div
+      class="absolute -top-48 -right-48 w-125 h-125 bg-primary/10 rounded-full blur-3xl animate-pulse"
+    ></div>
+    <div
+      class="absolute -bottom-48 -left-48 w-125 h-125 bg-accent-pink/8 rounded-full blur-3xl animate-pulse"
+      style="animation-delay: 1.5s"
+    ></div>
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-purple/6 rounded-full blur-3xl animate-pulse"
+      style="animation-delay: 3s"
+    ></div>
   </div>
 
-  <!-- Main Content -->
-  <div class="relative z-10 max-w-2xl mx-auto">
-    <!-- 404 Number -->
-    <div class="mb-8">
-      <h1 class="text-9xl font-black text-gray-900 mb-4 tracking-tight">404</h1>
-      <div class="w-24 h-1 gradient-bg mx-auto rounded-full"></div>
+  <!-- ── Particle dots ─────────────────────────────────────────── -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div
+      class="absolute top-[12%] left-[18%] w-1.5 h-1.5 bg-primary/50 rounded-full animate-ping"
+    ></div>
+    <div
+      class="absolute top-[25%] right-[20%] w-1 h-1 bg-accent-pink/40 rounded-full animate-ping"
+      style="animation-delay: 0.8s"
+    ></div>
+    <div
+      class="absolute top-[70%] left-[12%] w-1 h-1 bg-primary/30 rounded-full animate-ping"
+      style="animation-delay: 1.6s"
+    ></div>
+    <div
+      class="absolute top-[80%] right-[15%] w-1.5 h-1.5 bg-accent-purple/40 rounded-full animate-ping"
+      style="animation-delay: 2.4s"
+    ></div>
+    <div
+      class="absolute top-[45%] right-[8%] w-1 h-1 bg-primary/25 rounded-full animate-ping"
+      style="animation-delay: 0.4s"
+    ></div>
+  </div>
+
+  <!-- ── Main card ─────────────────────────────────────────────── -->
+  <div class="relative z-10 w-full max-w-2xl mx-auto text-center">
+    <!-- 404 display -->
+    <div class="animate-stagger-fade-in" style="--stagger-delay: 0">
+      <div class="relative inline-block mb-2">
+        <span
+          class="text-[clamp(6rem,20vw,10rem)] font-black leading-none gradient-text tracking-tight select-none"
+        >
+          404
+        </span>
+        <!-- hand emoji badge -->
+        <span class="absolute -top-4 -right-8 text-4xl animate-float">🤟</span>
+      </div>
+      <div class="w-32 h-1 gradient-bg mx-auto rounded-full mb-8"></div>
     </div>
 
-    <!-- Error Message -->
-    <div class="mb-12">
-      <h2 class="text-4xl font-bold text-gray-900 mb-4">Page Not Found</h2>
-      <p class="text-xl text-gray-600 mb-6 leading-relaxed">
-        Oops! The page you're looking for seems to have wandered off into the digital wilderness.
-      </p>
-      <p class="text-gray-500 max-w-lg mx-auto">
-        Don't worry, it happens to the best of us. Let's get you back on track to where you need to be.
-      </p>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-      <a 
-        routerLink="/" 
-        class="inline-flex items-center px-8 py-3 rounded-xl gradient-bg text-white font-semibold shadow-lg hover:from-pink-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+    <!-- Glass content card -->
+    <div
+      class="glass rounded-3xl border border-border-secondary p-8 md:p-12 mb-8 animate-stagger-fade-in"
+      style="--stagger-delay: 1"
+    >
+      <!-- Icon -->
+      <div
+        class="w-16 h-16 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-3xl mx-auto mb-6 animate-glow"
       >
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-        Back to Home
-      </a>
-      
-      <button 
-        (click)="goBack()"
-        class="inline-flex items-center px-8 py-3 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:border-border-secondary hover:bg-gray-50 transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        🔍
+      </div>
+
+      <h1 class="headline-2 text-white mb-4">Page Not Found</h1>
+
+      <p
+        class="body-1 text-font-secondary mb-3 max-w-md mx-auto leading-relaxed"
       >
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Go Back
-      </button>
+        Looks like this page wandered off into the digital wilderness.
+      </p>
+      <p class="body-3 text-font-muted max-w-sm mx-auto">
+        Don't worry — let's sign you back to somewhere familiar.
+      </p>
+
+      <!-- Divider -->
+      <div class="h-px w-full bg-border-muted my-8"></div>
+
+      <!-- Action buttons -->
+      <div
+        class="flex flex-col sm:flex-row gap-4 justify-center animate-stagger-fade-in"
+        style="--stagger-delay: 2"
+      >
+        <a
+          routerLink="/"
+          class="common-login-button inline-flex items-center justify-center gap-2 no-underline"
+        >
+          <fa-icon [icon]="faHouse"></fa-icon>
+          Back to Home
+        </a>
+
+        <button
+          (click)="goBack()"
+          class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-border-primary body-2-medium text-font-secondary hover:border-primary/60 hover:text-white hover:bg-primary/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        >
+          <fa-icon [icon]="faArrowLeft"></fa-icon>
+          Go Back
+        </button>
+      </div>
     </div>
 
-    <!-- Helpful Links -->
-    <div class="mt-16 pt-8 border-t border-gray-200">
-      <p class="text-sm text-gray-500 mb-4">Looking for something specific?</p>
-      <div class="flex flex-wrap justify-center gap-4 text-sm">
-        <a routerLink="/admin/dashboard" class="text-violet-primary hover:text-purple-700 font-medium transition-colors">Dashboard</a>
-        <a routerLink="/admin/settings" class="text-violet-primary hover:text-purple-700 font-medium transition-colors">Settings</a>
+    <!-- Quick links -->
+    <div class="animate-stagger-fade-in" style="--stagger-delay: 3">
+      <p class="body-4 text-font-muted mb-5">Looking for something specific?</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        @for (
+          link of [
+            { label: "🤚 Gesture Detect", route: "/gesture-detection" },
+            { label: "🔤 Translate", route: "/translate" },
+            { label: "📊 Dashboard", route: "/dashboard" },
+            { label: "🛟 Help", route: "/help" },
+          ];
+          track link.route
+        ) {
+          <a
+            [routerLink]="link.route"
+            class="px-4 py-2 rounded-lg bg-bg-card border border-border-primary body-3 text-font-secondary hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all duration-200 no-underline"
+          >
+            {{ link.label }}
+          </a>
+        }
       </div>
     </div>
   </div>
 
-  <!-- Decorative Elements -->
-  <div class="absolute bottom-8 left-8 text-gray-400 text-xs">
-    <div class="flex items-center space-x-2">
-      <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-      <span>404 Error</span>
-    </div>
+  <!-- ── Corner status badges ──────────────────────────────────── -->
+  <div
+    class="absolute bottom-6 left-6 body-4 text-font-muted flex items-center gap-2"
+  >
+    <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+    <span>404 Error</span>
   </div>
 
-  <div class="absolute bottom-8 right-8 text-gray-400 text-xs">
-    <div class="flex items-center space-x-2">
-      <span>Page Not Found</span>
-      <div class="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
-    </div>
+  <div
+    class="absolute bottom-6 right-6 body-4 text-font-muted flex items-center gap-2"
+  >
+    <span>SignSync</span>
+    <div class="w-2 h-2 bg-accent-pink rounded-full animate-pulse"></div>
   </div>
 </div>
-
-<style>
-  @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-      transform: translate(0px, 0px) scale(1);
-    }
-  }
-  
-  .animate-blob {
-    animation: blob 7s infinite;
-  }
-  
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-  
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
-</style>

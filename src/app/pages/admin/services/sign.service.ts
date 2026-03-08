@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { environment } from 'environments/environment';
 import { ApiService } from '@core/services/api/api.service';
 
@@ -8,6 +8,11 @@ export interface ASLSign {
   id: number;
   character: string;
   cloudinary_url: string;
+  cloudinary_public_id?: string;
+  file_size?: number;
+  width?: number;
+  height?: number;
+  mime_type?: string;
   version: number;
   updated_by?: number;
   notes?: string;
@@ -17,12 +22,12 @@ export interface ASLSign {
 
 export interface CloudinaryImage {
   public_id: string;
-  secure_url: string;
+  url: string;
+  file_size: number;
   width: number;
   height: number;
-  format: string;
-  bytes: number;
-  created_at: string;
+  mime_type: string;
+  created_at?: string;
 }
 
 export interface SignStats {
@@ -32,165 +37,155 @@ export interface SignStats {
   completion_percentage: number;
 }
 
+export interface BulkUploadResult {
+  uploaded: BulkUploadedItem[];
+  skipped: BulkSkippedItem[];
+}
+
+export interface BulkUploadedItem {
+  filename: string;
+  character: string;
+  sign: ASLSign;
+}
+
+export interface BulkSkippedItem {
+  filename: string;
+  reason: string;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SignService {
-
   private http = inject(HttpClient);
   private apiService = inject(ApiService);
 
-  /**
-   * Backend Admin API Base
-   * Example:
-   * http://localhost:8000/api/v1/admin/signs
-   */
   private apiUrl = `admin/signs`;
+  private publicApiUrl = `signs`;
 
-  /**
-   * Cloudinary config
-   */
   private cloudinaryCloudName = environment.cloudinaryCloudName;
-  private cloudinaryUploadPreset = environment.cloudinaryUploadPreset;
 
+  // ─────────────────────────────────────────────
+  // PUBLIC API (no auth required)
+  // ─────────────────────────────────────────────
+
+  /** GET /api/v1/signs — returns all active signs with Cloudinary URLs */
+  getPublicSigns(): Observable<ASLSign[]> {
+    return this.apiService.get<ASLSign[]>(this.publicApiUrl);
+  }
 
   // ─────────────────────────────────────────────
   // BACKEND API CALLS
   // ─────────────────────────────────────────────
 
-  /**
-   * GET /api/v1/admin/signs
-   */
-  async getAllSigns(): Promise<{ data: ASLSign[]; total: number; missing_characters: string[] }> {
+  /** GET /api/v1/admin/signs */
+  async getAllSigns(): Promise<{
+    data: ASLSign[];
+    total: number;
+    missing_characters: string[];
+  }> {
     return firstValueFrom(
-      this.apiService.get<{ data: ASLSign[]; total: number; missing_characters: string[] }>(
-        this.apiUrl
-      )
+      this.apiService.get<{
+        data: ASLSign[];
+        total: number;
+        missing_characters: string[];
+      }>(this.apiUrl),
     );
   }
 
-  /**
-   * POST /api/v1/admin/signs/character/{character}/update-url
-   */
-  async updateSignUrl(
-    character: string,
-    cloudinaryUrl: string,
-    notes?: string
-  ): Promise<ASLSign> {
+  /** GET /api/v1/admin/signs/stats */
+  async getStats(): Promise<SignStats> {
+    return firstValueFrom(
+      this.apiService.get<SignStats>(`${this.apiUrl}/stats`),
+    );
+  }
+
+  /** GET /api/v1/admin/signs/{character}/images */
+  async listCloudinaryImages(character: string): Promise<CloudinaryImage[]> {
+    try {
+      return await firstValueFrom(
+        this.apiService.get<CloudinaryImage[]>(
+          `${this.apiUrl}/${character}/images`,
+        ),
+      );
+    } catch (error) {
+      console.error('Failed to load Cloudinary images:', error);
+      return [];
+    }
+  }
+
+  /** POST /api/v1/admin/signs/{character}/upload */
+  async uploadSign(character: string, file: File | Blob): Promise<ASLSign> {
+    const formData = new FormData();
+    formData.append('file', file);
 
     return firstValueFrom(
       this.apiService.post<ASLSign>(
-        `${this.apiUrl}/character/${character}/update-url`,
-        {
-          cloudinary_url: cloudinaryUrl,
-          notes
-        }
-      )
+        `${this.apiUrl}/${character}/upload`,
+        formData,
+      ),
     );
   }
 
-  /**
-   * GET /api/v1/admin/signs/stats
-   */
-  async getStats(): Promise<SignStats> {
-
-    return firstValueFrom(
-      this.apiService.get<SignStats>(
-        `${this.apiUrl}/stats`
-      )
-    );
-  }
-
-
-  // ─────────────────────────────────────────────
-  // CLOUDINARY OPERATIONS (Frontend)
-  // ─────────────────────────────────────────────
-
-  /**
-   * List images for a character
-   */
-async listCloudinaryImages(character: string): Promise<CloudinaryImage[]> {
-
-  try {
-
-    const response = await fetch(
-      `${environment.rootUrl}/api/v1/admin/signs/cloudinary-images/${character}`
-    );
-
-    if (!response.ok) return [];
-
-    const data = await response.json();
-
-    return data || [];
-
-  } catch (error) {
-
-    console.error('Failed to load Cloudinary images:', error);
-
-    return [];
-  }
-}
-
-
-  /**
-   * Upload to Cloudinary
-   */
-  async uploadToCloudinary(
-    file: File | Blob,
-    character: string
-  ): Promise<CloudinaryImage> {
-
+  /** POST /api/v1/admin/signs/bulk-upload */
+  async bulkUploadSigns(files: File[]): Promise<BulkUploadResult> {
     const formData = new FormData();
-
-    formData.append('file', file);
-    formData.append('upload_preset', this.cloudinaryUploadPreset);
-
-    formData.append('folder', `asl-signs/${character}`);
-    formData.append('public_id', `${Date.now()}`);
-
-    formData.append('tags', `character_${character},asl-sign`);
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/image/upload`,
-      {
-        method: 'POST',
-        body: formData
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Cloudinary upload failed');
+    for (const file of files) {
+      formData.append('files', file);
     }
 
-    const data = await response.json();
-
-    return {
-      public_id: data.public_id,
-      secure_url: data.secure_url,
-      width: data.width,
-      height: data.height,
-      format: data.format,
-      bytes: data.bytes,
-      created_at: data.created_at
-    };
+    return firstValueFrom(
+      this.apiService.post<BulkUploadResult>(
+        `${this.apiUrl}/bulk-upload`,
+        formData,
+      ),
+    );
   }
 
+  /** PUT /api/v1/admin/signs/{character}/set-active */
+  async setActiveImage(
+    character: string,
+    publicId: string,
+    notes?: string,
+  ): Promise<ASLSign> {
+    return firstValueFrom(
+      this.apiService.put<ASLSign>(`${this.apiUrl}/${character}/set-active`, {
+        cloudinary_public_id: publicId,
+        notes,
+      }),
+    );
+  }
 
-  /**
-   * Optimized URL
-   */
+  /** DELETE /api/v1/admin/signs/{character} */
+  async deleteSign(character: string): Promise<void> {
+    return firstValueFrom(
+      this.apiService.delete<void>(`${this.apiUrl}/${character}`),
+    );
+  }
+
+  /** POST /api/v1/admin/signs/character/{character}/update-url (legacy) */
+  async updateSignUrl(
+    character: string,
+    cloudinaryUrl: string,
+    notes?: string,
+  ): Promise<ASLSign> {
+    return firstValueFrom(
+      this.apiService.post<ASLSign>(
+        `${this.apiUrl}/character/${character}/update-url`,
+        { cloudinary_url: cloudinaryUrl, notes },
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  // CLOUDINARY URL HELPERS
+  // ─────────────────────────────────────────────
+
   getOptimizedUrl(publicId: string, width = 400, height = 400): string {
-
     return `https://res.cloudinary.com/${this.cloudinaryCloudName}/image/upload/w_${width},h_${height},c_limit,q_auto,f_auto/${publicId}`;
   }
 
-
-  /**
-   * Thumbnail
-   */
   getThumbnailUrl(publicId: string): string {
-
     return this.getOptimizedUrl(publicId, 200, 200);
   }
-
 }

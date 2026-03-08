@@ -33,12 +33,7 @@ import { UserService } from '@pages/user/service/user-service/user.service';
   styleUrls: ['./gesture-detection.component.css'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    DecimalPipe,
-    RouterLink,
-    FontAwesomeModule,
-    CommonButtonComponent,
-  ],
+  imports: [DecimalPipe, RouterLink, FontAwesomeModule, CommonButtonComponent],
 })
 export class GestureDetectionComponent implements OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
@@ -72,6 +67,7 @@ export class GestureDetectionComponent implements OnDestroy {
   // Settings
   autoSpace = signal(true);
   isSpeechEnabled = signal(true);
+  speechRate = signal(0.7);
 
   feedbackText = signal<string>('Click Start to begin');
 
@@ -92,7 +88,6 @@ export class GestureDetectionComponent implements OnDestroy {
   // Internal State
   private mediaStream: MediaStream | null = null;
   private animationId?: number;
-  private isProcessingBackend = false;
   private lastLandmarks: NormalizedLandmark[] | null = null;
   private missingFrames = 0;
   private readonly MAX_MISSING_FRAMES = 5;
@@ -102,10 +97,11 @@ export class GestureDetectionComponent implements OnDestroy {
   // Letter Detection Logic
   private lastDetectedLetter: string | null = null;
   private lastLetterTime = 0;
-  private letterStability = signal(0);
-  private readonly STABILITY_THRESHOLD = 5;
-  private readonly MIN_LETTER_INTERVAL = 800;
-  private readonly AUTO_SPACE_TIMEOUT = 2000;
+  protected letterStability = signal(0);
+  protected readonly STABILITY_THRESHOLD = 3; // 3 consecutive frames (~450ms) to confirm
+  private readonly MIN_LETTER_INTERVAL = 500; // ms between accepted letters
+  private readonly MIN_CONFIDENCE = 0.9; // Only accept predictions with ≥90% confidence
+  private readonly AUTO_SPACE_TIMEOUT = 2500;
 
   private lastLetterTimestamp = 0;
   private spaceTimerHandle?: ReturnType<typeof setTimeout>;
@@ -127,8 +123,6 @@ export class GestureDetectionComponent implements OnDestroy {
     effect(() => {
       const result = this.userService.predictionResult();
       if (!result) return;
-
-      this.isProcessingBackend = false;
 
       if (
         !result.label ||
@@ -168,15 +162,26 @@ export class GestureDetectionComponent implements OnDestroy {
 
   private async loadModels(): Promise<void> {
     try {
-      await Promise.all([
+      // Load models in parallel; face detection is optional — don't let it block hands
+      await Promise.allSettled([
         this.handDetectService.preloadModel(),
         this.faceDetectService.preloadModel(),
       ]);
-      this.feedbackText.set('Click Start to begin');
+
+      if (!this.handDetectService.isReady()) {
+        this.feedbackText.set('Model failed to load — tap Retry');
+      } else {
+        this.feedbackText.set('Ready — tap Start to begin');
+      }
     } catch (err) {
-      console.error('Failed to load models:', err);
-      this.feedbackText.set('Model load failed');
+      console.error('Unexpected error loading models:', err);
+      this.feedbackText.set('Model failed to load — tap Retry');
     }
+  }
+
+  async retryModelLoad(): Promise<void> {
+    this.feedbackText.set('Retrying model load...');
+    await this.loadModels();
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -199,13 +204,22 @@ export class GestureDetectionComponent implements OnDestroy {
     const chars = word.toUpperCase().split('');
     this.sentenceBuffer.update((buf) => [...buf, ...chars, ' ']);
     this.feedbackText.set(`Added: ${word}`);
-    if (this.isSpeechEnabled()) speakText(word);
+    if (this.isSpeechEnabled()) speakText(word, this.speechRate());
   }
 
   // ─────────────────────────────────────────────────────────────────────────
   //  LETTER DETECTION LOGIC
   // ─────────────────────────────────────────────────────────────────
   private processLetter(letter: string, confidence: number): void {
+    // Reject low-confidence predictions to avoid false letters
+    if (confidence < this.MIN_CONFIDENCE) {
+      this.resetLetterDetection();
+      this.feedbackText.set(
+        `Low confidence (${Math.round(confidence * 100)}%) — hold steady`,
+      );
+      return;
+    }
+
     this.currentLetter.set(letter);
     this.currentConfidence.set(confidence);
     const now = Date.now();
@@ -237,10 +251,23 @@ export class GestureDetectionComponent implements OnDestroy {
   }
 
   private addLetterToSentence(letter: string): void {
-    this.sentenceBuffer.update((buf) => [...buf, letter]);
-    this.letterHistory.update((hist) => [...hist, letter].slice(-10));
-    if (this.isSpeechEnabled()) speakText(letter);
-    this.feedbackText.set(`Added: ${letter}`);
+    const normalized = letter.toLowerCase();
+
+    if (normalized === 'del' || normalized === 'delete') {
+      this.sentenceBuffer.update((buf) => buf.slice(0, -1));
+      this.letterHistory.update((hist) => [...hist, '⌫'].slice(-10));
+      this.feedbackText.set('Deleted last character');
+      return;
+    }
+
+    const entry = normalized === 'space' ? ' ' : letter;
+    this.sentenceBuffer.update((buf) => [...buf, entry]);
+    this.letterHistory.update((hist) => [...hist, entry].slice(-10));
+    if (this.isSpeechEnabled())
+      speakText(entry.trim() || 'space', this.speechRate());
+    this.feedbackText.set(
+      normalized === 'space' ? 'Added space' : `Added: ${letter}`,
+    );
   }
 
   private resetLetterDetection(): void {
@@ -288,7 +315,6 @@ export class GestureDetectionComponent implements OnDestroy {
 
       setTimeout(() => {
         this.feedbackText.set('Show hand to start signing');
-        this.isProcessingBackend = false;
         this.renderLoop();
       }, 1500);
     } catch (err) {
@@ -318,11 +344,11 @@ export class GestureDetectionComponent implements OnDestroy {
 
     this.userService.disconnect();
 
-    // Zero out canvas to free GPU memory
+    // Clear canvas without destroying it (zeroing dimensions would corrupt WebGL contexts)
     const canvas = this.overlayCanvas?.nativeElement;
     if (canvas) {
-      canvas.width = 0;
-      canvas.height = 0;
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
     this.canvasCtx = null;
 
@@ -354,59 +380,60 @@ export class GestureDetectionComponent implements OnDestroy {
       canvas.height = video.videoHeight;
     }
 
-    // Get hand landmarks
-    const result = this.handDetectService.getHandCrop(video);
+    try {
+      // Get hand landmarks
+      const result = this.handDetectService.getHandCrop(video);
 
-    // Face/emotion detection (throttled inside service to ~5fps)
-    const now = performance.now();
-    const faceResult = this.faceDetectService.detectEmotion(video, now);
-    if (faceResult) {
-      this.currentMood.set(faceResult.emotion);
-      if (this.currentLetter()) {
-        this.updateSuggestedWords(this.currentLetter());
+      // Face/emotion detection (throttled inside service to ~5fps)
+      const now = performance.now();
+      const faceResult = this.faceDetectService.detectEmotion(video, now);
+      if (faceResult) {
+        this.currentMood.set(faceResult.emotion);
+        if (this.currentLetter()) {
+          this.updateSuggestedWords(this.currentLetter());
+        }
       }
-    }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (result && result.landmarks) {
-      this.missingFrames = 0;
-      this.lastLandmarks = result.landmarks;
-      this.drawLandmarks(ctx, result.landmarks);
+      if (result && result.landmarks) {
+        this.missingFrames = 0;
+        this.lastLandmarks = result.landmarks;
+        this.drawLandmarks(ctx, result.landmarks);
 
-      if (result.crop && !this.isProcessingBackend) {
-        this.isProcessingBackend = true;
-        const blob = this.dataURLtoBlob(result.crop);
-        const sent = this.userService.sendImage(blob);
-        // If socket was unavailable, unblock immediately
-        if (!sent) this.isProcessingBackend = false;
+        // Send raw bytes directly — UserService pendingFrames handles backpressure
+        if (result.crop) {
+          const bytes = this.dataURLtoBytes(result.crop);
+          this.userService.sendImage(bytes);
+        }
+      } else if (
+        this.lastLandmarks &&
+        this.missingFrames < this.MAX_MISSING_FRAMES
+      ) {
+        this.missingFrames++;
+        this.drawLandmarks(ctx, this.lastLandmarks);
+      } else {
+        this.lastLandmarks = null;
+        this.missingFrames = 0;
+        this.resetLetterDetection();
       }
-    } else if (
-      this.lastLandmarks &&
-      this.missingFrames < this.MAX_MISSING_FRAMES
-    ) {
-      this.missingFrames++;
-      this.drawLandmarks(ctx, this.lastLandmarks);
-    } else {
-      this.lastLandmarks = null;
-      this.missingFrames = 0;
-      this.resetLetterDetection();
+    } catch (err) {
+      // Catch any unexpected errors so the render loop keeps running
+      console.warn('[renderLoop] frame error (skipping):', err);
     }
 
     this.animationId = requestAnimationFrame(() => this.renderLoop());
   }
 
-  /** Convert a data URL to Blob synchronously — faster than fetch() for small images */
-  private dataURLtoBlob(dataUrl: string): Blob {
+  /** Convert data URL to raw ArrayBuffer — matches backend receive_bytes() */
+  private dataURLtoBytes(dataUrl: string): ArrayBuffer {
     const commaIdx = dataUrl.indexOf(',');
-    const mimeMatch = dataUrl.substring(0, commaIdx).match(/:(.*?);/);
-    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
     const binary = atob(dataUrl.substring(commaIdx + 1));
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) {
       bytes[i] = binary.charCodeAt(i);
     }
-    return new Blob([bytes], { type: mime });
+    return bytes.buffer;
   }
 
   private drawLandmarks(
@@ -492,7 +519,7 @@ export class GestureDetectionComponent implements OnDestroy {
   speakSentence(): void {
     const text = this.sentenceBuffer().join('');
     if (text.trim()) {
-      speakText(text);
+      speakText(text, this.speechRate());
       this.feedbackText.set('Speaking...');
     }
   }

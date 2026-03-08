@@ -1,16 +1,41 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faCheck,
+  faArrowsRotate,
+  faArrowLeft,
+  faLock,
+  faAt,
+  faCircleExclamation,
+  faSpinner,
+  faEnvelope,
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './forgot-password.component.html'
+  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
+  templateUrl: './forgot-password.component.html',
 })
 export class ForgotPasswordComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+
+  readonly faCheck = faCheck;
+  readonly faArrowsRotate = faArrowsRotate;
+  readonly faArrowLeft = faArrowLeft;
+  readonly faLock = faLock;
+  readonly faAt = faAt;
+  readonly faCircleExclamation = faCircleExclamation;
+  readonly faSpinner = faSpinner;
+  readonly faEnvelope = faEnvelope;
 
   form: FormGroup;
   loading = signal<boolean>(false);
@@ -20,18 +45,18 @@ export class ForgotPasswordComponent {
 
   constructor() {
     this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
   submit() {
     if (this.form.invalid) return;
-    
+
     this.loading.set(true);
     this.error.set(null);
-    
+
     const email = this.form.get('email')?.value;
-    
+
     this.authService.forgotPassword(email).subscribe({
       next: () => {
         this.loading.set(false);
@@ -40,8 +65,10 @@ export class ForgotPasswordComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(err?.error?.message || 'An error occurred. Please try again.');
-      }
+        this.error.set(
+          err?.error?.message || 'An error occurred. Please try again.',
+        );
+      },
     });
   }
 

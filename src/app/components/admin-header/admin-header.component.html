@@ -10,19 +10,7 @@
       class="md:hidden p-2 rounded-lg hover:bg-bg-hover transition-colors"
       aria-label="Toggle mobile menu"
     >
-      <svg
-        class="w-5 h-5 text-font-muted"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"
-        />
-      </svg>
+      <fa-icon [icon]="faBars" class="w-5 h-5 text-font-muted"></fa-icon>
     </button>
 
     <!-- Breadcrumbs -->
@@ -33,19 +21,10 @@
       >
         Admin
       </a>
-      <svg
+      <fa-icon
+        [icon]="faChevronRight"
         class="w-4 h-4 text-neutral-d-grey"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M9 5l7 7-7 7"
-        />
-      </svg>
+      ></fa-icon>
       <span class="text-font-secondary font-medium">{{ currentPage() }}</span>
     </nav>
   </div>
@@ -53,7 +32,7 @@
   <!-- ═══ Right: Search + Notifications + User ═══ -->
   <div class="flex items-center gap-3">
     <!-- Search -->
-    <div class="hidden md:block relative">
+    <div class="hidden md:block relative search-area">
       <div
         class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
       >
@@ -64,11 +43,77 @@
       </div>
       <input
         type="text"
-        placeholder="Search..."
-        class="pl-9 pr-4 py-2 w-56 body-3 bg-bg-primary border border-border-primary rounded-lg text-white placeholder-neutral-d-grey focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+        placeholder="Search pages & actions… (↑↓ navigate, ↵ go)"
+        class="pl-9 pr-4 py-2 w-72 body-3 bg-bg-primary border border-border-primary rounded-lg text-white placeholder-neutral-d-grey focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
         [value]="searchQuery()"
-        (input)="searchQuery.set($any($event.target).value)"
+        (input)="onSearchInput($event)"
+        (keydown)="onSearchKeydown($event)"
+        (focus)="searchFocused.set(true)"
+        (blur)="onSearchBlur()"
+        autocomplete="off"
       />
+
+      <!-- Search Results Dropdown -->
+      @if (showSearch()) {
+        <div
+          class="absolute top-full mt-2 left-0 w-105 bg-bg-card border border-border-primary rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.6)] z-50 overflow-hidden animate-fade-in"
+        >
+          <!-- Hint row -->
+          <div
+            class="flex items-center justify-between px-4 py-2 border-b border-border-muted"
+          >
+            <span class="body-4 text-font-muted"
+              >{{ searchResults().length }} result{{
+                searchResults().length !== 1 ? "s" : ""
+              }}</span
+            >
+            <span class="body-4 text-font-muted hidden sm:block"
+              >↑↓ navigate · ↵ open · Esc close</span
+            >
+          </div>
+
+          <!-- Results list -->
+          <ul class="max-h-72 overflow-y-auto py-1">
+            @for (item of searchResults(); track item.label; let i = $index) {
+              <li>
+                <button
+                  (click)="navigateTo(item)"
+                  class="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-bg-hover"
+                  [class.bg-bg-hover]="focusedIndex() === i"
+                >
+                  <!-- Icon -->
+                  <div
+                    class="w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center shrink-0"
+                  >
+                    <fa-icon
+                      [icon]="item.icon"
+                      class="text-sm text-font-muted"
+                    ></fa-icon>
+                  </div>
+
+                  <!-- Text -->
+                  <div class="flex-1 min-w-0">
+                    <p class="body-3 font-medium text-font-primary">
+                      {{ item.label }}
+                    </p>
+                    <p class="body-4 text-font-muted truncate">
+                      {{ item.description }}
+                    </p>
+                  </div>
+
+                  <!-- Category badge -->
+                  <span
+                    class="shrink-0 px-2 py-0.5 rounded-full body-4 font-medium"
+                    [class]="categoryColors[item.category]"
+                  >
+                    {{ item.category }}
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+      }
     </div>
 
     <!-- Notifications -->
@@ -158,19 +203,11 @@
             {{ userEmail }}
           </p>
         </div>
-        <svg
+        <fa-icon
+          [icon]="faChevronDown"
           class="w-4 h-4 text-neutral-l-grey hidden md:block"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
+          [class.rotate-180]="showUserMenu()"
+        ></fa-icon>
       </button>
 
       <!-- User Dropdown -->

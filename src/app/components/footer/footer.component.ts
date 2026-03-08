@@ -11,15 +11,24 @@ import {
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { ViewportScroller } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  FaIconLibrary,
+  FontAwesomeModule,
+} from '@fortawesome/angular-fontawesome';
 import {
   faGithub,
   faXTwitter,
   faLinkedinIn,
   faInstagram,
 } from '@fortawesome/free-brands-svg-icons';
-import { faLock, faArrowUpRightFromSquare, faArrowUp, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import {
+  faLock,
+  faArrowUpRightFromSquare,
+  faArrowUp,
+  faSpinner,
+} from '@fortawesome/free-solid-svg-icons';
 import { Subscription, filter, delay } from 'rxjs';
+import { AlertService } from 'app/shared/alert/service/alert.service';
 
 import {
   SOCIAL_LINKS,
@@ -40,6 +49,7 @@ export class FooterComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private viewportScroller = inject(ViewportScroller);
   private library = inject(FaIconLibrary);
+  private alertService = inject(AlertService);
   private routerSub?: Subscription;
 
   // Data
@@ -62,8 +72,14 @@ export class FooterComponent implements OnInit, OnDestroy {
   constructor() {
     // Register all FA icons
     this.library.addIcons(
-      faGithub, faXTwitter, faLinkedinIn, faInstagram,
-      faLock, faArrowUpRightFromSquare, faArrowUp, faSpinner
+      faGithub,
+      faXTwitter,
+      faLinkedinIn,
+      faInstagram,
+      faLock,
+      faArrowUpRightFromSquare,
+      faArrowUp,
+      faSpinner,
     );
   }
 
@@ -74,8 +90,10 @@ export class FooterComponent implements OnInit, OnDestroy {
     // Listen for navigation events to handle fragment scrolling
     this.routerSub = this.router.events
       .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        delay(100) // Wait for DOM to render
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd,
+        ),
+        delay(100), // Wait for DOM to render
       )
       .subscribe(() => {
         const tree = this.router.parseUrl(this.router.url);
@@ -100,7 +118,10 @@ export class FooterComponent implements OnInit, OnDestroy {
     if (link.fragment) {
       // If we're already on the target route, just scroll
       const currentPath = this.router.url.split('#')[0].split('?')[0];
-      if (currentPath === link.route || (currentPath === '/' && link.route === '/')) {
+      if (
+        currentPath === link.route ||
+        (currentPath === '/' && link.route === '/')
+      ) {
         this.scrollToElement(link.fragment);
       } else {
         // Navigate to route, then scroll (handled by ngOnInit subscriber)
@@ -118,7 +139,8 @@ export class FooterComponent implements OnInit, OnDestroy {
     const element = document.getElementById(elementId);
     if (element) {
       const navbarHeight = 80; // Adjust to your navbar height
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      const elementPosition =
+        element.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top: elementPosition - navbarHeight,
         behavior: 'smooth',
@@ -144,10 +166,13 @@ export class FooterComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.isSubscribing.set(false);
       this.emailControl.reset();
-      alert('Subscribed successfully!');
+      this.alertService.alertMessage('success', {
+        content: 'Subscribed successfully!',
+        close: true,
+        timeout: 3000,
+      });
     }, 1500);
   }
-
 
   @HostListener('window:scroll')
   onWindowScroll(): void {

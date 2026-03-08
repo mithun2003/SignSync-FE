@@ -1,42 +1,55 @@
 <!-- admin-sidebar.component.html -->
-<aside class="flex flex-col border-r border-border-primary h-full bg-bg-secondary"
-       [class.w-64]="!collapsed()"
-       [class.w-[68px]]="collapsed()">
-
+<aside
+  class="flex flex-col border-r border-border-primary h-full bg-bg-secondary"
+  [class.w-64]="!collapsed()"
+  [class.w-[68px]]="collapsed()"
+>
   <!-- ═══ Sidebar Header ═══ -->
-  <div class="h-16 flex items-center justify-between px-4 border-b border-border-primary
-              sticky top-0 bg-bg-secondary z-10">
+  <div
+    class="h-16 flex items-center justify-between px-4 border-b border-border-primary sticky top-0 bg-bg-secondary z-10"
+  >
     @if (!collapsed()) {
       <div class="flex items-center gap-2.5">
-        <img ngSrc="images/icon.png" width="36" height="36"
-             alt="SignSync Logo" class="rounded-xl" />
-        <span class="text-lg font-bold tracking-tight text-white">SignSync</span>
+        <img
+          ngSrc="images/icon.png"
+          width="36"
+          height="36"
+          alt="SignSync Logo"
+          class="rounded-xl"
+        />
+        <span class="text-lg font-bold tracking-tight text-white"
+          >SignSync</span
+        >
       </div>
     } @else {
-      <img ngSrc="images/icon.png" width="32" height="32"
-           alt="SignSync Logo" class="rounded-lg mx-auto" />
+      <img
+        ngSrc="images/icon.png"
+        width="32"
+        height="32"
+        alt="SignSync Logo"
+        class="rounded-lg mx-auto"
+      />
     }
 
     <!-- Collapse toggle (desktop) -->
-    <button (click)="toggleCollapse()"
-            class="hidden md:flex p-1.5 rounded-lg hover:bg-bg-hover
-                   text-font-muted hover:text-white transition-all"
-            [attr.title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
-      <svg class="w-4 h-4 transition-transform" [class.rotate-180]="collapsed()"
-           fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-      </svg>
+    <button
+      (click)="toggleCollapse()"
+      class="hidden md:flex p-1.5 rounded-lg hover:bg-bg-hover text-font-muted hover:text-white transition-all"
+      [attr.title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+    >
+      <fa-icon
+        [icon]="faAnglesLeft"
+        class="w-4 h-4 transition-transform"
+        [class.rotate-180]="collapsed()"
+      ></fa-icon>
     </button>
 
     <!-- Mobile close -->
-    <button (click)="closeMobileMenu()"
-            class="md:hidden p-1.5 rounded-lg hover:bg-bg-hover
-                   text-font-muted hover:text-white transition-all">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"/>
-      </svg>
+    <button
+      (click)="closeMobileMenu()"
+      class="md:hidden p-1.5 rounded-lg hover:bg-bg-hover text-font-muted hover:text-white transition-all"
+    >
+      <fa-icon [icon]="faXmark" class="w-5 h-5"></fa-icon>
     </button>
   </div>
 
@@ -45,8 +58,9 @@
     @for (section of navSections; track section.title) {
       <!-- Section Title -->
       @if (!collapsed()) {
-        <div class="px-3 mb-2 mt-6 first:mt-0 body-4
-                    text-font-muted uppercase tracking-wider font-semibold">
+        <div
+          class="px-3 mb-2 mt-6 first:mt-0 body-4 text-font-muted uppercase tracking-wider font-semibold"
+        >
           {{ section.title }}
         </div>
       } @else {
@@ -55,21 +69,20 @@
 
       <!-- Nav Items -->
       @for (item of section.items; track item.route) {
-        <a [routerLink]="item.route"
-           routerLinkActive="bg-primary/15 text-primary-light border-l-[3px] border-l-primary"
-           [routerLinkActiveOptions]="{ exact: false }"
-           class="flex items-center gap-3 rounded-lg px-3 py-2.5
-                  body-3 font-medium text-font-primary
-                  hover:bg-bg-hover hover:text-white
-                  transition-all duration-200 group border-l-[3px] border-l-transparent"
-           [class.justify-center]="collapsed()"
-           [class.px-2]="collapsed()"
-           [attr.title]="collapsed() ? item.label : null">
-
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-primary/15 text-primary-light border-l-[3px] border-l-primary"
+          [routerLinkActiveOptions]="{ exact: false }"
+          class="flex items-center gap-3 rounded-lg px-3 py-2.5 body-3 font-medium text-font-primary hover:bg-bg-hover hover:text-white transition-all duration-200 group border-l-[3px] border-l-transparent"
+          [class.justify-center]="collapsed()"
+          [class.px-2]="collapsed()"
+          [attr.title]="collapsed() ? item.label : null"
+        >
           <!-- Icon -->
-          <fa-icon [icon]="item.icon"
-                   class="w-5 h-5 text-font-muted group-hover:text-primary-light
-                          transition-all group-hover:scale-110">
+          <fa-icon
+            [icon]="item.icon"
+            class="w-5 h-5 text-font-muted group-hover:text-primary-light transition-all group-hover:scale-110"
+          >
           </fa-icon>
 
           <!-- Label + Badge (hidden when collapsed()) -->
@@ -77,19 +90,23 @@
             <span>{{ item.label }}</span>
 
             @if (item.badge) {
-              <span class="ml-auto px-2 py-0.5 rounded-full body-4 font-medium"
-                    [class.bg-warning/20]="item.badgeColor === 'warning'"
-                    [class.text-warning]="item.badgeColor === 'warning'"
-                    [class.bg-info/20]="item.badgeColor === 'info'"
-                    [class.text-info]="item.badgeColor === 'info'"
-                    [class.bg-success/20]="item.badgeColor === 'success'"
-                    [class.text-success]="item.badgeColor === 'success'">
+              <span
+                class="ml-auto px-2 py-0.5 rounded-full body-4 font-medium"
+                [class.bg-warning/20]="item.badgeColor === 'warning'"
+                [class.text-warning]="item.badgeColor === 'warning'"
+                [class.bg-info/20]="item.badgeColor === 'info'"
+                [class.text-info]="item.badgeColor === 'info'"
+                [class.bg-success/20]="item.badgeColor === 'success'"
+                [class.text-success]="item.badgeColor === 'success'"
+              >
                 {{ item.badge }}
               </span>
             }
 
             @if (item.dot) {
-              <div class="ml-auto w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              <div
+                class="ml-auto w-2 h-2 bg-success rounded-full animate-pulse"
+              ></div>
             }
           }
         </a>
@@ -98,8 +115,9 @@
 
     <!-- ═══ Quick Actions ═══ -->
     @if (!collapsed()) {
-      <div class="px-3 mb-2 mt-6 body-4
-                  text-font-muted uppercase tracking-wider font-semibold">
+      <div
+        class="px-3 mb-2 mt-6 body-4 text-font-muted uppercase tracking-wider font-semibold"
+      >
         Quick Actions
       </div>
     } @else {
@@ -107,17 +125,17 @@
     }
 
     @for (action of quickActions; track action.action) {
-      <button (click)="handleQuickAction(action.action)"
-              class="w-full flex items-center gap-3 rounded-lg px-3 py-2.5
-                     body-3 font-medium text-font-primary
-                     hover:bg-bg-hover hover:text-white
-                     transition-all duration-200 group"
-              [class.justify-center]="collapsed()"
-              [class.px-2]="collapsed()"
-              [attr.title]="collapsed() ? action.label : null">
-        <fa-icon [icon]="action.icon"
-                 class="w-5 h-5 text-font-muted group-hover:text-primary-light
-                        transition-all group-hover:scale-110">
+      <button
+        (click)="handleQuickAction(action.action)"
+        class="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 body-3 font-medium text-font-primary hover:bg-bg-hover hover:text-white transition-all duration-200 group"
+        [class.justify-center]="collapsed()"
+        [class.px-2]="collapsed()"
+        [attr.title]="collapsed() ? action.label : null"
+      >
+        <fa-icon
+          [icon]="action.icon"
+          class="w-5 h-5 text-font-muted group-hover:text-primary-light transition-all group-hover:scale-110"
+        >
         </fa-icon>
         @if (!collapsed()) {
           <span>{{ action.label }}</span>
@@ -139,8 +157,10 @@
           </div>
         </div>
         <div class="w-full bg-bg-card rounded-full h-1.5">
-          <div class="bg-success h-1.5 rounded-full transition-all duration-500"
-               [style.width.%]="systemHealth()"></div>
+          <div
+            class="bg-success h-1.5 rounded-full transition-all duration-500"
+            [style.width.%]="systemHealth()"
+          ></div>
         </div>
       </div>
 

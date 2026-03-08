@@ -1,27 +1,35 @@
 <!-- settings.component.html -->
-<div class="min-h-screen bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary text-white pt-24 pb-12 px-6">
+<div
+  class="min-h-screen bg-linear-to-b from-bg-primary via-bg-secondary to-bg-primary text-font-primary pt-24 pb-12 px-6"
+>
   <div class="max-w-6xl mx-auto">
-
     <!-- Header -->
     <div class="mb-8">
       <h1 class="headline-2 mb-2">
         <span class="gradient-text">Settings</span>
       </h1>
-      <p class="text-font-primary body-2">Customize your SignSync experience</p>
+      <p class="text-font-secondary body-2">
+        Customize your SignSync experience
+      </p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
       <!-- ═══ Left Sidebar Navigation ═══ -->
       <div class="lg:col-span-1">
-        <nav class="bg-bg-card rounded-2xl border border-border-primary p-4 sticky top-28">
+        <nav
+          class="bg-bg-card rounded-2xl border border-border-primary p-4 sticky top-28"
+        >
           <ul class="space-y-1">
             @for (section of sections; track section.id) {
               <li>
-                <button (click)="setSection(section.id)"
-                  [class]="activeSection() === section.id
-                    ? 'w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/20 border border-primary/30 text-white'
-                    : 'w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-bg-hover text-font-muted hover:text-white transition-all'">
+                <button
+                  (click)="setSection(section.id)"
+                  [class]="
+                    activeSection() === section.id
+                      ? 'w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/20 border border-primary/30 text-primary font-semibold'
+                      : 'w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-bg-hover text-font-muted hover:text-font-primary transition-all'
+                  "
+                >
                   <span class="text-xl">{{ section.icon }}</span>
                   <span class="body-3 font-medium">{{ section.label }}</span>
                 </button>
@@ -33,24 +41,35 @@
 
       <!-- ═══ Right Content Area ═══ -->
       <div class="lg:col-span-3 space-y-6">
-
         <!-- ───── Appearance ───── -->
-        @if (activeSection() === 'appearance') {
-          <div class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in">
-            <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
+        @if (activeSection() === "appearance") {
+          <div
+            class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in"
+          >
+            <h3
+              class="text-lg font-semibold text-font-primary mb-6 flex items-center gap-2"
+            >
               <span class="text-2xl">🎨</span> Appearance
             </h3>
 
             <!-- Theme -->
             <div class="mb-6">
-              <div class="block text-sm font-medium text-font-muted mb-3">Theme</div>
+              <div class="block text-sm font-medium text-font-muted mb-3">
+                Theme
+              </div>
               <div class="flex gap-3">
                 @for (theme of themeOptions; track theme) {
-                  <button (click)="updateSetting('theme', theme)"
-                    [class]="settings().theme === theme
-                      ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-white font-semibold'
-                      : 'flex-1 py-3 rounded-xl bg-bg-primary border border-border-primary text-font-muted hover:border-primary/50 transition-all'">
-                    {{ theme === 'dark' ? '🌙' : theme === 'light' ? '☀️' : '💻' }}
+                  <button
+                    (click)="updateSetting('theme', theme)"
+                    [class]="
+                      settings().theme === theme
+                        ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-primary font-semibold'
+                        : 'flex-1 py-3 rounded-xl bg-bg-primary border border-border-primary text-font-muted hover:border-primary/50 transition-all'
+                    "
+                  >
+                    {{
+                      theme === "dark" ? "🌙" : theme === "light" ? "☀️" : "💻"
+                    }}
                     {{ theme | titlecase }}
                   </button>
                 }
@@ -59,14 +78,26 @@
 
             <!-- Font Size -->
             <div class="mb-6">
-              <div class="block text-sm font-medium text-font-muted mb-3">Font Size</div>
+              <div class="block text-sm font-medium text-font-muted mb-3">
+                Font Size
+              </div>
               <div class="flex gap-3">
                 @for (size of fontOptions; track size) {
-                  <button (click)="updateSetting('fontSize', size)"
-                    [class]="settings().fontSize === size
-                      ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-white font-semibold'
-                      : 'flex-1 py-3 rounded-xl bg-bg-primary border border-border-primary text-font-muted hover:border-primary/50 transition-all'"
-                    [style.font-size]="size === 'small' ? '13px' : size === 'large' ? '18px' : '15px'">
+                  <button
+                    (click)="updateSetting('fontSize', size)"
+                    [class]="
+                      settings().fontSize === size
+                        ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-primary font-semibold'
+                        : 'flex-1 py-3 rounded-xl bg-bg-primary border border-border-primary text-font-muted hover:border-primary/50 transition-all'
+                    "
+                    [style.font-size]="
+                      size === 'small'
+                        ? '13px'
+                        : size === 'large'
+                          ? '18px'
+                          : '15px'
+                    "
+                  >
                     Aa — {{ size | titlecase }}
                   </button>
                 }
@@ -74,61 +105,192 @@
             </div>
 
             <!-- Toggles -->
-            <div class="space-y-4">
-              <div class="flex items-center justify-between p-4 bg-bg-primary/50 rounded-xl">
+            <div class="space-y-3">
+              <div
+                class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+              >
                 <div>
-                  <p class="font-medium">Reduce Motion</p>
-                  <p class="text-sm text-font-muted">Disable animations and transitions</p>
+                  <p class="font-medium text-font-primary">Reduce Motion</p>
+                  <p class="text-sm text-font-muted">
+                    Disable animations and transitions
+                  </p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" [checked]="settings().reduceMotion"
-                         (change)="updateSetting('reduceMotion', !settings().reduceMotion)"
-                         class="sr-only peer" />
-                  <div class="w-11 h-6 bg-neutral-d-grey rounded-full peer
-                              peer-checked:bg-primary transition-colors
-                              after:content-[''] after:absolute after:top-0.5 after:start-0.5
-                              after:bg-white after:rounded-full after:h-5 after:w-5
-                              after:transition-all peer-checked:after:translate-x-full"></div>
+                  <input
+                    type="checkbox"
+                    [checked]="settings().reduceMotion"
+                    (change)="
+                      updateSetting('reduceMotion', !settings().reduceMotion)
+                    "
+                    class="sr-only peer"
+                  />
+                  <div
+                    class="w-11 h-6 bg-border-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+                  ></div>
                 </label>
               </div>
 
-              <div class="flex items-center justify-between p-4 bg-bg-primary/50 rounded-xl">
+              <div
+                class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+              >
                 <div>
-                  <p class="font-medium">Compact Mode</p>
-                  <p class="text-sm text-font-muted">Reduce spacing in dashboard cards</p>
+                  <p class="font-medium text-font-primary">Compact Mode</p>
+                  <p class="text-sm text-font-muted">
+                    Reduce spacing in dashboard cards
+                  </p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" [checked]="settings().compactMode"
-                         (change)="updateSetting('compactMode', !settings().compactMode)"
-                         class="sr-only peer" />
-                  <div class="w-11 h-6 bg-neutral-d-grey rounded-full peer
-                              peer-checked:bg-primary transition-colors
-                              after:content-[''] after:absolute after:top-0.5 after:start-0.5
-                              after:bg-white after:rounded-full after:h-5 after:w-5
-                              after:transition-all peer-checked:after:translate-x-full"></div>
+                  <input
+                    type="checkbox"
+                    [checked]="settings().compactMode"
+                    (change)="
+                      updateSetting('compactMode', !settings().compactMode)
+                    "
+                    class="sr-only peer"
+                  />
+                  <div
+                    class="w-11 h-6 bg-border-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+                  ></div>
                 </label>
               </div>
             </div>
           </div>
         }
 
+        <!-- ───── Notifications ───── -->
+        @if (activeSection() === "notifications") {
+          <div
+            class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in"
+          >
+            <h3
+              class="text-lg font-semibold text-font-primary mb-6 flex items-center gap-2"
+            >
+              <span class="text-2xl">🔔</span> Notifications
+            </h3>
+
+            <div class="space-y-3">
+              @for (
+                toggle of [
+                  {
+                    key: "pushNotifications",
+                    label: "Push Notifications",
+                    desc: "Receive in-app push alerts",
+                  },
+                  {
+                    key: "emailNotifications",
+                    label: "Email Notifications",
+                    desc: "Receive updates in your inbox",
+                  },
+                  {
+                    key: "streakReminder",
+                    label: "Streak Reminder",
+                    desc: "Daily nudge to keep your streak alive",
+                  },
+                  {
+                    key: "weeklyReport",
+                    label: "Weekly Report",
+                    desc: "A summary of your weekly progress",
+                  },
+                  {
+                    key: "achievementAlerts",
+                    label: "Achievement Alerts",
+                    desc: "Notify when you earn a badge or milestone",
+                  },
+                ];
+                track toggle.key
+              ) {
+                <div
+                  class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+                >
+                  <div>
+                    <p class="font-medium text-font-primary">
+                      {{ toggle.label }}
+                    </p>
+                    <p class="text-sm text-font-muted">{{ toggle.desc }}</p>
+                  </div>
+                  <label
+                    class="relative inline-flex items-center cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="$any(settings())[toggle.key]"
+                      (change)="
+                        updateSetting(
+                          $any(toggle.key),
+                          !$any(settings())[toggle.key]
+                        )
+                      "
+                      class="sr-only peer"
+                    />
+                    <div
+                      class="w-11 h-6 bg-border-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+                    ></div>
+                  </label>
+                </div>
+              }
+
+              <!-- Reminder Time -->
+              <div class="p-4 bg-bg-secondary rounded-xl">
+                <label
+                  for="reminderTime"
+                  class="block text-sm font-medium text-font-primary mb-2"
+                >
+                  Daily Reminder Time
+                </label>
+                <p class="text-sm text-font-muted mb-3">
+                  When should we remind you to practice?
+                </p>
+                <input
+                  id="reminderTime"
+                  type="time"
+                  [value]="settings().reminderTime"
+                  (change)="
+                    updateSetting('reminderTime', $any($event.target).value)
+                  "
+                  class="px-3 py-2 rounded-lg border border-border-primary bg-bg-card text-font-primary focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+        }
+
         <!-- ───── Camera & Detection ───── -->
-        @if (activeSection() === 'camera') {
-          <div class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in">
-            <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
+        @if (activeSection() === "camera") {
+          <div
+            class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in"
+          >
+            <h3
+              class="text-lg font-semibold text-font-primary mb-6 flex items-center gap-2"
+            >
               <span class="text-2xl">📷</span> Camera & Detection
             </h3>
 
             <!-- Confidence Threshold Slider -->
             <div class="mb-6">
-              <label for="confidenceThreshold" class="block text-sm font-medium text-font-muted mb-2">
-                Confidence Threshold: <span class="text-primary font-bold">{{ settings().confidenceThreshold }}%</span>
+              <label
+                for="confidenceThreshold"
+                class="block text-sm font-medium text-font-muted mb-2"
+              >
+                Confidence Threshold:
+                <span class="text-primary font-bold"
+                  >{{ settings().confidenceThreshold }}%</span
+                >
               </label>
-              <input id="confidenceThreshold" type="range" min="50" max="95" step="5"
-                     [value]="settings().confidenceThreshold"
-                     (input)="updateSetting('confidenceThreshold', $any($event.target).value)"
-                     class="w-full h-2 bg-bg-primary rounded-lg appearance-none cursor-pointer
-                            accent-primary" />
+              <input
+                id="confidenceThreshold"
+                type="range"
+                min="50"
+                max="95"
+                step="5"
+                [value]="settings().confidenceThreshold"
+                (input)="
+                  updateSetting(
+                    'confidenceThreshold',
+                    $any($event.target).value
+                  )
+                "
+                class="w-full h-2 bg-bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
               <div class="flex justify-between text-xs text-font-muted mt-1">
                 <span>50% (More detections)</span>
                 <span>95% (Higher accuracy)</span>
@@ -137,14 +299,26 @@
 
             <!-- Detection Speed -->
             <div class="mb-6">
-              <div class="block text-sm font-medium text-font-muted mb-3">Detection Speed</div>
+              <div class="block text-sm font-medium text-font-muted mb-3">
+                Detection Speed
+              </div>
               <div class="flex gap-3">
                 @for (speed of speedOptions; track speed) {
-                  <button (click)="updateSetting('detectionSpeed', speed)"
-                    [class]="settings().detectionSpeed === speed
-                      ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-white font-semibold'
-                      : 'flex-1 py-3 rounded-xl bg-bg-primary border border-border-primary text-font-muted hover:border-primary/50 transition-all'">
-                    {{ speed === 'fast' ? '⚡' : speed === 'accurate' ? '🎯' : '⚖️' }}
+                  <button
+                    (click)="updateSetting('detectionSpeed', speed)"
+                    [class]="
+                      settings().detectionSpeed === speed
+                        ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-primary font-semibold'
+                        : 'flex-1 py-3 rounded-xl bg-bg-primary border border-border-primary text-font-muted hover:border-primary/50 transition-all'
+                    "
+                  >
+                    {{
+                      speed === "fast"
+                        ? "⚡"
+                        : speed === "accurate"
+                          ? "🎯"
+                          : "⚖️"
+                    }}
                     {{ speed | titlecase }}
                   </button>
                 }
@@ -152,26 +326,53 @@
             </div>
 
             <!-- Camera Toggles -->
-            <div class="space-y-4">
-              @for (toggle of [
-                { key: 'mirrorVideo', label: 'Mirror Video', desc: 'Flip video horizontally (selfie mode)' },
-                { key: 'showBoundingBox', label: 'Show Bounding Box', desc: 'Draw rectangle around detected hand' },
-                { key: 'showConfidence', label: 'Show Confidence', desc: 'Display confidence % on screen' }
-              ]; track toggle.key) {
-                <div class="flex items-center justify-between p-4 bg-bg-primary/50 rounded-xl">
+            <div class="space-y-3">
+              @for (
+                toggle of [
+                  {
+                    key: "mirrorVideo",
+                    label: "Mirror Video",
+                    desc: "Flip video horizontally (selfie mode)",
+                  },
+                  {
+                    key: "showBoundingBox",
+                    label: "Show Bounding Box",
+                    desc: "Draw rectangle around detected hand",
+                  },
+                  {
+                    key: "showConfidence",
+                    label: "Show Confidence",
+                    desc: "Display confidence % on screen",
+                  },
+                ];
+                track toggle.key
+              ) {
+                <div
+                  class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+                >
                   <div>
-                    <p class="font-medium">{{ toggle.label }}</p>
+                    <p class="font-medium text-font-primary">
+                      {{ toggle.label }}
+                    </p>
                     <p class="text-sm text-font-muted">{{ toggle.desc }}</p>
                   </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" [checked]="$any(settings())[toggle.key]"
-                           (change)="updateSetting($any(toggle.key), !$any(settings())[toggle.key])"
-                           class="sr-only peer" />
-                    <div class="w-11 h-6 bg-neutral-d-grey rounded-full peer
-                                peer-checked:bg-primary transition-colors
-                                after:content-[''] after:absolute after:top-0.5 after:start-0.5
-                                after:bg-white after:rounded-full after:h-5 after:w-5
-                                after:transition-all peer-checked:after:translate-x-full"></div>
+                  <label
+                    class="relative inline-flex items-center cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="$any(settings())[toggle.key]"
+                      (change)="
+                        updateSetting(
+                          $any(toggle.key),
+                          !$any(settings())[toggle.key]
+                        )
+                      "
+                      class="sr-only peer"
+                    />
+                    <div
+                      class="w-11 h-6 bg-border-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+                    ></div>
                   </label>
                 </div>
               }
@@ -179,67 +380,389 @@
           </div>
         }
 
-        <!-- ... (other sections follow the same pattern) ... -->
+        <!-- ───── Language & Region ───── -->
+        @if (activeSection() === "language") {
+          <div
+            class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in"
+          >
+            <h3
+              class="text-lg font-semibold text-font-primary mb-6 flex items-center gap-2"
+            >
+              <span class="text-2xl">🌐</span> Language & Region
+            </h3>
+
+            <div class="space-y-4">
+              <!-- Sign Language (fixed ASL) -->
+              <div class="p-4 bg-bg-secondary rounded-xl">
+                <p class="font-medium text-font-primary mb-1">Sign Language</p>
+                <p class="text-sm text-font-muted mb-3">
+                  The model is trained exclusively on American Sign Language
+                  (ASL).
+                </p>
+                <div
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-lg"
+                >
+                  <span class="text-lg">🤟</span>
+                  <span class="font-semibold text-primary"
+                    >ASL — American Sign Language</span
+                  >
+                </div>
+              </div>
+
+              <!-- Date Format -->
+              <div class="p-4 bg-bg-secondary rounded-xl">
+                <label
+                  for="dateFormat"
+                  class="block font-medium text-font-primary mb-1"
+                  >Date Format</label
+                >
+                <p class="text-sm text-font-muted mb-3">
+                  How dates are displayed throughout the app.
+                </p>
+                <select
+                  id="dateFormat"
+                  [value]="settings().dateFormat"
+                  (change)="
+                    updateSetting('dateFormat', $any($event.target).value)
+                  "
+                  class="w-full px-3 py-2 rounded-lg border border-border-primary bg-bg-card text-font-primary focus:outline-none focus:border-primary transition-colors"
+                >
+                  <option value="DD/MM/YYYY">DD/MM/YYYY — 25/07/2025</option>
+                  <option value="MM/DD/YYYY">MM/DD/YYYY — 07/25/2025</option>
+                </select>
+              </div>
+
+              <!-- Time Format -->
+              <div class="p-4 bg-bg-secondary rounded-xl">
+                <label
+                  for="timeFormat"
+                  class="block font-medium text-font-primary mb-1"
+                  >Time Format</label
+                >
+                <p class="text-sm text-font-muted mb-3">
+                  Choose between 12-hour and 24-hour clock.
+                </p>
+                <div class="flex gap-3">
+                  @for (fmt of timeFormatOptions; track fmt) {
+                    <button
+                      (click)="updateSetting('timeFormat', fmt)"
+                      [class]="
+                        settings().timeFormat === fmt
+                          ? 'flex-1 py-3 rounded-xl bg-primary/20 border-2 border-primary text-primary font-semibold'
+                          : 'flex-1 py-3 rounded-xl bg-bg-primary border border-border-primary text-font-muted hover:border-primary/50 transition-all'
+                      "
+                    >
+                      {{ fmt === "12h" ? "🕐 12-hour (AM/PM)" : "🕐 24-hour" }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ───── Accessibility ───── -->
+        @if (activeSection() === "accessibility") {
+          <div
+            class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in"
+          >
+            <h3
+              class="text-lg font-semibold text-font-primary mb-6 flex items-center gap-2"
+            >
+              <span class="text-2xl">♿</span> Accessibility
+            </h3>
+
+            <div class="space-y-3">
+              @for (
+                toggle of [
+                  {
+                    key: "highContrast",
+                    label: "High Contrast",
+                    desc: "Increase colour contrast for better visibility",
+                  },
+                  {
+                    key: "screenReaderMode",
+                    label: "Screen Reader Mode",
+                    desc: "Optimize layout for screen readers",
+                  },
+                  {
+                    key: "keyboardHints",
+                    label: "Keyboard Hints",
+                    desc: "Show keyboard shortcut hints in the UI",
+                  },
+                  {
+                    key: "audioFeedback",
+                    label: "Audio Feedback",
+                    desc: "Play sounds when a sign is detected",
+                  },
+                ];
+                track toggle.key
+              ) {
+                <div
+                  class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+                >
+                  <div>
+                    <p class="font-medium text-font-primary">
+                      {{ toggle.label }}
+                    </p>
+                    <p class="text-sm text-font-muted">{{ toggle.desc }}</p>
+                  </div>
+                  <label
+                    class="relative inline-flex items-center cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="$any(settings())[toggle.key]"
+                      (change)="
+                        updateSetting(
+                          $any(toggle.key),
+                          !$any(settings())[toggle.key]
+                        )
+                      "
+                      class="sr-only peer"
+                    />
+                    <div
+                      class="w-11 h-6 bg-border-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+                    ></div>
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ───── Learning ───── -->
+        @if (activeSection() === "learning") {
+          <div
+            class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in"
+          >
+            <h3
+              class="text-lg font-semibold text-font-primary mb-6 flex items-center gap-2"
+            >
+              <span class="text-2xl">🎯</span> Learning
+            </h3>
+
+            <!-- Daily Goal -->
+            <div class="mb-6">
+              <label
+                for="dailyGoal"
+                class="block text-sm font-medium text-font-muted mb-2"
+              >
+                Daily Practice Goal:
+                <span class="text-primary font-bold"
+                  >{{ settings().dailyGoalMinutes }} min</span
+                >
+              </label>
+              <input
+                id="dailyGoal"
+                type="range"
+                min="5"
+                max="60"
+                step="5"
+                [value]="settings().dailyGoalMinutes"
+                (input)="
+                  updateSetting('dailyGoalMinutes', +$any($event.target).value)
+                "
+                class="w-full h-2 bg-bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <div class="flex justify-between text-xs text-font-muted mt-1">
+                <span>5 min (Quick)</span>
+                <span>60 min (Intensive)</span>
+              </div>
+            </div>
+
+            <!-- Session Duration -->
+            <div class="mb-6 p-4 bg-bg-secondary rounded-xl">
+              <label
+                for="sessionDuration"
+                class="block font-medium text-font-primary mb-1"
+                >Session Duration</label
+              >
+              <p class="text-sm text-font-muted mb-3">
+                Max minutes per single practice session.
+              </p>
+              <div class="flex items-center gap-3">
+                <input
+                  id="sessionDuration"
+                  type="number"
+                  min="1"
+                  max="60"
+                  [value]="settings().sessionDuration"
+                  (input)="
+                    updateSetting('sessionDuration', +$any($event.target).value)
+                  "
+                  class="w-24 px-3 py-2 rounded-lg border border-border-primary bg-bg-card text-font-primary text-center focus:outline-none focus:border-primary"
+                />
+                <span class="text-font-muted text-sm">minutes</span>
+              </div>
+            </div>
+
+            <!-- Learning Toggles -->
+            <div class="space-y-3">
+              @for (
+                toggle of [
+                  {
+                    key: "autoInactivityPause",
+                    label: "Auto-Pause on Inactivity",
+                    desc: "Pause session when no movement is detected",
+                  },
+                  {
+                    key: "showHints",
+                    label: "Show Hints",
+                    desc: "Display tips during practice sessions",
+                  },
+                ];
+                track toggle.key
+              ) {
+                <div
+                  class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+                >
+                  <div>
+                    <p class="font-medium text-font-primary">
+                      {{ toggle.label }}
+                    </p>
+                    <p class="text-sm text-font-muted">{{ toggle.desc }}</p>
+                  </div>
+                  <label
+                    class="relative inline-flex items-center cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="$any(settings())[toggle.key]"
+                      (change)="
+                        updateSetting(
+                          $any(toggle.key),
+                          !$any(settings())[toggle.key]
+                        )
+                      "
+                      class="sr-only peer"
+                    />
+                    <div
+                      class="w-11 h-6 bg-border-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+                    ></div>
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+        }
 
         <!-- ───── Privacy & Data ───── -->
-        @if (activeSection() === 'privacy') {
-          <div class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in">
-            <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
+        @if (activeSection() === "privacy") {
+          <div
+            class="bg-bg-card rounded-2xl border border-border-primary p-6 animate-fade-in"
+          >
+            <h3
+              class="text-lg font-semibold text-font-primary mb-6 flex items-center gap-2"
+            >
               <span class="text-2xl">🔒</span> Privacy & Data
             </h3>
 
             <div class="space-y-4">
               <!-- Download Data -->
-              <div class="flex items-center justify-between p-4 bg-bg-primary/50 rounded-xl group">
+              <div
+                class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+              >
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                  <div
+                    class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center"
+                  >
                     <span class="text-xl">📥</span>
                   </div>
                   <div>
-                    <p class="font-medium">Download My Data</p>
-                    <p class="text-sm text-font-muted">Export all your data (GDPR compliant)</p>
+                    <p class="font-medium text-font-primary">
+                      Download My Data
+                    </p>
+                    <p class="text-sm text-font-muted">
+                      Export all your data (GDPR compliant)
+                    </p>
                   </div>
                 </div>
-                <button (click)="downloadMyData()"
-                        class="px-4 py-2 bg-primary/10 border border-primary/30 text-primary rounded-lg
-                               hover:bg-primary/20 transition-all">
+                <button
+                  (click)="downloadMyData()"
+                  class="px-4 py-2 bg-primary/10 border border-primary/30 text-primary rounded-lg hover:bg-primary/20 transition-all"
+                >
                   Export
                 </button>
               </div>
 
               <!-- Clear History -->
-              <div class="flex items-center justify-between p-4 bg-bg-primary/50 rounded-xl group">
+              <div
+                class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+              >
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-warning/20 rounded-lg flex items-center justify-center">
+                  <div
+                    class="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center"
+                  >
                     <span class="text-xl">🗑️</span>
                   </div>
                   <div>
-                    <p class="font-medium">Clear Detection History</p>
-                    <p class="text-sm text-font-muted">Remove all past detection records</p>
+                    <p class="font-medium text-font-primary">
+                      Clear Detection History
+                    </p>
+                    <p class="text-sm text-font-muted">
+                      Remove all past detection records
+                    </p>
                   </div>
                 </div>
-                <button (click)="clearDetectionHistory()"
-                        [disabled]="isClearing().history"
-                        class="px-4 py-2 bg-warning/10 border border-warning/30 text-warning rounded-lg
-                               hover:bg-warning/20 transition-all disabled:opacity-50">
-                  {{ isClearing().history ? 'Clearing...' : 'Clear' }}
+                <button
+                  (click)="clearDetectionHistory()"
+                  [disabled]="isClearing().history"
+                  class="px-4 py-2 bg-warning/10 border border-warning/30 text-warning rounded-lg hover:bg-warning/20 transition-all disabled:opacity-50"
+                >
+                  {{ isClearing().history ? "Clearing..." : "Clear" }}
                 </button>
               </div>
 
+              <!-- Analytics -->
+              <div
+                class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl"
+              >
+                <div>
+                  <p class="font-medium text-font-primary">Analytics Opt-In</p>
+                  <p class="text-sm text-font-muted">
+                    Help improve SignSync with anonymous usage data
+                  </p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    [checked]="settings().analyticsOptIn"
+                    (change)="
+                      updateSetting(
+                        'analyticsOptIn',
+                        !settings().analyticsOptIn
+                      )
+                    "
+                    class="sr-only peer"
+                  />
+                  <div
+                    class="w-11 h-6 bg-border-secondary rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+                  ></div>
+                </label>
+              </div>
+
               <!-- Delete Account -->
-              <div class="flex items-center justify-between p-4 bg-danger/5 rounded-xl border border-danger/20">
+              <div
+                class="flex items-center justify-between p-4 bg-danger/5 rounded-xl border border-danger/20"
+              >
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-danger/20 rounded-lg flex items-center justify-center">
+                  <div
+                    class="w-10 h-10 bg-danger/10 rounded-lg flex items-center justify-center"
+                  >
                     <span class="text-xl">⚠️</span>
                   </div>
                   <div>
                     <p class="font-medium text-danger">Delete Account</p>
-                    <p class="text-sm text-font-muted">Permanently delete your account</p>
+                    <p class="text-sm text-font-muted">
+                      Permanently delete your account and all data
+                    </p>
                   </div>
                 </div>
-                <button (click)="navigateToDeleteAccount()"
-                        class="px-4 py-2 bg-danger/10 border border-danger text-danger rounded-lg
-                               hover:bg-danger hover:text-white transition-all">
+                <button
+                  (click)="navigateToDeleteAccount()"
+                  class="px-4 py-2 bg-danger/10 border border-danger text-danger rounded-lg hover:bg-danger hover:text-white transition-all"
+                >
                   Go to Profile
                 </button>
               </div>
@@ -249,27 +772,27 @@
 
         <!-- ═══ Save Bar ═══ -->
         @if (hasUnsavedChanges()) {
-          <div class="sticky bottom-6 bg-bg-card/95 backdrop-blur-xl rounded-2xl border border-primary/30
-                      p-4 flex items-center justify-between shadow-[0_0_30px_rgba(139,92,246,0.3)]
-                      animate-fade-in">
+          <div
+            class="sticky bottom-6 bg-bg-card/95 backdrop-blur-xl rounded-2xl border border-primary/30 p-4 flex items-center justify-between shadow-[0_0_30px_rgba(139,92,246,0.2)] animate-fade-in"
+          >
             <p class="text-font-muted body-3">You have unsaved changes</p>
             <div class="flex gap-3">
-              <button (click)="resetToDefaults()"
-                      class="px-4 py-2 bg-bg-primary border border-border-primary text-white rounded-lg
-                             hover:border-primary transition-all">
+              <button
+                (click)="resetToDefaults()"
+                class="px-4 py-2 bg-bg-secondary border border-border-primary text-font-primary rounded-lg hover:border-primary transition-all"
+              >
                 Reset Defaults
               </button>
-              <button (click)="saveSettings()"
-                      [disabled]="isSaving()"
-                      class="px-6 py-2 bg-linear-to-r from-primary via-violet-500 to-primary
-                             text-white font-semibold rounded-lg
-                             hover:scale-105 transition-all disabled:opacity-50">
-                {{ isSaving() ? '⏳ Saving...' : '💾 Save Changes' }}
+              <button
+                (click)="saveSettings()"
+                [disabled]="isSaving()"
+                class="common-login-button px-6 py-2 disabled:opacity-50"
+              >
+                {{ isSaving() ? "⏳ Saving..." : "💾 Save Changes" }}
               </button>
             </div>
           </div>
         }
-
       </div>
     </div>
   </div>

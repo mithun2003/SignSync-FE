@@ -3,7 +3,7 @@ import {
   FaceLandmarker,
   FilesetResolver,
   FaceLandmarkerResult,
-  Category
+  Category,
 } from '@mediapipe/tasks-vision';
 
 @Injectable({ providedIn: 'root' })
@@ -21,17 +21,17 @@ export class FaceDetectService {
     if (this._isReady()) return;
 
     const vision = await FilesetResolver.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm',
     );
 
     this.faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
       baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-        delegate: 'GPU' // Use GPU for face (it's heavier than hands)
+        delegate: 'GPU',
       },
-      outputFaceBlendshapes: true, // 👈 CRITICAL: This gives us "Smile", "Frown", etc.
+      outputFaceBlendshapes: true,
       runningMode: 'VIDEO',
-      numFaces: 1
+      numFaces: 1,
     });
 
     this._isReady.set(true);
@@ -39,16 +39,28 @@ export class FaceDetectService {
   }
 
   // Detect Face & Calculate Emotion
-  detectEmotion(video: HTMLVideoElement, timestamp: number): { 
-    emotion: string; score: number; 
+  detectEmotion(
+    video: HTMLVideoElement,
+    timestamp: number,
+  ): {
+    emotion: string;
+    score: number;
   } | null {
     if (!this.faceLandmarker || !this._isReady()) return null;
 
     // Skip frame if not enough time has elapsed (avoids running heavy ML every rAF)
-    if (timestamp - this.lastDetectionTs < this.MIN_FACE_INTERVAL_MS) return null;
+    if (timestamp - this.lastDetectionTs < this.MIN_FACE_INTERVAL_MS)
+      return null;
     this.lastDetectionTs = timestamp;
 
-    const result: FaceLandmarkerResult = this.faceLandmarker.detectForVideo(video, timestamp);
+    let result: FaceLandmarkerResult;
+    try {
+      result = this.faceLandmarker.detectForVideo(video, timestamp);
+    } catch (err) {
+      // Transient WebGL errors on first call — skip this frame, recover next call
+      console.warn('[FaceDetectService] detectForVideo skipped frame:', err);
+      return null;
+    }
 
     if (result.faceBlendshapes && result.faceBlendshapes.length > 0) {
       // The first face's blendshapes
@@ -59,18 +71,24 @@ export class FaceDetectService {
   }
 
   // 🔥 The Logic: Map Muscle Movements to Emotions
-  private classifyEmotion(shapes: Category[]): { emotion: string; score: number } {
+  private classifyEmotion(shapes: Category[]): {
+    emotion: string;
+    score: number;
+  } {
     // Helper to find score of a specific movement
-    const getScore = (name: string) => shapes.find(s => s.categoryName === name)?.score || 0;
+    const getScore = (name: string) =>
+      shapes.find((s) => s.categoryName === name)?.score || 0;
 
     // 1. Happy (Smile)
-    const smile = (getScore('mouthSmileLeft') + getScore('mouthSmileRight')) / 2;
-    
+    const smile =
+      (getScore('mouthSmileLeft') + getScore('mouthSmileRight')) / 2;
+
     // 2. Surprised (Raised Eyebrows + Open Mouth)
     const surprise = (getScore('browInnerUp') + getScore('jawOpen')) / 2;
 
     // 3. Angry (Frown + Brow Down)
-    const frown = (getScore('mouthFrownLeft') + getScore('mouthFrownRight')) / 2;
+    const frown =
+      (getScore('mouthFrownLeft') + getScore('mouthFrownRight')) / 2;
     const browDown = (getScore('browDownLeft') + getScore('browDownRight')) / 2;
     const anger = (frown + browDown) / 2;
 
@@ -87,7 +105,9 @@ export class FaceDetectService {
 
     // Find highest scoring emotion
     // Threshold: If all are low, assume "Neutral"
-    const dominant = emotions.reduce((prev, current) => (current.score > prev.score ? current : prev));
+    const dominant = emotions.reduce((prev, current) =>
+      current.score > prev.score ? current : prev,
+    );
 
     if (dominant.score > 0.4) {
       return { emotion: dominant.label, score: dominant.score };

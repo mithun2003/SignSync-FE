@@ -1,0 +1,166 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="headline-3 text-font-primary">Analytics</h1>
+      <p class="body-3 text-font-muted mt-1">
+        Usage statistics and platform performance insights.
+      </p>
+    </div>
+    <!-- Period selector -->
+    <div class="flex gap-2">
+      @for (p of periods; track p.key) {
+        <button
+          (click)="setPeriod(p.key)"
+          [class]="
+            selectedPeriod() === p.key
+              ? 'px-4 py-2 rounded-lg body-4 font-medium border border-primary bg-primary text-white'
+              : 'px-4 py-2 rounded-lg body-4 font-medium border border-border-primary bg-bg-card text-font-muted hover:border-primary transition-all duration-200'
+          "
+        >
+          {{ p.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div
+      class="bg-bg-card rounded-2xl border border-border-primary p-12 text-center"
+    >
+      <div
+        class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"
+      ></div>
+      <p class="text-font-muted body-3">Loading analytics...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (errorMessage() && !isLoading()) {
+    <div
+      class="bg-danger/10 border border-danger/30 rounded-xl p-4 flex items-center gap-3"
+    >
+      <span class="text-2xl">⚠️</span>
+      <p class="text-danger body-3">{{ errorMessage() }}</p>
+    </div>
+  }
+
+  @if (!isLoading() && !errorMessage()) {
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      @for (card of statCards(); track card.label) {
+        <div class="bg-bg-card rounded-2xl border border-border-primary p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-2xl">{{ card.icon }}</span>
+            <span
+              class="body-4 font-semibold px-2 py-0.5 rounded-full"
+              [class.bg-success\/10]="card.positive"
+              [class.text-success]="card.positive"
+              [class.bg-danger\/10]="!card.positive"
+              [class.text-danger]="!card.positive"
+            >
+              {{ card.change }}
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-font-primary">{{ card.value }}</p>
+          <p class="body-4 text-font-muted mt-1">{{ card.label }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- Activity Bar Chart + Top Signs -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Bar Chart -->
+      <div
+        class="lg:col-span-2 bg-bg-card rounded-2xl border border-border-primary p-6"
+      >
+        <h3 class="body-1-semibold text-font-primary mb-6">
+          Daily New Registrations
+        </h3>
+        <div class="flex items-end gap-3 h-48">
+          @for (entry of activityData(); track entry.date) {
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div
+                class="w-full relative flex items-end justify-center"
+                style="height: 160px"
+              >
+                <div
+                  class="w-full rounded-t-md bg-linear-to-t from-primary to-violet-400 transition-all duration-500"
+                  [style.height.%]="barHeight(entry.count)"
+                ></div>
+              </div>
+              <span
+                class="body-4 text-font-muted text-center leading-tight"
+                style="font-size: 10px"
+                >{{ entry.date }}</span
+              >
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Top Countries -->
+      <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+        <h3 class="body-1-semibold text-font-primary mb-6">Top Countries</h3>
+        <div class="space-y-4">
+          @for (item of topCountries(); track item.country) {
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="body-3 font-semibold text-font-primary">{{
+                  item.country || "Unknown"
+                }}</span>
+                <span class="body-4 text-font-muted">{{
+                  item.count | number
+                }}</span>
+              </div>
+              <div class="w-full bg-bg-secondary rounded-full h-2">
+                <div
+                  class="bg-linear-to-r from-primary to-violet-400 h-2 rounded-full transition-all duration-500"
+                  [style.width.%]="item.pct"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Registrations Table -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+      <h3 class="body-1-semibold text-font-primary mb-4">
+        Daily Registrations
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-border-primary">
+              <th
+                class="text-left pb-3 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                Date
+              </th>
+              <th
+                class="text-right pb-3 body-4 text-font-muted uppercase tracking-wider font-semibold"
+              >
+                New Users
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of activityData(); track entry.date) {
+              <tr
+                class="border-b border-border-primary/40 hover:bg-bg-hover/30 transition-colors"
+              >
+                <td class="py-3 body-3 text-font-primary">{{ entry.date }}</td>
+                <td class="py-3 text-right body-3 text-info font-medium">
+                  {{ entry.count | number }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

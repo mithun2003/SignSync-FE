@@ -8,12 +8,11 @@ import { HelpComponent } from './components/help/help.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { SettingsComponent } from './components/settings/settings.component';
 
-
 export const routes: Routes = [
   {
     path: 'home',
     redirectTo: '',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: '',
@@ -35,6 +34,15 @@ export const routes: Routes = [
     data: {
       title: 'Translate',
     },
+  },
+  {
+    path: 'change-password',
+    loadComponent: () =>
+      import('@pages/profile/change-password/change-password.component').then(
+        (m) => m.ChangePasswordComponent,
+      ),
+    canActivate: [roleGuard],
+    data: { title: 'Change Password' },
   },
   // ✅ Protected Routes (Require Login)
   {

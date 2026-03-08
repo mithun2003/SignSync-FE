@@ -13,6 +13,11 @@ import { CommonButtonComponent } from 'app/shared/components/common-button/commo
 import { CommonService } from '@core/services/common/common.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
+import {
+  faBars,
+  faXmark,
+  faChevronDown,
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-navbar',
@@ -37,12 +42,14 @@ export class NavbarComponent {
   protected readonly navLinks: INavItem[] = NAV_LINKS;
   commonService = inject(CommonService);
   faSpinner = faSpinner;
+  faBars = faBars;
+  faXmark = faXmark;
+  faChevronDown = faChevronDown;
 
   // Computed
   readonly user = computed(() => this.commonService.user());
   readonly isLoggedIn = computed(() => this.commonService.isSignedIn());
   readonly isLargeScreen = computed(() => this.windowWidth() >= 1024);
-
 
   @HostListener('window:resize')
   onResize() {

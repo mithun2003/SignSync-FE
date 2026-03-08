@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,15 +12,30 @@ import {
 } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faUser,
+  faAt,
+  faLock,
+  faEye,
+  faEyeSlash,
+  faCircleExclamation,
+  faXmark,
+  faSpinner,
+  faRightToBracket,
+} from '@fortawesome/free-solid-svg-icons';
 import { CommonService } from '@core/services/common/common.service';
 import { LocalStorageService } from '@core/services/local-storage/local-storage.service';
 import { AuthService } from '@pages/auth/service/auth.service';
-import { FastAPIErrorResponse, ValidationError } from '@pages/auth/model/auth.model';
+import {
+  FastAPIErrorResponse,
+  ValidationError,
+} from '@pages/auth/model/auth.model';
 
 @Component({
   selector: 'app-signin',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +46,16 @@ export class SigninComponent {
   private router = inject(Router);
   private localStorageService = inject(LocalStorageService);
   private commonService = inject(CommonService);
+
+  faUser = faUser;
+  faAt = faAt;
+  faLock = faLock;
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+  faCircleExclamation = faCircleExclamation;
+  faXmark = faXmark;
+  faSpinner = faSpinner;
+  faRightToBracket = faRightToBracket;
 
   form: FormGroup;
   loading = signal<boolean>(false);
@@ -41,7 +71,7 @@ export class SigninComponent {
   }
 
   togglePasswordVisibility(): void {
-    this.showPassword.update(v => !v);
+    this.showPassword.update((v) => !v);
   }
 
   submit(): void {

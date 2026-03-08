@@ -5,6 +5,7 @@ import {
   computed,
   inject,
   OnDestroy,
+  OnInit,
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -12,6 +13,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
 
 import { CommonService } from '@core/services/common/common.service';
+import { SignService } from '@pages/admin/services/sign.service';
 import { CommonButtonComponent } from 'app/shared/components/common-button/common-button.component';
 
 @Component({
@@ -20,22 +22,18 @@ import { CommonButtonComponent } from 'app/shared/components/common-button/commo
   styleUrls: ['./translate.component.css'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    DecimalPipe,
-    RouterLink,
-    FontAwesomeModule,
-    CommonButtonComponent,
-  ],
+  imports: [DecimalPipe, RouterLink, FontAwesomeModule, CommonButtonComponent],
 })
-export class TranslateComponent implements OnDestroy {
+export class TranslateComponent implements OnInit, OnDestroy {
   public commonService = inject(CommonService);
+  private signService = inject(SignService);
 
   // Icons
   faSpinner = faSpinner;
 
   // State
   inputText = signal('');
-  
+
   // Signals
   isPlaying = signal(false);
   currentLetterIndex = signal(0);
@@ -43,7 +41,10 @@ export class TranslateComponent implements OnDestroy {
   currentLetter = signal<string>('');
   currentSignImage = signal<string>('');
   imageLoading = signal(false);
+  signsLoading = signal(false);
   animationSpeed = signal(1500);
+
+  private signsMap = new Map<string, string>();
 
   // Computed
   readonly isLoggedIn = computed(() => this.commonService.isSignedIn());
@@ -54,6 +55,33 @@ export class TranslateComponent implements OnDestroy {
   });
 
   private animationTimer?: ReturnType<typeof setInterval>;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  LIFECYCLE
+  // ─────────────────────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    this.loadSigns();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  SIGN DATA LOADING
+  // ─────────────────────────────────────────────────────────────────────────
+  private loadSigns(): void {
+    this.signsLoading.set(true);
+    this.signService.getPublicSigns().subscribe({
+      next: (signs) => {
+        this.signsMap.clear();
+        for (const sign of signs) {
+          this.signsMap.set(sign.character.toUpperCase(), sign.cloudinary_url);
+        }
+        this.signsLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load sign images from backend:', err);
+        this.signsLoading.set(false);
+      },
+    });
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   //  TEXT PROCESSING
@@ -69,15 +97,15 @@ export class TranslateComponent implements OnDestroy {
       .toUpperCase()
       .split('')
       .filter((char) => /[A-Z ]/.test(char))
-      .map((char) => char === ' ' ? 'SPACE' : char);
-    
+      .map((char) => (char === ' ' ? 'SPACE' : char));
+
     this.letters.set(cleaned);
-    
+
     // Reset if playing
     if (this.isPlaying()) {
       this.stop();
     }
-    
+
     // Show first letter if exists
     if (cleaned.length > 0) {
       this.currentLetterIndex.set(0);
@@ -103,18 +131,18 @@ export class TranslateComponent implements OnDestroy {
     if (this.letters().length === 0) return;
 
     this.isPlaying.set(true);
-    
+
     // Start animation loop
     this.animationTimer = setInterval(() => {
       const current = this.currentLetterIndex();
       const total = this.letters().length;
-      
+
       if (current >= total - 1) {
         // Reached end
         this.stop();
         return;
       }
-      
+
       // Move to next letter
       this.currentLetterIndex.set(current + 1);
       this.updateCurrentSign();
@@ -157,7 +185,7 @@ export class TranslateComponent implements OnDestroy {
 
   onSpeedChange(event: Event): void {
     this.animationSpeed.set(Number((event.target as HTMLInputElement).value));
-    
+
     // If playing, restart timer with new speed
     if (this.isPlaying()) {
       this.pause();
@@ -171,19 +199,23 @@ export class TranslateComponent implements OnDestroy {
   private updateCurrentSign() {
     const index = this.currentLetterIndex();
     const letter = this.letters()[index];
-    
+
     if (!letter) return;
-    
+
     this.currentLetter.set(letter);
     this.imageLoading.set(true);
-    
-    // Handle space sign separately
-    const fileName = letter === 'SPACE' ? 'SPACE' : letter.toUpperCase();
-    
-    // 🔥 FIX: Add unique cache buster to force reload on duplicate letters
-    // This ensures "HELLO" shows both L's correctly
-    const cacheBuster = Date.now();
-    this.currentSignImage.set(`/asl-signs/${fileName}.jpg?v=${cacheBuster}`);
+
+    const key = letter === 'SPACE' ? 'SPACE' : letter.toUpperCase();
+    const url = this.signsMap.get(key);
+
+    if (url) {
+      // Append cache buster to force image reload when the same letter appears consecutively
+      const cacheBuster = Date.now();
+      this.currentSignImage.set(`${url}?v=${cacheBuster}`);
+    } else {
+      this.imageLoading.set(false);
+      this.currentSignImage.set('');
+    }
   }
 
   onImageLoad() {
@@ -192,8 +224,10 @@ export class TranslateComponent implements OnDestroy {
 
   onImageError() {
     this.imageLoading.set(false);
-    console.error(`Failed to load sign image for letter: ${this.currentLetter()}`);
-    
+    console.error(
+      `Failed to load sign image for letter: ${this.currentLetter()}`,
+    );
+
     // Fallback: show letter in large text instead of image
     // Or use a placeholder image
   }

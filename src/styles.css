@@ -1,11 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Karla:wght@400;500;600;700&family=Manrope:wght@200..800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Karla:wght@400;500;600;700&family=Manrope:wght@200..800&display=swap");
 
 /* Tailwind layers */
 @import "tailwindcss";
 
 /* @tailwind utilities; */
-@import './assets/style_variants/base.css';
-
+@import "./assets/style_variants/base.css";
 
 * {
   font-family: var(--font-manrope), var(--font-roboto);
@@ -17,15 +16,27 @@ body {
   font-family: var(--font-manrope);
 }
 
-
 /* ===== Fix browser autofill background & text color ===== */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-textarea:-webkit-autofill,
-select:-webkit-autofill {
+/* Dark theme */
+:root input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill,
+:root input:-webkit-autofill:hover,
+:root input:-webkit-autofill:focus,
+:root textarea:-webkit-autofill,
+:root select:-webkit-autofill {
   -webkit-text-fill-color: #ffffff !important;
   caret-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Light theme autofill */
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus,
+[data-theme="light"] textarea:-webkit-autofill,
+[data-theme="light"] select:-webkit-autofill {
+  -webkit-text-fill-color: #1a0a2e !important;
+  caret-color: #1a0a2e;
   transition: background-color 5000s ease-in-out 0s;
 }
 

@@ -1,6 +1,6 @@
 <!-- text-to-sign.component.html -->
 <div
-  class="flex flex-col items-center justify-center p-6 bg-linear-to-b from-[#0b022b] to-[#121232] text-gray-100 min-h-screen pt-24"
+  class="flex flex-col items-center justify-center p-6 bg-bg-primary text-font-primary min-h-screen pt-24"
 >
   @if (commonService.loading()) {
     <div
@@ -13,13 +13,11 @@
       ></fa-icon>
     </div>
   } @else if (isLoggedIn()) {
-    <div class="w-full max-w-6xl">
+    <div class="w-full max-w-6xl animate-fade-in">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-white mb-2">
-          Text to Sign Translation
-        </h1>
-        <p class="text-gray-400">
+        <h1 class="headline-2 text-white mb-2">Text to Sign Translation</h1>
+        <p class="body-2 text-font-muted">
           Type any text and watch it translate into ASL sign language
         </p>
       </div>
@@ -28,8 +26,10 @@
         <!-- Left Panel: Text Input -->
         <div class="w-full lg:w-1/2 flex flex-col gap-4">
           <!-- Text Input Card -->
-          <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
-            <h2 class="text-lg font-semibold text-gray-300 mb-4 flex items-center gap-2">
+          <div class="bg-bg-card rounded-2xl p-6 border border-border-primary">
+            <h2
+              class="body-1-semibold text-font-secondary mb-4 flex items-center gap-2"
+            >
               <span class="text-2xl">✍️</span>
               Enter Text
             </h2>
@@ -39,15 +39,17 @@
               [value]="inputText()"
               (input)="onInputTextChange($event)"
               placeholder="Type your message here... (e.g., 'Hello World')"
-              class="w-full h-40 p-4 bg-gray-700 text-white rounded-xl border-2 border-gray-600 
-                     focus:border-primary focus:outline-none resize-none transition-colors
-                     placeholder:text-gray-500"
+              class="w-full h-40 p-4 bg-bg-secondary text-white rounded-xl border-2 border-border-secondary focus:border-primary focus:outline-none resize-none transition-colors placeholder:text-font-muted"
               [disabled]="isPlaying()"
             ></textarea>
 
             <!-- Character counter -->
-            <div class="flex justify-between items-center mt-2 text-sm text-gray-400">
-              <span>{{ currentLetterIndex() + 1 }} / {{ letters().length }}</span>
+            <div
+              class="flex justify-between items-center mt-2 body-3 text-font-muted"
+            >
+              <span
+                >{{ currentLetterIndex() + 1 }} / {{ letters().length }}</span
+              >
               <span>{{ inputText().length }} characters</span>
             </div>
 
@@ -80,7 +82,7 @@
 
             <!-- Speed Control -->
             <div class="mt-4">
-              <p class="text-sm text-gray-300 mb-2 block">
+              <p class="body-3 text-font-secondary mb-2 block">
                 Animation Speed: {{ animationSpeed() }}ms per sign
               </p>
               <input
@@ -90,13 +92,10 @@
                 step="100"
                 [value]="animationSpeed()"
                 (input)="onSpeedChange($event)"
-                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer
-                       [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                       [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
-                       [&::-webkit-slider-thumb]:bg-violet-secondary [&::-webkit-slider-thumb]:cursor-pointer"
+                class="w-full h-2 bg-bg-secondary rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-violet-secondary [&::-webkit-slider-thumb]:cursor-pointer"
                 [disabled]="isPlaying()"
               />
-              <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <div class="flex justify-between body-4 text-font-muted mt-1">
                 <span>Fast</span>
                 <span>Normal</span>
                 <span>Slow</span>
@@ -106,20 +105,27 @@
             <!-- Letter Navigation -->
             @if (letters().length > 0) {
               <div class="mt-4">
-                <h3 class="text-sm text-gray-300 mb-2">Letter Sequence:</h3>
+                <h3 class="body-3 text-font-secondary mb-2">
+                  Letter Sequence:
+                </h3>
                 <div class="flex flex-wrap gap-2">
                   @for (letter of letters(); track $index) {
                     <button
                       (click)="jumpToLetter($index)"
                       [disabled]="isPlaying()"
-                      class="px-3 py-2 rounded-lg font-semibold text-sm transition-all
-                             hover:scale-110 disabled:cursor-not-allowed"
-                      [class]="$index === currentLetterIndex()
-                        ? 'bg-primary text-white scale-110 ring-2 ring-primary ring-offset-2 ring-offset-gray-800'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
-                      [title]="letter === 'SPACE' ? 'Space separator' : 'Letter ' + letter"
+                      class="px-3 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-110 disabled:cursor-not-allowed"
+                      [class]="
+                        $index === currentLetterIndex()
+                          ? 'bg-primary text-white scale-110 ring-2 ring-primary ring-offset-2 ring-offset-bg-card'
+                          : 'bg-bg-secondary text-font-secondary hover:bg-bg-hover'
+                      "
+                      [title]="
+                        letter === 'SPACE'
+                          ? 'Space separator'
+                          : 'Letter ' + letter
+                      "
                     >
-                      {{ letter === 'SPACE' ? '␣' : letter }}
+                      {{ letter === "SPACE" ? "␣" : letter }}
                     </button>
                   }
                 </div>
@@ -128,12 +134,14 @@
           </div>
 
           <!-- Instructions Card -->
-          <div class="bg-gray-800 rounded-2xl p-6 shadow-lg">
-            <h3 class="text-lg font-semibold text-gray-300 mb-3 flex items-center gap-2">
+          <div class="bg-bg-card rounded-2xl p-6 border border-border-primary">
+            <h3
+              class="body-1-semibold text-font-secondary mb-3 flex items-center gap-2"
+            >
               <span class="text-xl">ℹ️</span>
               How to Use
             </h3>
-            <ul class="space-y-2 text-sm text-gray-400">
+            <ul class="space-y-2 body-3 text-font-muted">
               <li class="flex items-start gap-2">
                 <span class="text-primary mt-0.5">1.</span>
                 <span>Type your text in the input box above</span>
@@ -152,10 +160,12 @@
               </li>
             </ul>
 
-            <div class="mt-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+            <div
+              class="mt-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg"
+            >
               <p class="text-xs text-yellow-200">
-                <strong>Note:</strong> Only A-Z letters are translated. Spaces, numbers, and 
-                special characters are skipped automatically.
+                <strong>Note:</strong> Only A-Z letters are translated. Spaces,
+                numbers, and special characters are skipped automatically.
               </p>
             </div>
           </div>
@@ -163,23 +173,41 @@
 
         <!-- Right Panel: Sign Display -->
         <div class="w-full lg:w-1/2">
-          <div class="bg-gray-800 rounded-2xl p-6 shadow-lg sticky top-6">
-            <h2 class="text-lg font-semibold text-gray-300 mb-4 flex items-center justify-between">
+          <div
+            class="bg-bg-card rounded-2xl p-6 border border-border-primary sticky top-6"
+          >
+            <h2
+              class="body-1-semibold text-font-secondary mb-4 flex items-center justify-between"
+            >
               <span class="flex items-center gap-2">
                 <span class="text-2xl">🤟</span>
                 Current Sign
               </span>
               @if (isPlaying()) {
                 <span class="flex items-center gap-2 text-sm text-green-400">
-                  <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  <span
+                    class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+                  ></span>
                   Playing
                 </span>
               }
             </h2>
 
             <!-- Sign Image Display -->
-            <div class="relative aspect-square bg-linear-to-b from-[#0b022b] to-[#121232] rounded-2xl overflow-hidden border-4 border-gray-700 mb-4">
-              @if (currentSignImage()) {
+            <div
+              class="relative aspect-square bg-bg-primary rounded-2xl overflow-hidden border-4 border-border-primary mb-4"
+            >
+              @if (signsLoading()) {
+                <div
+                  class="absolute inset-0 flex flex-col items-center justify-center text-font-muted"
+                >
+                  <fa-icon
+                    [icon]="faSpinner"
+                    class="text-4xl text-primary animate-spin mb-2"
+                  ></fa-icon>
+                  <p class="body-2">Loading signs…</p>
+                </div>
+              } @else if (currentSignImage()) {
                 <img
                   [src]="currentSignImage()"
                   [alt]="'ASL sign for ' + currentLetter()"
@@ -188,9 +216,11 @@
                   (load)="onImageLoad()"
                   (error)="onImageError()"
                 />
-                
+
                 @if (imageLoading()) {
-                  <div class="absolute inset-0 flex items-center justify-center">
+                  <div
+                    class="absolute inset-0 flex items-center justify-center"
+                  >
                     <fa-icon
                       [icon]="faSpinner"
                       class="text-4xl text-primary animate-spin"
@@ -198,50 +228,65 @@
                   </div>
                 }
               } @else {
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+                <div
+                  class="absolute inset-0 flex flex-col items-center justify-center text-font-muted"
+                >
                   <span class="text-6xl mb-4">👋</span>
-                  <p class="text-lg">Type text to see signs</p>
+                  <p class="body-1">Type text to see signs</p>
                 </div>
               }
             </div>
 
             <!-- Current Letter Display -->
             <div class="text-center mb-4">
-              @if (currentLetter() === 'SPACE') {
-                <div class="text-6xl font-bold text-primary mb-2">
-                  ␣
-                </div>
-                <p class="text-gray-400 text-sm">Space</p>
+              @if (currentLetter() === "SPACE") {
+                <div class="text-6xl font-bold text-primary mb-2">␣</div>
+                <p class="body-3 text-font-muted">Space</p>
               } @else {
-                <div class="text-8xl font-bold text-primary mb-2 tracking-wider">
-                  {{ currentLetter() || '-' }}
+                <div
+                  class="text-8xl font-bold text-primary mb-2 tracking-wider"
+                >
+                  {{ currentLetter() || "-" }}
                 </div>
               }
-              <p class="text-gray-400 text-sm">
-                {{ currentLetter() ? 'Sign ' + (currentLetterIndex() + 1) + ' of ' + letters().length : 'Waiting for input...' }}
+              <p class="body-3 text-font-muted">
+                {{
+                  currentLetter()
+                    ? "Sign " +
+                      (currentLetterIndex() + 1) +
+                      " of " +
+                      letters().length
+                    : "Waiting for input..."
+                }}
               </p>
             </div>
 
             <!-- Progress Bar -->
             @if (letters().length > 0) {
               <div class="mb-4">
-                <div class="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  class="w-full h-3 bg-bg-secondary rounded-full overflow-hidden"
+                >
                   <div
                     class="h-full bg-linear-to-r from-primary to-violet-primary transition-all duration-500"
                     [style.width.%]="progress()"
                   ></div>
                 </div>
-                <p class="text-center text-xs text-gray-400 mt-2">
-                  {{ progress() | number: '1.0-0' }}% Complete
+                <p class="text-center body-4 text-font-muted mt-2">
+                  {{ progress() | number: "1.0-0" }}% Complete
                 </p>
               </div>
             }
 
             <!-- Full Sentence Display -->
             @if (inputText().trim()) {
-              <div class="bg-gray-700 rounded-xl p-4">
-                <h3 class="text-sm text-gray-300 mb-2 font-semibold">Your Message:</h3>
-                <p class="text-white text-lg wrap-break-word">
+              <div
+                class="bg-bg-secondary rounded-xl p-4 border border-border-muted"
+              >
+                <h3 class="body-3-semibold text-font-secondary mb-2">
+                  Your Message:
+                </h3>
+                <p class="body-1 text-white wrap-break-word">
                   {{ inputText() }}
                 </p>
               </div>
@@ -255,11 +300,11 @@
     <div class="flex flex-col items-center justify-center text-center px-6">
       <div class="text-6xl mb-4">🔒</div>
 
-      <h2 class="text-2xl font-bold text-white mb-2">
+      <h2 class="headline-3 text-white mb-2">
         Text to Sign Translation Locked
       </h2>
 
-      <p class="text-gray-400 max-w-md mb-6">
+      <p class="body-2 text-font-muted max-w-md mb-6">
         Learn ASL by translating your text into sign language. Login to access
         the interactive text-to-sign translator and practice finger spelling.
       </p>
@@ -282,7 +327,7 @@
         </app-common-button>
       </div>
 
-      <p class="mt-6 text-sm text-gray-500 italic">
+      <p class="mt-6 body-3 text-font-muted italic">
         Start learning ASL alphabet 🤟
       </p>
     </div>

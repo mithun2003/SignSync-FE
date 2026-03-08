@@ -1,0 +1,371 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div>
+    <h1 class="headline-3 text-font-primary">Backup & System</h1>
+    <p class="body-3 text-font-muted mt-1">
+      Monitor system health, manage backups, and clear cache.
+    </p>
+  </div>
+
+  <!-- Error Banner -->
+  @if (healthError()) {
+    <div
+      class="bg-danger/10 border border-danger/30 rounded-xl p-4 flex items-center gap-3"
+    >
+      <span class="text-2xl">⚠️</span>
+      <p class="text-danger body-3">{{ healthError() }}</p>
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Overall Status -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p
+            class="body-4 text-font-muted uppercase tracking-wider font-semibold"
+          >
+            System Status
+          </p>
+          @if (isLoadingHealth()) {
+            <div
+              class="w-24 h-8 bg-bg-secondary rounded animate-pulse mt-1"
+            ></div>
+          } @else {
+            <p
+              class="text-2xl font-bold mt-1 capitalize"
+              [class]="overallStatusColor(systemStatus())"
+            >
+              {{ systemStatus() }}
+            </p>
+          }
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center"
+        >
+          <fa-icon
+            [icon]="faCircleCheck"
+            class="text-xl text-success"
+          ></fa-icon>
+        </div>
+      </div>
+      <p class="body-4 text-font-muted">
+        {{ services().length }} services monitored
+      </p>
+    </div>
+
+    <!-- Last Backup -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p
+            class="body-4 text-font-muted uppercase tracking-wider font-semibold"
+          >
+            Last Backup
+          </p>
+          @if (isLoadingBackup()) {
+            <div
+              class="w-20 h-8 bg-bg-secondary rounded animate-pulse mt-1"
+            ></div>
+          } @else {
+            <p class="text-2xl font-bold text-font-primary mt-1">
+              {{ lastBackupAgo() }}
+            </p>
+          }
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center"
+        >
+          <fa-icon
+            [icon]="faCloudArrowDown"
+            class="text-xl text-info"
+          ></fa-icon>
+        </div>
+      </div>
+      @if (lastBackup()) {
+        <p class="body-4 text-font-muted truncate">
+          {{ formatBytes(lastBackup()!.size_bytes) }}
+        </p>
+      } @else {
+        <p class="body-4 text-font-muted">No backup found</p>
+      }
+    </div>
+
+    <!-- Active Users (last 24 h) -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p
+            class="body-4 text-font-muted uppercase tracking-wider font-semibold"
+          >
+            Active Users
+          </p>
+          <p class="text-3xl font-bold text-info mt-1">{{ activeUsers() }}</p>
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"
+        >
+          <fa-icon [icon]="faUsers" class="text-xl text-primary"></fa-icon>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+        <p class="body-4 text-success">Last 24 hours</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services Health -->
+  <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+    <h3 class="body-1-semibold text-font-primary mb-5">Services</h3>
+    @if (isLoadingHealth()) {
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="h-20 bg-bg-secondary rounded-xl animate-pulse"></div>
+        }
+      </div>
+    } @else if (services().length === 0) {
+      <p class="body-3 text-font-muted text-center py-4">
+        No service data available.
+      </p>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        @for (svc of services(); track svc.name) {
+          <div
+            class="rounded-xl border p-4"
+            [class]="serviceStatusBg(svc.status)"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <p class="body-3 font-semibold text-font-primary capitalize">
+                {{ svc.name }}
+              </p>
+              <span
+                class="body-4 font-medium capitalize"
+                [class]="serviceStatusColor(svc.status)"
+              >
+                {{ svc.status }}
+              </span>
+            </div>
+            @if (svc.latency_ms !== null) {
+              <p class="body-4 text-font-muted">
+                {{ svc.latency_ms | number: "1.0-1" }} ms latency
+              </p>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Actions Row: Backup + Clear Cache -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Create Backup -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div
+          class="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center"
+        >
+          <fa-icon
+            [icon]="faCloudArrowDown"
+            class="text-xl text-info"
+          ></fa-icon>
+        </div>
+        <div>
+          <h3 class="body-2-medium text-font-primary">Create Backup</h3>
+          <p class="body-4 text-font-muted">Snapshot all data right now</p>
+        </div>
+      </div>
+      @if (backupSuccess()) {
+        <div
+          class="flex items-center gap-2 p-3 mb-4 bg-success/10 border border-success/30 rounded-lg"
+        >
+          <fa-icon [icon]="faCheck" class="text-xl text-success"></fa-icon>
+          <p class="body-4 text-success">Backup created successfully!</p>
+        </div>
+      }
+      <button
+        (click)="createBackup()"
+        [disabled]="isCreatingBackup()"
+        class="w-full py-3 bg-linear-to-r from-info/80 to-info rounded-lg body-3 font-semibold text-white hover:scale-[1.02] hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        @if (isCreatingBackup()) {
+          <span class="flex items-center justify-center gap-2">
+            <span
+              class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+            ></span>
+            Creating backup...
+          </span>
+        } @else {
+          Create Backup Now
+        }
+      </button>
+    </div>
+
+    <!-- Clear Cache -->
+    <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div
+          class="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center"
+        >
+          <fa-icon
+            [icon]="faArrowsRotate"
+            class="text-xl text-warning"
+          ></fa-icon>
+        </div>
+        <div>
+          <h3 class="body-2-medium text-font-primary">Clear Cache</h3>
+          <p class="body-4 text-font-muted">Flush Redis cache</p>
+        </div>
+      </div>
+      @if (cacheCleared()) {
+        <div
+          class="flex items-center gap-2 p-3 mb-4 bg-success/10 border border-success/30 rounded-lg"
+        >
+          <fa-icon [icon]="faCheck" class="text-xl text-success"></fa-icon>
+          <p class="body-4 text-success">
+            {{ cacheMessage() || "Cache cleared successfully!" }}
+          </p>
+        </div>
+      }
+      <button
+        (click)="clearCache()"
+        [disabled]="isClearingCache()"
+        class="w-full py-3 bg-linear-to-r from-warning/80 to-warning rounded-lg body-3 font-semibold text-white hover:scale-[1.02] hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        @if (isClearingCache()) {
+          <span class="flex items-center justify-center gap-2">
+            <span
+              class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+            ></span>
+            Clearing cache...
+          </span>
+        } @else {
+          Clear Cache
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Notifications Panel -->
+  <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+    <h3 class="body-1-semibold text-font-primary mb-5">
+      Notification Settings
+    </h3>
+    <div class="space-y-4">
+      @for (
+        row of [
+          {
+            key: "notificationsEnabled",
+            label: "Enable Notifications",
+            desc: "Master toggle for all admin notifications",
+            enabled: notificationsEnabled(),
+            alwaysOn: true,
+          },
+          {
+            key: "emailAlertsEnabled",
+            label: "Email Alerts",
+            desc: "Receive system alerts via email",
+            enabled: emailAlertsEnabled(),
+            alwaysOn: false,
+          },
+          {
+            key: "backupAlertsEnabled",
+            label: "Backup Completion Alerts",
+            desc: "Get notified when backups finish",
+            enabled: backupAlertsEnabled(),
+            alwaysOn: false,
+          },
+        ];
+        track row.key
+      ) {
+        <div
+          class="flex items-center justify-between p-4 bg-bg-secondary rounded-xl border border-border-primary"
+          [class.opacity-50]="!row.alwaysOn && !notificationsEnabled()"
+        >
+          <div>
+            <p class="body-3 font-medium text-font-primary">{{ row.label }}</p>
+            <p class="body-4 text-font-muted">{{ row.desc }}</p>
+          </div>
+          <button
+            (click)="
+              (row.alwaysOn || notificationsEnabled()) &&
+                toggleNotification($any(row.key))
+            "
+            class="relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none"
+            [class.bg-primary]="
+              row.enabled && (row.alwaysOn || notificationsEnabled())
+            "
+            [class.bg-border-secondary]="
+              !row.enabled || (!row.alwaysOn && !notificationsEnabled())
+            "
+          >
+            <span
+              class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300"
+              [class.translate-x-6]="
+                row.enabled && (row.alwaysOn || notificationsEnabled())
+              "
+            >
+            </span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Last Backup Details -->
+  <div class="bg-bg-card rounded-2xl border border-border-primary p-6">
+    <h3 class="body-1-semibold text-font-primary mb-4">Last Backup Details</h3>
+    @if (isLoadingBackup()) {
+      <div class="space-y-3">
+        @for (i of [1, 2]; track i) {
+          <div class="h-14 bg-bg-secondary rounded-xl animate-pulse"></div>
+        }
+      </div>
+    } @else if (!lastBackup()) {
+      <p class="text-font-muted body-3 text-center py-8">
+        No backup has been created yet.
+      </p>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div
+          class="p-4 bg-bg-secondary rounded-xl border border-border-primary"
+        >
+          <p class="body-4 text-font-muted mb-1">Backup ID</p>
+          <p class="body-3 font-medium text-font-primary truncate">
+            {{ lastBackup()!.backup_id }}
+          </p>
+        </div>
+        <div
+          class="p-4 bg-bg-secondary rounded-xl border border-border-primary"
+        >
+          <p class="body-4 text-font-muted mb-1">Size</p>
+          <p class="body-3 font-medium text-font-primary">
+            {{ formatBytes(lastBackup()!.size_bytes) }}
+          </p>
+        </div>
+        <div
+          class="p-4 bg-bg-secondary rounded-xl border border-border-primary"
+        >
+          <p class="body-4 text-font-muted mb-1">Created</p>
+          <p class="body-3 font-medium text-font-primary">
+            {{ lastBackupAgo() }}
+          </p>
+        </div>
+        <div
+          class="p-4 bg-bg-secondary rounded-xl border border-border-primary"
+        >
+          <p class="body-4 text-font-muted mb-1">Records</p>
+          @for (
+            entry of lastBackup()!.record_counts | keyvalue;
+            track entry.key
+          ) {
+            <span class="body-4 text-font-secondary mr-3"
+              >{{ entry.key }}: {{ entry.value }}</span
+            >
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

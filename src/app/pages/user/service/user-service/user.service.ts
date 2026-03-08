@@ -13,14 +13,14 @@ import { LocalStorageService } from '@core/services/local-storage/local-storage.
 
 // ✅ FIX B5: Backpressure constants
 const MAX_WS_BUFFER = 1024 * 512; // 512KB — skip if buffer exceeds this
-const MAX_PENDING = 2; // Max frames in flight
+const MAX_PENDING = 3; // Max frames in flight
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
   private apiService = inject(ApiService);
-  private localStorageService = inject(LocalStorageService)
+  private localStorageService = inject(LocalStorageService);
   predictionResult = signal<IPredictResponse | null>(null);
   private socket?: WebSocket;
   private pendingFrames = 0; // ✅ FIX B5: Track in-flight frames
@@ -47,8 +47,6 @@ export class UserService {
     this.socket.onmessage = (event: MessageEvent) => {
       try {
         const response = JSON.parse(event.data);
-        this.pendingFrames = Math.max(0, this.pendingFrames - 1);
-
         if (response.success && response.data) {
           this.predictionResult.set({
             label: response.data.label,
@@ -60,6 +58,7 @@ export class UserService {
           console.warn('[WS] Failed to parse message', error);
         }
       } finally {
+        // Decrement exactly once per message received
         this.pendingFrames = Math.max(0, this.pendingFrames - 1);
       }
     };
@@ -141,6 +140,13 @@ export class UserService {
 
   deleteProfileImage(): Observable<IUserResponse> {
     return this.apiService.delete('user/me/profile-image');
+  }
+
+  changePassword(data: {
+    current_password: string;
+    new_password: string;
+  }): Observable<{ message: string }> {
+    return this.apiService.post('user/me/change-password', data);
   }
 
   getDashboard(period: '7d' | '30d'): Observable<IApiRes<IDashboardResponse>> {

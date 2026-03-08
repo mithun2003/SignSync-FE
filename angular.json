@@ -60,13 +60,9 @@
                 "input": "src/assets/asl-signs"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "././src/assets/style_variants"
-              ]
+              "includePaths": ["././src/assets/style_variants"]
             },
             "outputMode": "static"
           },
@@ -126,18 +122,13 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         }
       }
@@ -145,8 +136,6 @@
   },
   "cli": {
     "analytics": "4bcefd12-821d-4cea-a52c-fcf22ed1b730",
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ]
+    "schematicCollections": ["@angular-eslint/schematics"]
   }
 }
