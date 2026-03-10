@@ -264,9 +264,26 @@
 
           <div class="flex gap-2">
             <button
+              (click)="toggleEditMessage()"
+              class="px-3 py-1.5 rounded-lg body-3 transition-colors flex items-center gap-2"
+              [class]="
+                isEditingMessage()
+                  ? 'bg-primary text-white'
+                  : 'bg-bg-secondary hover:bg-bg-hover text-font-secondary'
+              "
+              [title]="
+                isEditingMessage()
+                  ? 'Exit edit mode'
+                  : 'Edit message with keyboard (A–Z, Space, Backspace)'
+              "
+            >
+              ✏️ {{ isEditingMessage() ? "Done" : "Edit" }}
+            </button>
+
+            <button
               (click)="copyToClipboard()"
               [disabled]="sentenceBuffer().length === 0"
-              class="px-3 py-1.5 bg-bg-secondary hover:b g-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 text-font-secondary transition-colors flex items-center gap-2"
+              class="px-3 py-1.5 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 text-font-secondary transition-colors flex items-center gap-2"
             >
               📋 Copy
             </button>
@@ -283,9 +300,18 @@
 
         <!-- Sentence Text Area -->
         <div
-          class="bg-bg-primary rounded-xl p-6 min-h-50 max-h-100 overflow-y-auto border-2 border-border-primary focus-within:border-primary transition-colors [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-bg-card [&::-webkit-scrollbar-thumb]:bg-border-secondary [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-border-secondary"
+          class="bg-bg-primary rounded-xl p-6 min-h-50 max-h-100 overflow-y-auto border-2 transition-colors [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-bg-card [&::-webkit-scrollbar-thumb]:bg-border-secondary [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-border-secondary"
+          [class]="
+            isEditingMessage()
+              ? 'border-primary'
+              : 'border-border-primary focus-within:border-primary'
+          "
         >
-          @if (sentenceBuffer().length === 0) {
+          @if (isEditingMessage() && sentenceBuffer().length === 0) {
+            <p class="body-2 text-font-muted italic text-center py-8">
+              ✏️ Keyboard active — type letters, Space, or Backspace...
+            </p>
+          } @else if (sentenceBuffer().length === 0) {
             <p class="body-2 text-font-muted italic text-center py-8">
               Start signing to build your message...
             </p>
@@ -322,58 +348,89 @@
         >
           <span>{{ letterCount() }} letters</span>
           <span>{{ wordCount() }} words</span>
-          <span>Last: {{ timeSinceLastLetter() }}</span>
+          @if (isEditingMessage()) {
+            <span class="text-primary font-semibold">⌨️ Keyboard active</span>
+          } @else {
+            <span>Last: {{ timeSinceLastLetter() }}</span>
+          }
         </div>
       </div>
 
-      <!-- Emotion & Suggested Words -->
-      <div
-        class="bg-bg-card rounded-2xl p-6 border border-border-primary animate-fade-in"
-      >
-        <h3 class="body-3-semibold text-font-secondary mb-3">
-          Emotion & Suggestions
-        </h3>
+      <!-- Emotion & Suggestions + Emergency Words (side by side) -->
+      <div class="flex gap-4">
+        <!-- Emotion & Suggested Words -->
+        <div
+          class="bg-bg-card rounded-2xl p-6 border border-border-primary animate-fade-in w-1/2 min-w-0"
+        >
+          <h3 class="body-3-semibold text-font-secondary mb-3">
+            Emotion & Suggestions
+          </h3>
 
-        <!-- Emotion Display -->
-        <div class="text-center mb-4 pb-4 border-b border-border-primary">
-          <div class="text-6xl mb-2">
-            {{ currentMood().split(" ")[1] }}
-          </div>
-          <div class="text-xl font-bold text-white tracking-wide">
-            {{ currentMood().split(" ")[0] }}
-          </div>
-        </div>
-
-        <!-- Suggested Words -->
-        @if (suggestedWords().length > 0) {
-          <div class="text-center">
-            <h4
-              class="body-4 font-semibold text-font-muted mb-2 uppercase tracking-wider"
-            >
-              Suggested Words
-            </h4>
-            <div class="flex flex-wrap justify-center gap-2">
-              @for (word of suggestedWords(); track word) {
-                <button
-                  type="button"
-                  class="px-3 py-1.5 bg-primary/20 border border-primary rounded-full text-white text-sm hover:bg-primary/30 transition-colors cursor-pointer animate-[fadeIn_0.3s_ease-out]"
-                  (click)="addSuggestedWord(word)"
-                  [title]="'Click to add: ' + word"
-                >
-                  {{ word }}
-                </button>
-              }
+          <!-- Emotion Display -->
+          <div class="text-center mb-4 pb-4 border-b border-border-primary">
+            <div class="text-6xl mb-2">
+              {{ currentMood().split(" ")[1] }}
+            </div>
+            <div class="text-xl font-bold text-white tracking-wide">
+              {{ currentMood().split(" ")[0] }}
             </div>
           </div>
-        } @else {
-          <p class="body-3 text-font-muted italic text-center">
-            {{
-              currentLetter()
-                ? "No suggestions for " + currentLetter()
-                : "Sign a letter to see suggestions"
-            }}
-          </p>
-        }
+
+          <!-- Suggested Words -->
+          @if (suggestedWords().length > 0) {
+            <div class="text-center">
+              <h4
+                class="body-4 font-semibold text-font-muted mb-2 uppercase tracking-wider"
+              >
+                Suggested Words
+              </h4>
+              <div class="flex flex-wrap justify-center gap-2">
+                @for (word of suggestedWords(); track word) {
+                  <button
+                    type="button"
+                    class="px-3 py-1.5 bg-primary/20 border border-primary rounded-full text-white text-sm hover:bg-primary/30 transition-colors cursor-pointer animate-[fadeIn_0.3s_ease-out]"
+                    (click)="addSuggestedWord(word)"
+                    [title]="'Click to add: ' + word"
+                  >
+                    {{ word }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @else {
+            <p class="body-3 text-font-muted italic text-center">
+              {{
+                currentLetter()
+                  ? "No suggestions for " + currentLetter()
+                  : "Sign a letter to see suggestions"
+              }}
+            </p>
+          }
+        </div>
+
+        <!-- Emergency Words -->
+        <div
+          class="bg-bg-card rounded-2xl p-6 border border-red-800 animate-fade-in w-1/2 min-w-0"
+        >
+          <h3 class="body-3-semibold mb-3 flex items-center gap-2 text-red-400">
+            <span>🆘</span>
+            Emergency Words
+          </h3>
+
+          <div class="flex flex-wrap gap-2">
+            @for (item of emergencyWords; track item.label) {
+              <button
+                type="button"
+                class="px-3 py-1.5 bg-red-900/40 border border-red-700 rounded-full text-red-200 text-sm font-medium hover:bg-red-800/60 hover:border-red-500 transition-colors cursor-pointer animate-[fadeIn_0.3s_ease-out] flex items-center gap-1.5"
+                (click)="addEmergencyWord(item.label)"
+                [title]="'Click to add: ' + item.label"
+              >
+                <span>{{ item.icon }}</span>
+                <span>{{ item.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
       </div>
 
       <!-- Letter History -->

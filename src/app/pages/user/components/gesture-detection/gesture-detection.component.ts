@@ -94,12 +94,15 @@ export class GestureDetectionComponent implements OnDestroy {
 
   private canvasCtx: CanvasRenderingContext2D | null = null;
 
+  // Message editing mode
+  isEditingMessage = signal(false);
+
   // Letter Detection Logic
   private lastDetectedLetter: string | null = null;
   private lastLetterTime = 0;
   protected letterStability = signal(0);
-  protected readonly STABILITY_THRESHOLD = 3; // 3 consecutive frames (~450ms) to confirm
-  private readonly MIN_LETTER_INTERVAL = 500; // ms between accepted letters
+  protected readonly STABILITY_THRESHOLD = 6; // 6 consecutive frames (~900ms) to confirm
+  private readonly MIN_LETTER_INTERVAL = 1500; // ms between accepted letters
   private readonly MIN_CONFIDENCE = 0.9; // Only accept predictions with ≥90% confidence
   private readonly AUTO_SPACE_TIMEOUT = 2500;
 
@@ -205,6 +208,34 @@ export class GestureDetectionComponent implements OnDestroy {
     this.sentenceBuffer.update((buf) => [...buf, ...chars, ' ']);
     this.feedbackText.set(`Added: ${word}`);
     if (this.isSpeechEnabled()) speakText(word, this.speechRate());
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  EMERGENCY WORDS
+  // ─────────────────────────────────────────────────────────────────────────
+  readonly emergencyWords: { label: string; icon: string }[] = [
+    { label: 'HELP', icon: '🆘' },
+    { label: 'CALL 911', icon: '🚨' },
+    { label: 'DOCTOR', icon: '🏥' },
+    { label: 'AMBULANCE', icon: '🚑' },
+    { label: 'FIRE', icon: '🔥' },
+    { label: 'POLICE', icon: '👮' },
+    { label: 'PAIN', icon: '😣' },
+    { label: 'EMERGENCY', icon: '⚠️' },
+    { label: 'CANT BREATHE', icon: '😮‍💨' },
+    { label: 'FALLING', icon: '🤕' },
+    { label: 'ALLERGIC', icon: '💊' },
+    { label: 'BLEEDING', icon: '🩸' },
+  ];
+
+  addEmergencyWord(phrase: string): void {
+    const chars = phrase.toUpperCase().split('');
+    this.sentenceBuffer.update((buf) => {
+      const needsSpace = buf.length > 0 && buf[buf.length - 1] !== ' ';
+      return [...buf, ...(needsSpace ? [' '] : []), ...chars, ' '];
+    });
+    this.feedbackText.set(`Added: ${phrase}`);
+    if (this.isSpeechEnabled()) speakText(phrase, this.speechRate());
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -521,6 +552,37 @@ export class GestureDetectionComponent implements OnDestroy {
     if (text.trim()) {
       speakText(text, this.speechRate());
       this.feedbackText.set('Speaking...');
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  //  MESSAGE EDITING
+  // ─────────────────────────────────────────────────────────────────
+  toggleEditMessage(): void {
+    this.isEditingMessage.update((v) => !v);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEdit(event: KeyboardEvent): void {
+    if (!this.isEditingMessage()) return;
+
+    const key = event.key;
+
+    if (key === 'Backspace') {
+      event.preventDefault();
+      this.sentenceBuffer.update((buf) => buf.slice(0, -1));
+      return;
+    }
+
+    if (key === ' ') {
+      event.preventDefault();
+      this.sentenceBuffer.update((buf) => [...buf, ' ']);
+      return;
+    }
+
+    if (/^[a-zA-Z]$/.test(key)) {
+      event.preventDefault();
+      this.sentenceBuffer.update((buf) => [...buf, key.toUpperCase()]);
     }
   }
 
