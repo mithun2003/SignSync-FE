@@ -10,10 +10,11 @@ import {
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
 import { LocalStorageService } from '@core/services/local-storage/local-storage.service';
+import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 
-// ✅ FIX B5: Backpressure constants
-const MAX_WS_BUFFER = 1024 * 512; // 512KB — skip if buffer exceeds this
-const MAX_PENDING = 3; // Max frames in flight
+// Backpressure constants
+const MAX_WS_BUFFER = 1024 * 512; // 512 KB — skip if buffer exceeds this
+const MAX_PENDING = 3; // max frames in flight
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +48,9 @@ export class UserService {
     this.socket.onmessage = (event: MessageEvent) => {
       try {
         const response = JSON.parse(event.data);
-        if (response.success && response.data) {
+        // Propagate all labels (including uncertain/no_hand) so the component
+        // can react (show "Hold steady…", "Show hand to camera", etc.)
+        if (response.data?.label) {
           this.predictionResult.set({
             label: response.data.label,
             confidence: response.data.confidence,
@@ -73,6 +76,25 @@ export class UserService {
     };
   }
 
+  /** Send pre-extracted MediaPipe landmarks over WebSocket (primary real-time path).
+   *
+   * Sends JSON: {"landmarks": [{x, y, z} × 21]}
+   * ~500 B per frame vs ~30 KB JPEG — 60× less bandwidth, no backend MediaPipe re-run.
+   */
+  sendLandmarks(landmarks: NormalizedLandmark[]): boolean {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return false;
+    if (this.pendingFrames >= MAX_PENDING) return false;
+    if (this.socket.bufferedAmount > MAX_WS_BUFFER) return false;
+
+    const payload = JSON.stringify({
+      landmarks: landmarks.map((lm) => ({ x: lm.x, y: lm.y, z: lm.z })),
+    });
+    this.socket.send(payload);
+    this.pendingFrames++;
+    return true;
+  }
+
+  /** Send raw image bytes over WebSocket (used by HTTP single-shot predict). */
   sendImage(data: Blob | ArrayBuffer): boolean {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return false;
 

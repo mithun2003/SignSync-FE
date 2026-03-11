@@ -103,8 +103,19 @@ export class GestureDetectionComponent implements OnDestroy {
   protected letterStability = signal(0);
   protected readonly STABILITY_THRESHOLD = 6; // 6 consecutive frames (~900ms) to confirm
   private readonly MIN_LETTER_INTERVAL = 1500; // ms between accepted letters
-  private readonly MIN_CONFIDENCE = 0.9; // Only accept predictions with ≥90% confidence
+  private readonly MIN_CONFIDENCE = 85; // Regular letters: ≥85% confidence (0–100 scale)
   private readonly AUTO_SPACE_TIMEOUT = 2500;
+
+  // Custom / emergency signs trained on synthetic data — need a lower bar
+  private readonly EMERGENCY_LABELS = new Set([
+    'help',
+    'danger',
+    'emergency',
+    'thumbs_down',
+    'ok_sign',
+  ]);
+  private readonly EMERGENCY_MIN_CONFIDENCE = 20; // lower threshold for custom signs
+  private readonly EMERGENCY_STABILITY = 4; // fewer frames needed (~600ms)
 
   private lastLetterTimestamp = 0;
   private spaceTimerHandle?: ReturnType<typeof setTimeout>;
@@ -242,11 +253,19 @@ export class GestureDetectionComponent implements OnDestroy {
   //  LETTER DETECTION LOGIC
   // ─────────────────────────────────────────────────────────────────
   private processLetter(letter: string, confidence: number): void {
+    const isEmergency = this.EMERGENCY_LABELS.has(letter.toLowerCase());
+    const minConfidence = isEmergency
+      ? this.EMERGENCY_MIN_CONFIDENCE
+      : this.MIN_CONFIDENCE;
+    const stabilityNeeded = isEmergency
+      ? this.EMERGENCY_STABILITY
+      : this.STABILITY_THRESHOLD;
+
     // Reject low-confidence predictions to avoid false letters
-    if (confidence < this.MIN_CONFIDENCE) {
+    if (confidence < minConfidence) {
       this.resetLetterDetection();
       this.feedbackText.set(
-        `Low confidence (${Math.round(confidence * 100)}%) — hold steady`,
+        `Low confidence (${Math.round(confidence)}%) — hold steady`,
       );
       return;
     }
@@ -264,9 +283,9 @@ export class GestureDetectionComponent implements OnDestroy {
       return;
     }
 
-    if (this.letterStability() < this.STABILITY_THRESHOLD) {
+    if (this.letterStability() < stabilityNeeded) {
       this.feedbackText.set(
-        `Hold ${letter}... (${this.letterStability()}/${this.STABILITY_THRESHOLD})`,
+        `Hold ${letter}... (${this.letterStability()}/${stabilityNeeded})`,
       );
       return;
     }
@@ -281,6 +300,18 @@ export class GestureDetectionComponent implements OnDestroy {
     if (this.autoSpace()) this.resetAutoSpaceTimer();
   }
 
+  protected readonly EMERGENCY_DISPLAY: Record<string, string> = {
+    help: 'HELP',
+    danger: 'DANGER',
+    emergency: 'EMERGENCY',
+    thumbs_down: 'THUMBS DOWN',
+    ok_sign: 'OK',
+  };
+
+  readonly isEmergencyLetter = computed(
+    () => this.currentLetter().toLowerCase() in this.EMERGENCY_DISPLAY,
+  );
+
   private addLetterToSentence(letter: string): void {
     const normalized = letter.toLowerCase();
 
@@ -288,6 +319,17 @@ export class GestureDetectionComponent implements OnDestroy {
       this.sentenceBuffer.update((buf) => buf.slice(0, -1));
       this.letterHistory.update((hist) => [...hist, '⌫'].slice(-10));
       this.feedbackText.set('Deleted last character');
+      if (this.isSpeechEnabled()) speakText('delete', this.speechRate());
+      return;
+    }
+
+    // Emergency / custom signs: add as full word + trailing space
+    if (this.EMERGENCY_DISPLAY[normalized]) {
+      const word = this.EMERGENCY_DISPLAY[normalized];
+      this.sentenceBuffer.update((buf) => [...buf, word, ' ']);
+      this.letterHistory.update((hist) => [...hist, word].slice(-10));
+      if (this.isSpeechEnabled()) speakText(word, this.speechRate());
+      this.feedbackText.set(`Added: ${word}`);
       return;
     }
 
@@ -432,11 +474,9 @@ export class GestureDetectionComponent implements OnDestroy {
         this.lastLandmarks = result.landmarks;
         this.drawLandmarks(ctx, result.landmarks);
 
-        // Send raw bytes directly — UserService pendingFrames handles backpressure
-        if (result.crop) {
-          const bytes = this.dataURLtoBytes(result.crop);
-          this.userService.sendImage(bytes);
-        }
+        // Send the 21 MediaPipe landmarks as JSON — backend SVM classifies directly.
+        // ~500 B per message vs ~30 KB JPEG; no skeleton preprocessing needed.
+        this.userService.sendLandmarks(result.landmarks);
       } else if (
         this.lastLandmarks &&
         this.missingFrames < this.MAX_MISSING_FRAMES
@@ -454,17 +494,6 @@ export class GestureDetectionComponent implements OnDestroy {
     }
 
     this.animationId = requestAnimationFrame(() => this.renderLoop());
-  }
-
-  /** Convert data URL to raw ArrayBuffer — matches backend receive_bytes() */
-  private dataURLtoBytes(dataUrl: string): ArrayBuffer {
-    const commaIdx = dataUrl.indexOf(',');
-    const binary = atob(dataUrl.substring(commaIdx + 1));
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes.buffer;
   }
 
   private drawLandmarks(

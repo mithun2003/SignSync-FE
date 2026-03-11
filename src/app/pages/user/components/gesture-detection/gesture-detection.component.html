@@ -1,6 +1,6 @@
 <!-- sign-to-text.component.html -->
 <div
-  class="flex flex-col lg:flex-row justify-center items-center p-6 pt-24 gap-6 bg-bg-primary text-font-primary min-h-screen"
+  class="flex flex-col lg:flex-row justify-center p-6 pt-24 gap-6 bg-bg-primary text-font-primary min-h-screen"
 >
   @if (commonService.loading()) {
     <div
@@ -187,7 +187,12 @@
               />
             </svg>
             <div
-              class="text-8xl font-bold text-primary z-10 w-28 h-28 flex items-center justify-center transition-all duration-200"
+              class="font-bold text-primary z-10 w-28 h-28 flex items-center justify-center transition-all duration-200 text-center"
+              [class.text-8xl]="currentLetter().length <= 1"
+              [class.text-xs]="isEmergencyLetter()"
+              [class.text-xl]="
+                currentLetter().length > 1 && !isEmergencyLetter()
+              "
               [class.scale-110]="letterStability() >= STABILITY_THRESHOLD"
               [class.text-green-400]="letterStability() >= STABILITY_THRESHOLD"
             >
@@ -452,7 +457,10 @@
           } @else {
             @for (letter of letterHistory(); track $index) {
               <div
-                class="shrink-0 w-16 h-16 rounded-lg flex items-center justify-center text-2xl font-bold border-2 transition-all duration-300 hover:bg-bg-hover animate-fade-in"
+                class="shrink-0 w-16 h-16 rounded-lg flex items-center justify-center font-bold border-2 transition-all duration-300 hover:bg-bg-hover animate-fade-in overflow-hidden text-center leading-tight px-1"
+                [class.text-2xl]="letter.length <= 1"
+                [class.text-sm]="letter.length > 1 && letter.length <= 5"
+                [class.text-xs]="letter.length > 5"
                 [class.bg-bg-secondary]="letter !== '⌫'"
                 [class.bg-red-900]="letter === '⌫'"
                 [class.border-primary]="$index === letterHistory().length - 1"

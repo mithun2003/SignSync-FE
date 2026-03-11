@@ -114,7 +114,7 @@ export class HandDetectService {
     const landmarks = result.landmarks[0];
     return {
       landmarks,
-      crop: this.performCanvasCrop(video, landmarks),
+      crop: null, // Skeleton crop no longer sent to backend; landmarks are sent directly
     };
   }
 

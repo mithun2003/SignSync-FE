@@ -89,9 +89,9 @@ export class SignupComponent {
     // Prepare data for API
     const formData = this.form.getRawValue();
 
-    // Combine firstName and lastName into name for API (if your API expects 'name')
     const signupData = {
-      name: `${formData.firstName} ${formData.lastName}`,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
       username: formData.username,
       email: formData.email,
       password: formData.password,
