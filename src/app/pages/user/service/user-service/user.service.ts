@@ -3,6 +3,11 @@ import { ApiService } from '@core/services/api/api.service';
 import { IApiRes } from '@models/global.model';
 import {
   IDashboardResponse,
+  IEmergencyContactsBatchResult,
+  IEmergencyContactsBatchUpdatePayload,
+  IEmergencyContactsPayload,
+  IHelpMailRequest,
+  IHelpMailResponse,
   IPredictResponse,
   IUserResponse,
   IUserUpdate,
@@ -173,5 +178,27 @@ export class UserService {
 
   getDashboard(period: '7d' | '30d'): Observable<IApiRes<IDashboardResponse>> {
     return this.apiService.get(`dashboard?period=${period}`);
+  }
+
+  getEmergencyContacts(): Observable<IApiRes<IEmergencyContactsPayload>> {
+    return this.apiService.get('user/me/emergency-contacts');
+  }
+
+  updateEmergencyContacts(
+    payload: IEmergencyContactsPayload,
+  ): Observable<IApiRes<IEmergencyContactsPayload>> {
+    return this.apiService.put('user/me/emergency-contacts', payload);
+  }
+
+  batchUpdateEmergencyContacts(
+    payload: IEmergencyContactsBatchUpdatePayload,
+  ): Observable<IApiRes<IEmergencyContactsBatchResult>> {
+    return this.apiService.patch('user/me/emergency-contacts', payload);
+  }
+
+  sendHelpMail(
+    payload: IHelpMailRequest,
+  ): Observable<IApiRes<IHelpMailResponse>> {
+    return this.apiService.post('alerts/help-mail', payload);
   }
 }

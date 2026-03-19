@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { CommonService } from '@core/services/common/common.service';
 import { UserService } from '@pages/user/service/user-service/user.service';
 import { ThemeService } from '@core/services/theme/theme.service';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { AlertService } from 'app/shared/alert/service/alert.service';
 
 // ── Interfaces ──────────────────────────────────────────────
@@ -82,6 +82,11 @@ export class SettingsComponent implements OnInit {
     history: false,
     stats: false,
   });
+  emergencyContactEmails = signal<string[]>([]);
+  newEmergencyEmail = signal('');
+  selectedEmergencyEmails = signal<string[]>([]);
+  editingEmergencyEmail = signal<string | null>(null);
+  editingEmergencyEmailValue = signal('');
 
   // Static option lists — plain readonly arrays (no reactivity needed)
   protected readonly themeOptions: readonly AppSettings['theme'][] = [
@@ -178,6 +183,19 @@ export class SettingsComponent implements OnInit {
           (user.language?.toUpperCase() as 'ASL' | 'BSL' | 'ISL') || 'ASL',
       }));
     }
+
+    this.userService.getEmergencyContacts().subscribe({
+      next: (res) => {
+        const emails = (res.data?.emails ?? [])
+          .map((email) => email.trim().toLowerCase())
+          .filter((email) => this.isValidEmail(email));
+        this.emergencyContactEmails.set([...new Set(emails)]);
+        this.selectedEmergencyEmails.set([]);
+      },
+      error: (err: unknown) => {
+        console.warn('Failed to load emergency contact emails', err);
+      },
+    });
   }
 
   // ── Update a single setting ───────────────────────────────
@@ -208,18 +226,163 @@ export class SettingsComponent implements OnInit {
       language: s.signLanguageDialect.toLowerCase(),
     };
 
-    this.userService
-      .updateProfile(backendUpdate)
+    const contactsPayload = {
+      emails: this.emergencyContactEmails(),
+    };
+
+    forkJoin([
+      this.userService.updateProfile(backendUpdate),
+      this.userService.updateEmergencyContacts(contactsPayload),
+    ])
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: () => {
           this.hasUnsavedChanges.set(false);
-          // Show success toast
+          this.alertService.alertMessage('success', {
+            content: 'Settings saved successfully.',
+            close: true,
+            timeout: 2000,
+          });
         },
         error: (err: unknown) => {
           console.error('Failed to save settings:', err);
+          this.alertService.alertMessage('fail', {
+            content: 'Failed to save settings. Please try again.',
+            close: true,
+            timeout: 3000,
+          });
         },
       });
+  }
+
+  addEmergencyEmail(): void {
+    const normalized = this.newEmergencyEmail().trim().toLowerCase();
+    if (!normalized) return;
+
+    if (!this.isValidEmail(normalized)) {
+      this.alertService.alertMessage('warning', {
+        content: 'Enter a valid email address.',
+        close: true,
+        timeout: 2500,
+      });
+      return;
+    }
+
+    const existing = this.emergencyContactEmails();
+    if (existing.includes(normalized)) {
+      this.alertService.alertMessage('inform', {
+        content: 'This email is already in emergency contacts.',
+        close: true,
+        timeout: 2000,
+      });
+      return;
+    }
+
+    this.emergencyContactEmails.set([...existing, normalized]);
+    this.newEmergencyEmail.set('');
+    this.hasUnsavedChanges.set(true);
+  }
+
+  removeEmergencyEmail(email: string): void {
+    this.emergencyContactEmails.update((list) =>
+      list.filter((v) => v !== email),
+    );
+    this.selectedEmergencyEmails.update((list) =>
+      list.filter((v) => v !== email),
+    );
+    if (this.editingEmergencyEmail() === email) {
+      this.cancelEmergencyEmailEdit();
+    }
+    this.hasUnsavedChanges.set(true);
+  }
+
+  toggleEmergencyEmailSelection(email: string, checked: boolean): void {
+    if (checked) {
+      this.selectedEmergencyEmails.update((list) =>
+        list.includes(email) ? list : [...list, email],
+      );
+      return;
+    }
+    this.selectedEmergencyEmails.update((list) =>
+      list.filter((v) => v !== email),
+    );
+  }
+
+  removeSelectedEmergencyEmails(): void {
+    const selected = this.selectedEmergencyEmails();
+    if (selected.length === 0) {
+      return;
+    }
+    this.emergencyContactEmails.update((list) =>
+      list.filter((email) => !selected.includes(email)),
+    );
+    this.selectedEmergencyEmails.set([]);
+    if (
+      this.editingEmergencyEmail() &&
+      selected.includes(this.editingEmergencyEmail()!)
+    ) {
+      this.cancelEmergencyEmailEdit();
+    }
+    this.hasUnsavedChanges.set(true);
+  }
+
+  startEmergencyEmailEdit(email: string): void {
+    this.editingEmergencyEmail.set(email);
+    this.editingEmergencyEmailValue.set(email);
+  }
+
+  cancelEmergencyEmailEdit(): void {
+    this.editingEmergencyEmail.set(null);
+    this.editingEmergencyEmailValue.set('');
+  }
+
+  saveEmergencyEmailEdit(): void {
+    const original = this.editingEmergencyEmail();
+    if (!original) {
+      return;
+    }
+    const next = this.editingEmergencyEmailValue().trim().toLowerCase();
+    if (!next) {
+      this.alertService.alertMessage('warning', {
+        content: 'Email cannot be empty.',
+        close: true,
+        timeout: 2000,
+      });
+      return;
+    }
+    if (!this.isValidEmail(next)) {
+      this.alertService.alertMessage('warning', {
+        content: 'Enter a valid email address.',
+        close: true,
+        timeout: 2500,
+      });
+      return;
+    }
+    if (original !== next && this.emergencyContactEmails().includes(next)) {
+      this.alertService.alertMessage('inform', {
+        content: 'This email already exists in emergency contacts.',
+        close: true,
+        timeout: 2000,
+      });
+      return;
+    }
+
+    this.emergencyContactEmails.update((list) =>
+      list.map((email) => (email === original ? next : email)),
+    );
+    this.selectedEmergencyEmails.update((list) =>
+      list.map((email) => (email === original ? next : email)),
+    );
+    this.cancelEmergencyEmailEdit();
+    this.hasUnsavedChanges.set(true);
+  }
+
+  isEmergencyEmailSelected(email: string): boolean {
+    return this.selectedEmergencyEmails().includes(email);
+  }
+
+  private isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
   // ── Reset to defaults ─────────────────────────────────────

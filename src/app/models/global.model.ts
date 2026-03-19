@@ -19,11 +19,12 @@ export interface IUserRead {
   language: string;
   two_factor_enabled: boolean;
   tier_id: number | null;
-  created_at?: string;  
+  created_at?: string;
   updated_at?: string;
+  password_changed_at?: string | null;
+  last_password_changed_at?: string | null;
   is_superuser?: boolean;
 }
-
 
 export interface IApiRes<TData = unknown> {
   status_code: 200 | 401 | 404;

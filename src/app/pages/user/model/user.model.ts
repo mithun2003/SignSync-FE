@@ -1,8 +1,43 @@
-import { IUserRead } from "@models/global.model";
+import { IUserRead } from '@models/global.model';
 
 export interface IPredictResponse {
   label: string;
   confidence: number;
+}
+
+export interface IEmergencyContactsPayload {
+  emails: string[];
+}
+
+export interface IEmergencyContactUpdatePair {
+  old_email: string;
+  new_email: string;
+}
+
+export interface IEmergencyContactsBatchUpdatePayload {
+  add: string[];
+  remove: string[];
+  update: IEmergencyContactUpdatePair[];
+}
+
+export interface IEmergencyContactsBatchResult {
+  operation: 'batch_update';
+  added: string[];
+  removed: string[];
+  updated: string[];
+  unchanged: string[];
+  emails: string[];
+}
+
+export interface IHelpMailRequest {
+  recipients: string[];
+  trigger: 'help_sign';
+}
+
+export interface IHelpMailResponse {
+  message: string;
+  recipients: string[];
+  sent_count: number;
 }
 
 // export interface IUser {
@@ -18,17 +53,16 @@ export interface IPredictResponse {
 //   two_factor_enabled: boolean;
 // }
 
-
 export interface IUserUpdate {
-  username?: string;        
-  email?: string;           
-  first_name?: string;    
-  last_name?: string;     
-  bio?: string;           
-  country?: string;       
-  language?: string;      
+  username?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  bio?: string;
+  country?: string;
+  language?: string;
   two_factor_enabled?: boolean;
-  profile_image_url?: string;  
+  profile_image_url?: string;
 }
 
 export interface IUserResponse {

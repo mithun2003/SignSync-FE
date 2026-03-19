@@ -230,7 +230,7 @@
               }
 
               <!-- Reminder Time -->
-              <div class="p-4 bg-bg-secondary rounded-xl">
+              <!-- <div class="p-4 bg-bg-secondary rounded-xl">
                 <label
                   for="reminderTime"
                   class="block text-sm font-medium text-font-primary mb-2"
@@ -249,6 +249,157 @@
                   "
                   class="px-3 py-2 rounded-lg border border-border-primary bg-bg-card text-font-primary focus:outline-none focus:border-primary transition-colors"
                 />
+              </div> -->
+
+              <div class="p-4 bg-bg-secondary rounded-xl">
+                <label
+                  for="emergencyEmailInput"
+                  class="block text-sm font-medium text-font-primary mb-2"
+                >
+                  🆘 Emergency Contact Emails
+                </label>
+                <p class="text-sm text-font-muted mb-3">
+                  Add relatives or trusted contacts who will receive alerts when
+                  the HELP sign is detected. You'll be asked for permission
+                  before sending.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                  <input
+                    id="emergencyEmailInput"
+                    type="email"
+                    [value]="newEmergencyEmail()"
+                    (input)="newEmergencyEmail.set($any($event.target).value)"
+                    (keydown.enter)="addEmergencyEmail()"
+                    placeholder="relative@example.com"
+                    class="flex-1 px-3 py-2 rounded-lg border border-border-primary bg-bg-card text-font-primary placeholder:text-font-muted/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                  <button
+                    type="button"
+                    (click)="addEmergencyEmail()"
+                    [disabled]="!newEmergencyEmail().trim()"
+                    class="px-5 py-2 rounded-lg bg-primary/15 border border-primary/40 text-primary hover:bg-primary/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  >
+                    ➕ Add Contact
+                  </button>
+                </div>
+
+                @if (selectedEmergencyEmails().length > 0) {
+                  <div class="mb-3">
+                    <button
+                      type="button"
+                      (click)="removeSelectedEmergencyEmails()"
+                      class="px-4 py-2 rounded-lg bg-danger/10 border border-danger/30 text-danger text-sm hover:bg-danger/20 transition-colors font-medium"
+                    >
+                      🗑️ Remove Selected ({{
+                        selectedEmergencyEmails().length
+                      }})
+                    </button>
+                  </div>
+                }
+
+                @if (emergencyContactEmails().length > 0) {
+                  <div class="space-y-2 mb-2">
+                    @for (
+                      email of emergencyContactEmails();
+                      track email;
+                      let idx = $index
+                    ) {
+                      <div
+                        class="flex items-center justify-between px-4 py-3 rounded-lg bg-bg-card border border-border-primary hover:border-primary/50 transition-all group"
+                      >
+                        <div class="flex items-center gap-3 flex-1">
+                          <input
+                            type="checkbox"
+                            [checked]="isEmergencyEmailSelected(email)"
+                            (change)="
+                              toggleEmergencyEmailSelection(
+                                email,
+                                $any($event.target).checked
+                              )
+                            "
+                            [title]="'Select ' + email"
+                            class="h-4 w-4 rounded border-border-primary bg-bg-card text-primary focus:ring-primary/50"
+                          />
+                          <span class="text-xl">📧</span>
+                          @if (editingEmergencyEmail() === email) {
+                            <input
+                              type="email"
+                              [value]="editingEmergencyEmailValue()"
+                              (input)="
+                                editingEmergencyEmailValue.set(
+                                  $any($event.target).value
+                                )
+                              "
+                              (keydown.enter)="saveEmergencyEmailEdit()"
+                              class="flex-1 min-w-0 px-2 py-1 rounded-md border border-border-primary bg-bg-secondary text-font-primary focus:outline-none focus:border-primary"
+                            />
+                          } @else {
+                            <span
+                              class="text-sm text-font-primary font-medium"
+                              >{{ email }}</span
+                            >
+                          }
+                          <span class="text-xs text-font-muted"
+                            >Contact {{ idx + 1 }}</span
+                          >
+                        </div>
+                        <div
+                          class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          @if (editingEmergencyEmail() === email) {
+                            <button
+                              type="button"
+                              class="px-3 py-1.5 rounded-md bg-primary/15 border border-primary/40 text-primary text-sm hover:bg-primary/25 transition-colors"
+                              (click)="saveEmergencyEmailEdit()"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              class="px-3 py-1.5 rounded-md bg-bg-secondary border border-border-primary text-font-muted text-sm hover:bg-bg-tertiary transition-colors"
+                              (click)="cancelEmergencyEmailEdit()"
+                            >
+                              Cancel
+                            </button>
+                          } @else {
+                            <button
+                              type="button"
+                              class="px-3 py-1.5 rounded-md bg-primary/10 border border-primary/30 text-primary text-sm hover:bg-primary/20 transition-colors"
+                              (click)="startEmergencyEmailEdit(email)"
+                              [title]="'Edit ' + email"
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              type="button"
+                              class="px-3 py-1.5 rounded-md bg-danger/10 border border-danger/30 text-danger text-sm hover:bg-danger/20 transition-colors"
+                              (click)="removeEmergencyEmail(email)"
+                              [title]="'Remove ' + email"
+                            >
+                              🗑️ Remove
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                  <p class="text-xs text-font-muted mt-3">
+                    💡 Tip: Only one alert email per camera session to prevent
+                    spam
+                  </p>
+                } @else {
+                  <div
+                    class="text-center py-6 border border-dashed border-border-primary rounded-lg"
+                  >
+                    <p class="text-sm text-font-muted">
+                      No emergency contacts added yet.
+                    </p>
+                    <p class="text-xs text-font-muted mt-1">
+                      Add at least one contact to enable emergency alerts
+                    </p>
+                  </div>
+                }
               </div>
             </div>
           </div>

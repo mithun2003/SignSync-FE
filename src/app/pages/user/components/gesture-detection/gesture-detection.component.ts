@@ -26,6 +26,7 @@ import { HandDetectService } from '@pages/user/service/hand-detect-service/hand-
 import { FaceDetectService } from '@pages/user/service/face-detect-service/face-detect.service';
 import { EMOTION_WORD_MAP } from '@pages/user/service/face-detect-service/emotion-word-map';
 import { UserService } from '@pages/user/service/user-service/user.service';
+import { AlertService } from 'app/shared/alert/service/alert.service';
 
 @Component({
   selector: 'app-gesture-detection',
@@ -44,6 +45,7 @@ export class GestureDetectionComponent implements OnDestroy {
   public faceDetectService = inject(FaceDetectService);
   public userService = inject(UserService);
   public commonService = inject(CommonService);
+  private alertService = inject(AlertService);
 
   // Icons
   faSpinner = faSpinner;
@@ -103,7 +105,7 @@ export class GestureDetectionComponent implements OnDestroy {
   protected letterStability = signal(0);
   protected readonly STABILITY_THRESHOLD = 6; // 6 consecutive frames (~900ms) to confirm
   private readonly MIN_LETTER_INTERVAL = 1500; // ms between accepted letters
-  private readonly MIN_CONFIDENCE = 85; // Regular letters: ≥85% confidence (0–100 scale)
+  private readonly MIN_CONFIDENCE = 50; // Regular letters: ≥85% confidence (0–100 scale)
   private readonly AUTO_SPACE_TIMEOUT = 2500;
 
   // Custom / emergency signs trained on synthetic data — need a lower bar
@@ -121,6 +123,8 @@ export class GestureDetectionComponent implements OnDestroy {
   private spaceTimerHandle?: ReturnType<typeof setTimeout>;
 
   private tickIntervalId?: ReturnType<typeof setInterval>;
+  private emergencyMailSentInSession = false;
+  private emergencyContacts: string[] = [];
 
   constructor() {
     effect(() => {
@@ -130,6 +134,7 @@ export class GestureDetectionComponent implements OnDestroy {
         return;
       }
       this.feedbackText.set('Loading AI models...');
+      this.loadEmergencyContacts();
       this.loadModels();
     });
 
@@ -249,6 +254,19 @@ export class GestureDetectionComponent implements OnDestroy {
     if (this.isSpeechEnabled()) speakText(phrase, this.speechRate());
   }
 
+  private loadEmergencyContacts(): void {
+    this.userService.getEmergencyContacts().subscribe({
+      next: (res) => {
+        this.emergencyContacts = (res.data?.emails ?? [])
+          .map((email) => email.trim().toLowerCase())
+          .filter((email) => this.isValidEmail(email));
+      },
+      error: (err: unknown) => {
+        console.warn('Unable to load emergency contacts for help mail', err);
+      },
+    });
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   //  LETTER DETECTION LOGIC
   // ─────────────────────────────────────────────────────────────────
@@ -330,6 +348,9 @@ export class GestureDetectionComponent implements OnDestroy {
       this.letterHistory.update((hist) => [...hist, word].slice(-10));
       if (this.isSpeechEnabled()) speakText(word, this.speechRate());
       this.feedbackText.set(`Added: ${word}`);
+      if (normalized === 'help') {
+        this.triggerHelpMailFlow();
+      }
       return;
     }
 
@@ -384,6 +405,7 @@ export class GestureDetectionComponent implements OnDestroy {
       this.canvasCtx = this.overlayCanvas.nativeElement.getContext('2d');
 
       this.isRecording.set(true);
+      this.emergencyMailSentInSession = false;
       this.feedbackText.set('Initializing...');
 
       setTimeout(() => {
@@ -430,6 +452,70 @@ export class GestureDetectionComponent implements OnDestroy {
     this.currentMood.set('Neutral 😐');
     this.feedbackText.set('Stopped');
     this.lastLandmarks = null;
+    this.emergencyMailSentInSession = false;
+  }
+
+  private triggerHelpMailFlow(): void {
+    if (this.emergencyMailSentInSession) {
+      this.feedbackText.set(
+        'Help mail already sent in this camera session. Stop and start to send again.',
+      );
+      return;
+    }
+
+    if (this.emergencyContacts.length === 0) {
+      this.feedbackText.set(
+        'HELP detected, but no emergency contact email is configured.',
+      );
+      return;
+    }
+
+    const recipients = this.emergencyContacts.join(', ');
+    this.alertService
+      .alertMessage('confirm', {
+        title: 'Send Emergency Email?',
+        content: `HELP sign detected. Do you want to send emergency email to: ${recipients}?`,
+        doneMsg: 'Send',
+        cancelMsg: 'Cancel',
+        iconBgColor: 'red',
+      })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) {
+          this.feedbackText.set('Emergency email canceled.');
+          return;
+        }
+
+        this.userService
+          .sendHelpMail({
+            recipients: this.emergencyContacts,
+            trigger: 'help_sign',
+          })
+          .subscribe({
+            next: () => {
+              this.emergencyMailSentInSession = true;
+              this.feedbackText.set('Emergency email sent.');
+              this.alertService.alertMessage('success', {
+                content: 'Emergency help email sent successfully.',
+                close: true,
+                timeout: 2500,
+              });
+            },
+            error: (err: unknown) => {
+              console.error('Failed to send emergency help mail', err);
+              this.feedbackText.set('Failed to send emergency email.');
+              this.alertService.alertMessage('fail', {
+                content: 'Could not send emergency help email. Please retry.',
+                close: true,
+                timeout: 3000,
+              });
+            },
+          });
+      });
+  }
+
+  private isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
   // ─────────────────────────────────────────────────────────────────

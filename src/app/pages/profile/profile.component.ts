@@ -40,6 +40,7 @@ export class ProfileComponent implements OnInit {
   username = signal<string>('');
   email = signal<string>('');
   memberSince = signal<string>('');
+  passwordLastChangedLabel = signal<string>('Password update date unavailable');
   totalSigns = signal<number>(0);
   streak = signal<number>(0);
   twoFactorEnabled = signal<boolean>(false);
@@ -108,6 +109,12 @@ export class ProfileComponent implements OnInit {
       );
     }
 
+    const passwordChangedAt =
+      user.password_changed_at ?? user.last_password_changed_at;
+    this.passwordLastChangedLabel.set(
+      this.formatPasswordLastChanged(passwordChangedAt),
+    );
+
     this.profileForm.patchValue({
       username: user.username ?? '',
       email: user.email ?? '',
@@ -117,6 +124,53 @@ export class ProfileComponent implements OnInit {
       country: user.country ?? '',
       language: user.language ?? 'en',
     });
+  }
+
+  private formatPasswordLastChanged(timestamp?: string | null): string {
+    if (!timestamp) {
+      return 'Password update date unavailable';
+    }
+
+    const changedAt = new Date(timestamp);
+    if (Number.isNaN(changedAt.getTime())) {
+      return 'Password update date unavailable';
+    }
+
+    const now = new Date();
+    const diffMs = now.getTime() - changedAt.getTime();
+
+    if (diffMs < 0) {
+      return 'Password change date invalid';
+    }
+
+    const minuteMs = 60 * 1000;
+    const hourMs = 60 * minuteMs;
+    const dayMs = 24 * hourMs;
+    const monthMs = 30 * dayMs;
+    const yearMs = 365 * dayMs;
+
+    if (diffMs < minuteMs) {
+      return 'Last changed just now';
+    }
+    if (diffMs < hourMs) {
+      const minutes = Math.floor(diffMs / minuteMs);
+      return `Last changed ${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+    }
+    if (diffMs < dayMs) {
+      const hours = Math.floor(diffMs / hourMs);
+      return `Last changed ${hours} hour${hours === 1 ? '' : 's'} ago`;
+    }
+    if (diffMs < monthMs) {
+      const days = Math.floor(diffMs / dayMs);
+      return `Last changed ${days} day${days === 1 ? '' : 's'} ago`;
+    }
+    if (diffMs < yearMs) {
+      const months = Math.floor(diffMs / monthMs);
+      return `Last changed ${months} month${months === 1 ? '' : 's'} ago`;
+    }
+
+    const years = Math.floor(diffMs / yearMs);
+    return `Last changed ${years} year${years === 1 ? '' : 's'} ago`;
   }
 
   // ✅ FIXED: 'any' → proper Event + HTMLInputElement typing
