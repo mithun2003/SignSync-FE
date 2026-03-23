@@ -45,12 +45,12 @@ export class HelpComponent {
     {
       question: 'How do I add a space between words?',
       answer:
-        'Sign the SPACE gesture to insert a word boundary. If "Auto-add spaces" is enabled in settings, a space is automatically added after a short pause in signing. You can also tap the Space button in the Quick Actions panel.',
+        'Sign the SPACE gesture to insert a word boundary. If "Auto-add spaces" is enabled in settings, a space is automatically added after a short pause in signing. You can also use keyboard edit mode and press Space.',
     },
     {
       question: 'How do I delete the last letter?',
       answer:
-        'Sign the DEL gesture to remove the last character from your sentence. You can also tap the ⌫ Backspace button in the Quick Actions panel, or click any individual letter in the sentence area to remove it.',
+        'Sign the DEL gesture to remove the last character from your sentence. You can also use keyboard edit mode and press Backspace, or click any individual letter in the sentence area to remove it.',
     },
     {
       question: 'Why is my gesture not being detected?',
@@ -65,7 +65,7 @@ export class HelpComponent {
     {
       question: 'Can I copy or share my sentence?',
       answer:
-        'Yes! Once your sentence is built, use the Copy button in the Quick Actions panel to copy it to your clipboard. You can also tap the Speak button to have the full sentence read aloud.',
+        'Yes! Once your sentence is built, use the Copy button in the message toolbar to copy it to your clipboard. You can also tap the Speak button to have the full sentence read aloud.',
     },
     {
       question: 'What does the AI word suggestion bar do?',

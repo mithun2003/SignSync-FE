@@ -16,7 +16,9 @@
     <!-- Left: Webcam + Controls -->
     <div class="w-full lg:w-2/5 flex flex-col gap-4">
       <!-- Webcam Preview -->
-      <div class="bg-bg-card rounded-2xl p-4 border border-border-primary">
+      <div
+        class="bg-bg-card rounded-2xl p-4 border border-border-primary flex flex-col h-full"
+      >
         <h2
           class="body-1-semibold mb-3 text-font-secondary flex items-center gap-2"
         >
@@ -88,7 +90,120 @@
         </div>
 
         <!-- Settings -->
-        <div class="mt-4 flex flex-col gap-3">
+        <div class="mt-4 flex flex-col gap-4">
+          <!-- Current Detection -->
+          <div
+            class="bg-bg-secondary rounded-xl p-4 border border-border-primary"
+          >
+            <h3 class="body-3-semibold text-font-secondary mb-3">
+              Current Detection
+            </h3>
+
+            <div class="flex items-center gap-3">
+              <div
+                class="relative inline-flex items-center justify-center shrink-0"
+              >
+                <svg
+                  class="absolute w-20 h-20 -rotate-90"
+                  viewBox="0 0 120 120"
+                >
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="28"
+                    fill="none"
+                    stroke="#4b5563"
+                    stroke-width="8"
+                  />
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="28"
+                    fill="none"
+                    stroke="#7c3aed"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                    stroke-dasharray="175.9"
+                    [style.stroke-dashoffset]="
+                      175.9 * (1 - letterStability() / STABILITY_THRESHOLD)
+                    "
+                    [style.transition]="'stroke-dashoffset 0.1s ease'"
+                    [class.stroke-green-400]="
+                      letterStability() >= STABILITY_THRESHOLD
+                    "
+                  />
+                </svg>
+
+                <div
+                  class="font-bold text-primary z-10 w-14 h-14 flex items-center justify-center transition-all duration-200 text-center leading-tight break-words px-1"
+                  [class.text-4xl]="currentLetter().length <= 1"
+                  [class.text-xs]="isEmergencyLetter()"
+                  [class.text-sm]="
+                    currentLetter().length > 1 && !isEmergencyLetter()
+                  "
+                  [class.scale-110]="letterStability() >= STABILITY_THRESHOLD"
+                  [class.text-green-400]="
+                    letterStability() >= STABILITY_THRESHOLD
+                  "
+                >
+                  {{ currentLetter() || "–" }}
+                </div>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="body-4 text-font-muted">Confidence:</span>
+                  <span
+                    class="body-3 font-bold"
+                    [class.text-green-400]="currentConfidence() >= 80"
+                    [class.text-yellow-400]="
+                      currentConfidence() >= 50 && currentConfidence() < 80
+                    "
+                    [class.text-red-400]="
+                      currentConfidence() > 0 && currentConfidence() < 50
+                    "
+                    [class.text-white]="currentConfidence() === 0"
+                  >
+                    {{ currentConfidence() | number: "1.0-0" }}%
+                  </span>
+                </div>
+
+                <div
+                  class="w-full h-2 bg-bg-hover rounded-full overflow-hidden mb-2"
+                >
+                  <div
+                    class="h-full transition-all duration-300 rounded-full"
+                    [class.bg-green-500]="currentConfidence() >= 80"
+                    [class.bg-yellow-500]="
+                      currentConfidence() >= 50 && currentConfidence() < 80
+                    "
+                    [class.bg-red-500]="
+                      currentConfidence() > 0 && currentConfidence() < 50
+                    "
+                    [class.bg-bg-hover]="currentConfidence() === 0"
+                    [style.width.%]="currentConfidence()"
+                  ></div>
+                </div>
+
+                @if (isRecording() && currentLetter()) {
+                  <div class="flex gap-1">
+                    @for (i of [1, 2, 3]; track i) {
+                      <div
+                        class="w-1.5 h-1.5 rounded-full transition-all duration-150"
+                        [class.bg-violet-500]="letterStability() >= i"
+                        [class.bg-bg-hover]="letterStability() < i"
+                      ></div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <p class="body-4 text-font-muted italic mt-2 truncate">
+              {{ feedbackText() }}
+            </p>
+          </div>
+
           <label
             class="flex items-center gap-2 body-3 text-font-secondary cursor-pointer"
           >
@@ -146,111 +261,6 @@
               </div>
             </div>
           }
-        </div>
-      </div>
-
-      <!-- Current Detection -->
-      <div class="bg-bg-card rounded-2xl p-6 border border-border-primary">
-        <h3 class="body-3-semibold text-font-secondary mb-3">
-          Current Detection
-        </h3>
-
-        <div class="text-center">
-          <!-- Letter with stability ring -->
-          <div class="relative inline-flex items-center justify-center mb-3">
-            <!-- SVG progress ring -->
-            <svg class="absolute w-36 h-36 -rotate-90" viewBox="0 0 120 120">
-              <circle
-                cx="60"
-                cy="60"
-                r="54"
-                fill="none"
-                stroke="#374151"
-                stroke-width="6"
-              />
-              <circle
-                cx="60"
-                cy="60"
-                r="54"
-                fill="none"
-                stroke="#7c3aed"
-                stroke-width="6"
-                stroke-linecap="round"
-                stroke-dasharray="339.3"
-                [style.stroke-dashoffset]="
-                  339.3 * (1 - letterStability() / STABILITY_THRESHOLD)
-                "
-                [style.transition]="'stroke-dashoffset 0.1s ease'"
-                [class.stroke-green-400]="
-                  letterStability() >= STABILITY_THRESHOLD
-                "
-              />
-            </svg>
-            <div
-              class="font-bold text-primary z-10 w-28 h-28 flex items-center justify-center transition-all duration-200 text-center leading-tight break-words px-1"
-              [class.text-8xl]="currentLetter().length <= 1"
-              [class.text-xs]="isEmergencyLetter()"
-              [class.text-xl]="
-                currentLetter().length > 1 && !isEmergencyLetter()
-              "
-              [class.scale-110]="letterStability() >= STABILITY_THRESHOLD"
-              [class.text-green-400]="letterStability() >= STABILITY_THRESHOLD"
-            >
-              {{ currentLetter() || "–" }}
-            </div>
-          </div>
-
-          <div class="flex items-center justify-center gap-2 mb-3">
-            <span class="body-3 text-font-muted">Confidence:</span>
-            <span
-              class="text-lg font-bold"
-              [class.text-green-400]="currentConfidence() >= 80"
-              [class.text-yellow-400]="
-                currentConfidence() >= 50 && currentConfidence() < 80
-              "
-              [class.text-red-400]="
-                currentConfidence() > 0 && currentConfidence() < 50
-              "
-              [class.text-white]="currentConfidence() === 0"
-            >
-              {{ currentConfidence() | number: "1.0-0" }}%
-            </span>
-          </div>
-
-          <!-- Confidence Bar -->
-          <div
-            class="w-full h-3 bg-bg-secondary rounded-full overflow-hidden mb-3"
-          >
-            <div
-              class="h-full transition-all duration-300 rounded-full"
-              [class.bg-green-500]="currentConfidence() >= 80"
-              [class.bg-yellow-500]="
-                currentConfidence() >= 50 && currentConfidence() < 80
-              "
-              [class.bg-red-500]="
-                currentConfidence() > 0 && currentConfidence() < 50
-              "
-              [class.bg-bg-hover]="currentConfidence() === 0"
-              [style.width.%]="currentConfidence()"
-            ></div>
-          </div>
-
-          <!-- Stability dots -->
-          @if (isRecording() && currentLetter()) {
-            <div class="flex justify-center gap-1.5 mb-2">
-              @for (i of [1, 2, 3]; track i) {
-                <div
-                  class="w-2.5 h-2.5 rounded-full transition-all duration-150"
-                  [class.bg-violet-500]="letterStability() >= i"
-                  [class.bg-bg-hover]="letterStability() < i"
-                ></div>
-              }
-            </div>
-          }
-
-          <p class="body-4 text-font-muted italic">
-            {{ feedbackText() }}
-          </p>
         </div>
       </div>
     </div>
@@ -483,47 +493,6 @@
               </div>
             }
           }
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div
-        class="bg-bg-card rounded-2xl p-6 border border-border-primary animate-fade-in"
-      >
-        <h3 class="body-3-semibold text-font-secondary mb-3">Quick Actions</h3>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <button
-            (click)="addSpace()"
-            [disabled]="!isRecording()"
-            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Add Space
-          </button>
-
-          <button
-            (click)="backspace()"
-            [disabled]="sentenceBuffer().length === 0"
-            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            ⌫ Backspace
-          </button>
-
-          <button
-            (click)="addPunctuation('.')"
-            [disabled]="!isRecording()"
-            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Add Period
-          </button>
-
-          <button
-            (click)="addPunctuation('?')"
-            [disabled]="!isRecording()"
-            class="px-4 py-3 bg-bg-secondary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg body-3 font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Add ?
-          </button>
         </div>
       </div>
     </div>
