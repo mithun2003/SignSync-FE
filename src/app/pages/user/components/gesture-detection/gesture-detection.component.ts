@@ -105,8 +105,9 @@ export class GestureDetectionComponent implements OnDestroy {
   protected letterStability = signal(0);
   protected readonly STABILITY_THRESHOLD = 6; // 6 consecutive frames (~900ms) to confirm
   private readonly MIN_LETTER_INTERVAL = 1500; // ms between accepted letters
-  private readonly MIN_CONFIDENCE = 50; // Regular letters: ≥85% confidence (0–100 scale)
+  private readonly MIN_CONFIDENCE = 50; // Regular letters: minimum confidence (0–100)
   private readonly AUTO_SPACE_TIMEOUT = 2500;
+  protected readonly DETECTION_RING_CIRCUMFERENCE = 175.9;
 
   // Custom / emergency signs trained on synthetic data — need a lower bar
   private readonly EMERGENCY_LABELS = new Set([
@@ -328,6 +329,28 @@ export class GestureDetectionComponent implements OnDestroy {
 
   readonly isEmergencyLetter = computed(
     () => this.currentLetter().toLowerCase() in this.EMERGENCY_DISPLAY,
+  );
+
+  protected readonly activeStabilityThreshold = computed(() =>
+    this.EMERGENCY_LABELS.has(this.currentLetter().toLowerCase())
+      ? this.EMERGENCY_STABILITY
+      : this.STABILITY_THRESHOLD,
+  );
+
+  protected readonly displayedStabilityFrames = computed(() =>
+    Math.min(this.letterStability(), this.activeStabilityThreshold()),
+  );
+
+  protected readonly stabilityProgress = computed(() => {
+    const threshold = this.activeStabilityThreshold();
+    if (threshold <= 0) return 0;
+    return (this.displayedStabilityFrames() / threshold) * 100;
+  });
+
+  protected readonly isDetectionStable = computed(
+    () =>
+      this.currentLetter().length > 0 &&
+      this.letterStability() >= this.activeStabilityThreshold(),
   );
 
   private addLetterToSentence(letter: string): void {

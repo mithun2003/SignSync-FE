@@ -123,14 +123,14 @@
                     stroke="#7c3aed"
                     stroke-width="8"
                     stroke-linecap="round"
-                    stroke-dasharray="175.9"
+                    [attr.stroke-dasharray]="DETECTION_RING_CIRCUMFERENCE"
                     [style.stroke-dashoffset]="
-                      175.9 * (1 - letterStability() / STABILITY_THRESHOLD)
+                      DETECTION_RING_CIRCUMFERENCE *
+                      (1 - stabilityProgress() / 100)
                     "
                     [style.transition]="'stroke-dashoffset 0.1s ease'"
-                    [class.stroke-green-400]="
-                      letterStability() >= STABILITY_THRESHOLD
-                    "
+                    [class.stroke-green-400]="isDetectionStable()"
+                    [class.stroke-violet-500]="!isDetectionStable()"
                   />
                 </svg>
 
@@ -141,10 +141,8 @@
                   [class.text-sm]="
                     currentLetter().length > 1 && !isEmergencyLetter()
                   "
-                  [class.scale-110]="letterStability() >= STABILITY_THRESHOLD"
-                  [class.text-green-400]="
-                    letterStability() >= STABILITY_THRESHOLD
-                  "
+                  [class.scale-110]="isDetectionStable()"
+                  [class.text-green-400]="isDetectionStable()"
                 >
                   {{ currentLetter() || "–" }}
                 </div>
@@ -155,16 +153,26 @@
                   <span class="body-4 text-font-muted">Confidence:</span>
                   <span
                     class="body-3 font-bold"
-                    [class.text-green-400]="currentConfidence() >= 80"
-                    [class.text-yellow-400]="
-                      currentConfidence() >= 50 && currentConfidence() < 80
-                    "
-                    [class.text-red-400]="
-                      currentConfidence() > 0 && currentConfidence() < 50
-                    "
-                    [class.text-white]="currentConfidence() === 0"
+                    [class.text-font-secondary]="currentConfidence() > 0"
+                    [class.text-font-muted]="currentConfidence() === 0"
                   >
                     {{ currentConfidence() | number: "1.0-0" }}%
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="body-4 text-font-muted"
+                    >Detection Progress:</span
+                  >
+                  <span
+                    class="body-3 font-bold"
+                    [class.text-green-400]="isDetectionStable()"
+                    [class.text-primary]="
+                      !isDetectionStable() && currentLetter().length > 0
+                    "
+                    [class.text-font-muted]="currentLetter().length === 0"
+                  >
+                    {{ stabilityProgress() | number: "1.0-0" }}%
                   </span>
                 </div>
 
@@ -173,15 +181,12 @@
                 >
                   <div
                     class="h-full transition-all duration-300 rounded-full"
-                    [class.bg-green-500]="currentConfidence() >= 80"
-                    [class.bg-yellow-500]="
-                      currentConfidence() >= 50 && currentConfidence() < 80
+                    [class.bg-green-500]="isDetectionStable()"
+                    [class.bg-violet-500]="
+                      !isDetectionStable() && currentLetter().length > 0
                     "
-                    [class.bg-red-500]="
-                      currentConfidence() > 0 && currentConfidence() < 50
-                    "
-                    [class.bg-bg-hover]="currentConfidence() === 0"
-                    [style.width.%]="currentConfidence()"
+                    [class.bg-bg-hover]="currentLetter().length === 0"
+                    [style.width.%]="stabilityProgress()"
                   ></div>
                 </div>
 
