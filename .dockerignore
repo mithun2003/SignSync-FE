@@ -1,0 +1,26 @@
+# Dependencies and caches
+node_modules
+.angular
+dist
+build
+coverage
+tmp
+temp
+.cache
+
+# VCS and editor artifacts
+.git
+.github
+.vscode
+.cursor
+.husky
+
+# Environment and local config
+.env
+.env.*
+
+# Docs and non-runtime files
+README.md
+PROJECT_REPORT_FRONTEND.md
+PAGES.md
+LICENSE
